@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["https://*.myshopify.com"],
+    "method": ["PUT", "OPTIONS"],
+    "responseHeader": ["Content-Type"],
+    "maxAgeSeconds": 3600
+  }
+]

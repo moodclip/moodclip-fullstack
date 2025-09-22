@@ -1,0 +1,35 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id       = "bc4a14e184b8697b63929e67246d1871"
+name            = "moodclip-v3"
+handle          = "moodclip-v3"
+application_url = "https://mf-backend-270455452709.us-central1.run.app"
+embedded        = true
+
+[build]
+automatically_update_urls_on_dev = true
+
+[webhooks]
+api_version = "2025-07"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/scopes_update", "app/uninstalled" ]
+  uri    = "/webhooks"
+
+[access_scopes]
+scopes = "read_products,write_products,write_script_tags"
+
+[auth]
+redirect_urls = [
+  "https://mf-backend-270455452709.us-central1.run.app/auth/callback",
+  "https://mf-backend-270455452709.us-central1.run.app/auth/shopify/callback",
+  "https://mf-backend-270455452709.us-central1.run.app/api/auth/callback"
+]
+
+[app_proxy]
+url     = "https://mf-backend-270455452709.us-central1.run.app"
+subpath = "moodclip-uploader-v4"
+prefix  = "apps"
+
+[pos]
+embedded = false

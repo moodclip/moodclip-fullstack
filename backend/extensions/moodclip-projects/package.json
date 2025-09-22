@@ -1,0 +1,17 @@
+{
+  "name": "moodclip-projects",
+  "private": true,
+  "type": "module",
+  "version": "0.1.2",
+  "sideEffects": true,
+  "scripts": {
+    "build": "echo \"Build is handled by the Shopify CLI\""
+  },
+  "dependencies": {
+    "@shopify/ui-extensions": "2025.7.0",
+    "@shopify/ui-extensions-react": "2025.7.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-reconciler": "0.29.0"
+  }
+}

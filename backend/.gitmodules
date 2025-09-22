@@ -1,0 +1,4 @@
+[submodule "extensions/lovable-ui"]
+	path = extensions/lovable-ui
+	url = https://github.com/moodclip/moodclip-frontend.git
+	branch = main

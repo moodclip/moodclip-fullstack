@@ -1,0 +1,104 @@
+apiVersion: serving.knative.dev/v1
+kind: Revision
+metadata:
+  annotations:
+    autoscaling.knative.dev/maxScale: '2'
+    run.googleapis.com/build-source-location: '{"mf-backend-1":"gs://run-sources-moodflow-464810-us-central1/services/mf-backend/1753261582.984376-02d2d4959de64185bd1e4c8889dc23d0.zip#1753261585132784"}'
+    run.googleapis.com/client-name: gcloud
+    run.googleapis.com/client-version: 525.0.0
+    run.googleapis.com/cloudsql-instances: moodflow-464810:us-central1:moodflow-postgres
+    run.googleapis.com/operation-id: f79083d3-f566-4829-8487-2802389d1ae0
+    run.googleapis.com/startup-cpu-boost: 'true'
+    serving.knative.dev/creator: alex@moodcreativestudios.com
+  creationTimestamp: '2025-07-23T09:10:07.426390Z'
+  generation: 1
+  labels:
+    client.knative.dev/nonce: vsvzykryxf
+    cloud.googleapis.com/location: us-central1
+    run.googleapis.com/startupProbeType: Default
+    serving.knative.dev/configuration: mf-backend
+    serving.knative.dev/configurationGeneration: '39'
+    serving.knative.dev/route: mf-backend
+    serving.knative.dev/service: mf-backend
+    serving.knative.dev/serviceUid: 59a4e3c5-f290-411c-920a-caf9bfe2ff24
+  name: mf-backend-00039-vpd
+  namespace: '270455452709'
+  ownerReferences:
+  - apiVersion: serving.knative.dev/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Configuration
+    name: mf-backend
+    uid: 33587bf7-ebb8-41fa-af22-7e5f1731cfb7
+  resourceVersion: AAY6vM82F/U
+  selfLink: /apis/serving.knative.dev/v1/namespaces/270455452709/revisions/mf-backend-00039-vpd
+  uid: d701a6ac-1d77-4c96-89e3-fa9ae2212762
+spec:
+  containerConcurrency: 80
+  containers:
+  - env:
+    - name: GCS_BUCKET
+      value: mf-uploads-prod
+    - name: SCOPES
+      value: read_products,write_products,write_script_tags
+    - name: SHOPIFY_APP_URL
+      value: https://mf-backend-270455452709.us-central1.run.app
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          key: latest
+          name: DATABASE_URL
+    - name: SHOPIFY_API_KEY
+      valueFrom:
+        secretKeyRef:
+          key: latest
+          name: SHOPIFY_API_KEY
+    - name: SHOPIFY_API_SECRET
+      valueFrom:
+        secretKeyRef:
+          key: latest
+          name: SHOPIFY_API_SECRET
+    image: us-central1-docker.pkg.dev/moodflow-464810/cloud-run-source-deploy/mf-backend@sha256:b359690839dd683c6e72a44fd5107eb20496c9f26d62085ea1fcd4175e763dca
+    name: mf-backend-1
+    ports:
+    - containerPort: 8080
+      name: http1
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 512Mi
+    startupProbe:
+      failureThreshold: 1
+      periodSeconds: 240
+      tcpSocket:
+        port: 8080
+      timeoutSeconds: 240
+  serviceAccountName: mf-backend-sa@moodflow-464810.iam.gserviceaccount.com
+  timeoutSeconds: 300
+status:
+  conditions:
+  - lastTransitionTime: '2025-07-25T08:34:23.662180Z'
+    message: Deploying revision succeeded in 2.05s.
+    status: 'True'
+    type: Ready
+  - lastTransitionTime: '2025-07-25T08:34:23.754388Z'
+    severity: Info
+    status: 'True'
+    type: Active
+  - lastTransitionTime: '2025-07-23T09:11:41.464826Z'
+    message: Containers became healthy in 11.45s.
+    status: 'True'
+    type: ContainerHealthy
+  - lastTransitionTime: '2025-07-25T08:34:22.208232Z'
+    message: Container image import completed.
+    status: 'True'
+    type: ContainerReady
+  - lastTransitionTime: '2025-07-25T08:34:23.598908Z'
+    message: Provisioning imported containers completed in 1.99s. Checking container
+      health. This will wait for up to 4m for the configured startup probe, including
+      an initial delay of 0s.
+    status: 'True'
+    type: ResourcesAvailable
+  imageDigest: us-central1-docker.pkg.dev/moodflow-464810/cloud-run-source-deploy/mf-backend@sha256:b359690839dd683c6e72a44fd5107eb20496c9f26d62085ea1fcd4175e763dca
+  logUrl: https://console.cloud.google.com/logs/viewer?project=moodflow-464810&resource=cloud_run_revision/service_name/mf-backend/revision_name/mf-backend-00039-vpd&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22mf-backend%22%0Aresource.labels.revision_name%3D%22mf-backend-00039-vpd%22
+  observedGeneration: 1

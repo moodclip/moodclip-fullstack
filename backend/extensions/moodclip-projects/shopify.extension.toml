@@ -1,0 +1,16 @@
+api_version = "2025-07"
+uid         = "8f7c9c5c-3839-ecdf-616c-8dc0ffaed8f73a779281"
+type        = "ui_extension"
+name        = "MoodClip Projects"
+handle      = "moodclip-projects"
+
+surface     = "customer_accounts"
+runtime     = "react"
+
+[capabilities]
+network_access = true
+api_access     = true
+
+[[extension_points]]
+target = "customer-account.page.render"
+module = "./src/ProjectsPage.tsx"

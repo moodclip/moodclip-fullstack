@@ -1,0 +1,327 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here.
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Dark cinematic base colors */
+    --background: 220 27% 8%;
+    --foreground: 220 14% 95%;
+
+    --card: 220 25% 10%;
+    --card-foreground: 220 14% 95%;
+
+    --popover: 220 25% 10%;
+    --popover-foreground: 220 14% 95%;
+
+    /* Premium neon accent gradient (hot-pink to violet) */
+    --primary: 320 100% 65%;
+    --primary-foreground: 220 14% 95%;
+    --primary-glow: 320 100% 75%;
+    
+    --secondary: 220 20% 15%;
+    --secondary-foreground: 220 14% 85%;
+
+    --muted: 220 20% 12%;
+    --muted-foreground: 220 10% 60%;
+
+    --accent: 280 100% 70%;
+    --accent-foreground: 220 14% 95%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 220 14% 95%;
+
+    --border: 220 20% 18%;
+    --input: 220 20% 15%;
+    --ring: 320 100% 65%;
+
+    --radius: 1.75rem;
+
+    /* Pipeline specific colors */
+    --stage-completed: 140 60% 55%;
+    --stage-active: 320 100% 65%;
+    --stage-upcoming: 220 10% 40%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(320 100% 65%), hsl(280 100% 70%));
+    --gradient-card: linear-gradient(145deg, hsl(220 25% 11%), hsl(220 20% 9%));
+    --gradient-glow: radial-gradient(circle, hsl(320 100% 65% / 0.15), transparent 70%);
+    
+    /* CTA Button gradients */
+    --accent-gradient: linear-gradient(135deg, hsl(320 100% 65%), hsl(280 100% 70%));
+    --muted-gradient: linear-gradient(135deg, hsl(220 20% 15%), hsl(220 15% 12%));
+    
+    /* Shadows and glows */
+    --shadow-card: 0 25px 50px -12px hsl(220 27% 4% / 0.6);
+    --shadow-primary: 0 0 30px hsl(320 100% 65% / 0.3);
+    --glow-active: 0 0 20px hsl(320 100% 65% / 0.4);
+    
+    /* Typography */
+    --font-heading: "Inter", "Plus Jakarta Sans", system-ui, sans-serif;
+    --font-body: "Inter", system-ui, sans-serif;
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  /* ✅ Apply the cinematic background to the whole page */
+  html, body {
+    min-height: 100%;
+  }
+
+  body {
+    @apply text-foreground antialiased; /* removed bg-background so our gradient shows */
+    font-family: var(--font-body);
+    position: relative;
+    background:
+      /* purple spotlight centered slightly above middle (topmost) */
+      radial-gradient(ellipse at 50% 46%,
+        hsla(320, 100%, 65%, 0.12) 0%,
+        hsla(320, 100%, 65%, 0.06) 28%,
+        hsla(320, 100%, 65%, 0.00) 58%
+      ),
+      /* neutral vignette for depth */
+      radial-gradient(circle at center,
+        hsl(220, 25%, 10%) 0%,
+        hsl(220, 27%, 8%) 25%,
+        hsl(220, 30%, 6%) 50%,
+        hsl(220, 35%, 4%) 75%,
+        hsl(220, 40%, 2%) 100%
+      ),
+      /* deep night wash */
+      linear-gradient(-45deg,
+        hsl(220, 40%, 2%) 0%,
+        hsl(240, 35%, 4%) 20%,
+        hsl(260, 30%, 6%) 40%,
+        hsl(280, 25%, 5%) 60%,
+        hsl(300, 30%, 4%) 80%,
+        hsl(220, 40%, 2%) 100%
+      );
+    background-size: 100% 100%, 100% 100%, 400% 400%;
+    background-repeat: no-repeat;
+  }
+
+  /* subtle film grain over the whole viewport */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.025'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ensure app content renders above the film grain */
+  #root {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+@layer utilities {
+  /* Pipeline specific utilities */
+  .pipeline-card {
+    background: var(--gradient-card);
+    box-shadow: var(--shadow-card);
+    border: 1px solid hsl(var(--border));
+    backdrop-filter: blur(20px);
+  }
+  
+  /* Glass card effect - 3D transparent */
+  .glass-card {
+    background: linear-gradient(145deg, 
+      hsla(220, 25%, 11%, 0.4), 
+      hsla(220, 20%, 9%, 0.6)
+    );
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid hsla(220, 20%, 18%, 0.5);
+    box-shadow: 
+      0 25px 50px -12px hsla(220, 27%, 4%, 0.6),
+      0 0 0 1px hsla(220, 20%, 18%, 0.2),
+      inset 0 1px 0 hsla(220, 14%, 95%, 0.05);
+    position: relative;
+  }
+  
+  .glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+      transparent, 
+      hsla(220, 14%, 95%, 0.1), 
+      transparent
+    );
+    border-radius: 1.5rem 1.5rem 0 0;
+  }
+
+  /* Pipeline focus card - clean dark glass */
+  .pipeline-focus-card {
+    @apply relative backdrop-blur-lg rounded-3xl p-10 flex flex-col items-center justify-center;
+    background: hsla(220, 25%, 10%, 0.8);
+    border: 1px solid hsla(320, 100%, 65%, 0.3);
+    position: relative;
+  }
+
+  .pipeline-focus-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+  
+  .pipeline-glow {
+    box-shadow: var(--glow-active);
+  }
+  
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-glow {
+    background: var(--gradient-glow);
+  }
+  
+  /* Stage dot states */
+  .stage-dot-completed {
+    background: hsl(var(--stage-completed));
+    border-color: hsl(var(--stage-completed));
+    box-shadow: 0 0 10px hsl(var(--stage-completed) / 0.3);
+  }
+  
+  .stage-dot-active {
+    background: hsl(var(--stage-active));
+    border-color: hsl(var(--stage-active));
+    box-shadow: var(--glow-active);
+  }
+  
+  .stage-dot-upcoming {
+    background: transparent;
+    border-color: hsl(var(--muted-foreground));
+  }
+
+  /* Optional utility if you need to apply the same background on a wrapper instead of <body> */
+  .animated-gradient-bg {
+    background:
+      radial-gradient(ellipse at 50% 46%,
+        hsla(320, 100%, 65%, 0.12) 0%,
+        hsla(320, 100%, 65%, 0.06) 28%,
+        hsla(320, 100%, 65%, 0.00) 58%
+      ),
+      radial-gradient(circle at center,
+        hsl(220, 25%, 10%) 0%,
+        hsl(220, 27%, 8%) 25%,
+        hsl(220, 30%, 6%) 50%,
+        hsl(220, 35%, 4%) 75%,
+        hsl(220, 40%, 2%) 100%
+      ),
+      linear-gradient(-45deg,
+        hsl(220, 40%, 2%) 0%,
+        hsl(240, 35%, 4%) 20%,
+        hsl(260, 30%, 6%) 40%,
+        hsl(280, 25%, 5%) 60%,
+        hsl(300, 30%, 4%) 80%,
+        hsl(220, 40%, 2%) 100%
+      );
+    background-size: 100% 100%, 100% 100%, 400% 400%;
+    background-repeat: no-repeat;
+    position: relative;
+  }
+
+  .animated-gradient-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.025'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  /* Animations */
+  .transition-smooth { transition: var(--transition-smooth); }
+  .transition-fast   { transition: var(--transition-fast); }
+
+  /* Keep this pulse for stage accents (unchanged) */
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px hsl(320 100% 65% / 0.4); }
+    50%      { box-shadow: 0 0 30px hsl(320 100% 65% / 0.6); }
+  }
+
+  /* Scale in animation for search expansion */
+  @keyframes scale-in {
+    0% {
+      transform: scale(0.95);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  /* Optional breathing animation if you want movement later */
+  @keyframes gradient-breathe {
+    0%, 100% { background-position: 0% 50%, 0% 50%, 0% 50%; }
+    25%      { background-position: 25% 25%, 0% 50%, 100% 0%; }
+    50%      { background-position: 100% 50%, 0% 50%, 200% 100%; }
+    75%      { background-position: 75% 75%, 0% 50%, 300% 50%; }
+  }
+
+  /* Typography */
+  .font-heading {
+    font-family: var(--font-heading);
+    letter-spacing: -0.025em;
+  }
+}

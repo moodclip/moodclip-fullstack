@@ -1,0 +1,15 @@
+name = "Moodclip Uploader v2"
+uid = "212b41f8-9130-c9f7-7e6b-bd3af357ab4000ae67ab"
+type = "theme"
+
+[capabilities]
+network_access = true
+
+[[blocks]]
+name = "Moodclip File Uploader"
+target = "section"
+stylesheet = "app-block.v4.css"
+javascript = "app-block.v4.js"
+
+[settings.theme_check]
+AssetSizeAppBlockCSS = { max_size = 500000 }

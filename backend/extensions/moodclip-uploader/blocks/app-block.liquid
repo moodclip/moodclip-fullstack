@@ -1,0 +1,23 @@
+<div class="mc-editor-host">
+  <div id="root"></div>
+</div>
+
+<script src="{{ 'app-block.umd.js' | asset_url }}" defer="defer"
+  data-title="{{ section.settings.title | escape }}">
+</script>
+
+{% schema %}
+  {
+    "name": "MoodClip Uploader",
+    "target": "section",
+    "stylesheet": "app-block.css",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Title",
+        "default": "Upload Your Video"
+      }
+    ]
+  }
+{% endschema %}

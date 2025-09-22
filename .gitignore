@@ -1,0 +1,22 @@
+# Node
+node_modules/
+**/node_modules/
+
+# Build artifacts
+backend/build/
+backend/extensions/moodclip-uploader/web-app/dist/
+backend/extensions/moodclip-uploader/.vite/
+backend/.cache/
+backend/.turbo/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env
+backend/.env*
+backend/env.yaml
+
+# macOS
+.DS_Store

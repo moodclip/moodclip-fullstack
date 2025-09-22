@@ -1,0 +1,77 @@
+steps:
+  # (Optional) Phase 4 guard-rail: fail build if console.log is present (warn/error allowed).
+  # Toggle with substitution _CONSOLE_GUARD=true
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: console-log-guard
+    entrypoint: bash
+    args:
+      - -lc
+      - |
+        if [[ "${_CONSOLE_GUARD}" == "true" ]]; then
+          echo "Console guard enabled: scanning for console.log (warn/error allowed)..."
+          FOUND=$$(find . \
+            -path ./node_modules -prune -o \
+            -path ./build -prune -o \
+            -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -print0 \
+            | xargs -0 grep -nE 'console\.log\s*\(' || true)
+          if [[ -n "$$FOUND" ]]; then
+            echo "$$FOUND"
+            echo "Forbidden console.log found. Use the structured log() helper or console.warn/error."
+            exit 1
+          fi
+          echo "No forbidden console.log found."
+        else
+          echo "Console guard disabled (set _CONSOLE_GUARD=true to enforce)."
+        fi
+
+  # Step 1: Build the container image using Docker
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE}:latest', '.']
+
+  # Step 2: Push the built image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE}:latest']
+
+  # Step 3: Deploy the new container image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_SERVICE}'
+      - '--image'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE}:latest'
+      - '--region'
+      - '${_REGION}'
+      - '--service-account'
+      - 'mf-backend-sa@${PROJECT_ID}.iam.gserviceaccount.com'
+      - '--allow-unauthenticated'
+      - '--min-instances'
+      - '0'
+      - '--max-instances'
+      - '2'
+      - '--cpu'
+      - '1'
+      - '--memory'
+      - '512Mi'
+      - '--concurrency'
+      - '80'
+      - '--set-secrets=DATABASE_URL=DATABASE_URL:latest,SHOPIFY_API_KEY=SHOPIFY_API_KEY:latest,SHOPIFY_API_SECRET=SHOPIFY_API_SECRET:latest,SCOPES=SCOPES:latest'
+      # FINAL FIX: Updated with the real service URL.
+      - '--set-env-vars=^;^GCS_BUCKET=mf-uploads-prod;SHOPIFY_APP_URL=https://mf-backend-270455452709.us-central1.run.app'
+      - '--add-cloudsql-instances'
+      - '${_SQL_CONNECTION_NAME}'
+
+images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE}:latest'
+
+substitutions:
+  _SERVICE: mf-backend
+  _REPOSITORY: backend
+  _REGION: us-central1
+  _SQL_CONNECTION_NAME: 'moodflow-464810:us-central1:moodflow-postgres'
+  _CONSOLE_GUARD: 'false'   # set to 'true' or pass --substitutions=_CONSOLE_GUARD=true to enforce
+
+# Send build logs directly to Cloud Logging
+options:
+  logging: CLOUD_LOGGING_ONLY

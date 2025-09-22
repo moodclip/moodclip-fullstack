@@ -1,0 +1,20 @@
+[
+  {
+    "origin": [
+      "https://moodclip.myshopify.com",
+      "https://moodclipteststore3.myshopify.com",
+      "https://2zxcc0-tx.myshopify.com",
+      "https://moodclip.com",
+      "https://admin.shopify.com"
+    ],
+    "method": [
+      "PUT",
+      "OPTIONS"
+    ],
+    "responseHeader": [
+      "Content-Type",
+      "x-goog-resumable"
+    ],
+    "maxAgeSeconds": 3600
+  }
+]

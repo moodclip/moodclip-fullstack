@@ -1,0 +1,11 @@
+# Ignore development dependencies
+node_modules
+
+# Ignore source code and build configurations
+src
+vite.config.js
+package.json
+package-lock.json
+
+# Ignore IDE and OS files
+.DS_Store

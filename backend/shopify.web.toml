@@ -1,0 +1,22 @@
+# This is the primary configuration for your Remix web app.
+name = "remix"
+
+# Your app serves both as a frontend and a backend.
+roles = ["frontend", "backend"]
+
+# Defines the endpoint for handling the app uninstalled webhook.
+webhooks_path = "/webhooks/app/uninstalled"
+
+# This tells the Shopify CLI that your Vite server will run on port 5173.
+# The CLI's reverse proxy will then forward requests to this port.
+port = 5173
+
+# Defines the commands the Shopify CLI will run.
+[commands]
+
+# This command runs before the dev server starts.
+predev = "npx prisma generate"
+
+# This is the main command to start your development server.
+# It ensures your database is migrated and then starts Vite on its default port (5173).
+dev = "npx prisma migrate deploy && npm exec remix vite:dev"

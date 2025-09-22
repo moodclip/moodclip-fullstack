@@ -1,0 +1,51 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: mf-backend
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/cloudsql-instances: moodflow-464810:us-central1:moodflow-postgres
+        run.googleapis.com/startup-cpu-boost: 'true'
+        autoscaling.knative.dev/maxScale: '2'
+    spec:
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      serviceAccountName: mf-backend-sa@moodflow-464810.iam.gserviceaccount.com
+      containers:
+      - image: gcr.io/moodflow-464810/mf-backend:integrated-fix-final
+        ports:
+        - containerPort: 8080
+        env:
+        - name: APP_URL
+          value: https://mf-backend-270455452709.us-central1.run.app
+        - name: GCS_BUCKET
+          value: mf-uploads-prod
+        - name: SCOPES
+          value: read_products,write_products,write_script_tags
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: DATABASE_URL
+        - name: SHOPIFY_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: SHOPIFY_API_KEY
+        - name: SHOPIFY_API_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: SHOPIFY_API_SECRET
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+        startupProbe:
+          failureThreshold: 1
+          periodSeconds: 240
+          timeoutSeconds: 240
+          tcpSocket:
+            port: 8080

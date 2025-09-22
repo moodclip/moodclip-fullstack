@@ -1,0 +1,103 @@
+apiVersion: serving.knative.dev/v1
+kind: Revision
+metadata:
+  annotations:
+    autoscaling.knative.dev/maxScale: '2'
+    run.googleapis.com/client-name: gcloud
+    run.googleapis.com/client-version: 525.0.0
+    run.googleapis.com/cloudsql-instances: moodflow-464810:us-central1:moodflow-postgres
+    run.googleapis.com/operation-id: e35a2b94-830e-4ba7-b73f-9daa16627834
+    run.googleapis.com/startup-cpu-boost: 'true'
+    serving.knative.dev/creator: alex@moodcreativestudios.com
+  creationTimestamp: '2025-07-30T02:20:41.139715Z'
+  generation: 1
+  labels:
+    client.knative.dev/nonce: ipbqxjhpxv
+    cloud.googleapis.com/location: us-central1
+    run.googleapis.com/startupProbeType: Default
+    serving.knative.dev/configuration: mf-backend
+    serving.knative.dev/configurationGeneration: '144'
+    serving.knative.dev/route: mf-backend
+    serving.knative.dev/service: mf-backend
+    serving.knative.dev/serviceUid: 59a4e3c5-f290-411c-920a-caf9bfe2ff24
+  name: mf-backend-00144-x5k
+  namespace: '270455452709'
+  ownerReferences:
+  - apiVersion: serving.knative.dev/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Configuration
+    name: mf-backend
+    uid: 33587bf7-ebb8-41fa-af22-7e5f1731cfb7
+  resourceVersion: AAY7HCzb73w
+  selfLink: /apis/serving.knative.dev/v1/namespaces/270455452709/revisions/mf-backend-00144-x5k
+  uid: a9e14e52-56d7-415e-861c-4596b9e3e38a
+spec:
+  containerConcurrency: 80
+  containers:
+  - env:
+    - name: GCS_BUCKET
+      value: mf-uploads-prod
+    - name: SCOPES
+      value: read_products,write_products,write_script_tags
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          key: latest
+          name: DATABASE_URL
+    - name: SHOPIFY_API_KEY
+      valueFrom:
+        secretKeyRef:
+          key: latest
+          name: SHOPIFY_API_KEY
+    - name: SHOPIFY_API_SECRET
+      valueFrom:
+        secretKeyRef:
+          key: latest
+          name: SHOPIFY_API_SECRET
+    - name: SHOPIFY_APP_URL
+      value: https://mf-backend-270455452709.us-central1.run.app
+    image: gcr.io/moodflow-464810/mf-backend@sha256:30c1bb510cd1f9661214b2fd66ab466b433d77bb424f0b44b41111aa8bfb402b
+    name: mf-backend-1
+    ports:
+    - containerPort: 8080
+      name: http1
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 512Mi
+    startupProbe:
+      failureThreshold: 1
+      periodSeconds: 240
+      tcpSocket:
+        port: 8080
+      timeoutSeconds: 240
+  serviceAccountName: mf-backend-sa@moodflow-464810.iam.gserviceaccount.com
+  timeoutSeconds: 300
+status:
+  conditions:
+  - lastTransitionTime: '2025-07-30T02:20:56.731382Z'
+    message: Deploying revision succeeded in 15.59s.
+    status: 'True'
+    type: Ready
+  - lastTransitionTime: '2025-07-30T02:20:56.802140Z'
+    severity: Info
+    status: 'True'
+    type: Active
+  - lastTransitionTime: '2025-07-30T02:20:56.685378Z'
+    message: Containers became healthy in 12.42s.
+    status: 'True'
+    type: ContainerHealthy
+  - lastTransitionTime: '2025-07-30T02:20:41.944046Z'
+    message: Container image import completed.
+    status: 'True'
+    type: ContainerReady
+  - lastTransitionTime: '2025-07-30T02:20:43.509794Z'
+    message: Provisioning imported containers completed in 1.56s. Checking container
+      health. This will wait for up to 4m for the configured startup probe, including
+      an initial delay of 0s.
+    status: 'True'
+    type: ResourcesAvailable
+  imageDigest: gcr.io/moodflow-464810/mf-backend@sha256:30c1bb510cd1f9661214b2fd66ab466b433d77bb424f0b44b41111aa8bfb402b
+  logUrl: https://console.cloud.google.com/logs/viewer?project=moodflow-464810&resource=cloud_run_revision/service_name/mf-backend/revision_name/mf-backend-00144-x5k&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22mf-backend%22%0Aresource.labels.revision_name%3D%22mf-backend-00144-x5k%22
+  observedGeneration: 1
