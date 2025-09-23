@@ -60,7 +60,7 @@ export const Typewriter = ({
     <div className={`font-heading text-center ${className}`}>
       <h2 className="text-5xl md:text-6xl xl:text-7xl font-bold leading-tight tracking-tight">
         <span className="text-foreground">Create Me </span>
-        <span className="bg-gradient-to-r from-[hsl(var(--primary))] via-[hsl(300_95%_70%)] to-[hsl(var(--accent))] bg-clip-text text-transparent">
+        <span className="bg-gradient-to-r from-[#FF7AC8] via-[#F05ED2] to-[#9E55FF] bg-clip-text text-transparent">
           Short Clips
         </span>
         <br />

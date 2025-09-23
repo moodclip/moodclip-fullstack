@@ -11,7 +11,6 @@ import {
   uploadToSignedUrl,
 } from '@/lib/api';
 import { isLoggedIn } from '@/lib/auth';
-import { isLoggedIn } from '@/lib/auth';
 import { useClaimTokensOnAuth } from '@/hooks/useClaimTokens';
 import type { ClipStatus, ProjectStatusResponse } from '@/types/backend';
 import type { PipelineData, PipelineStage } from '@/types/pipeline';
@@ -24,6 +23,23 @@ interface PipelineContainerProps {
 }
 
 const POLL_INTERVAL_MS = 2500;
+const MAX_MARK_ATTEMPTS = 15;
+const MARK_RETRY_BASE_DELAY_MS = 800;
+const MARK_RETRY_MAX_DELAY_MS = 5000;
+
+const readErrorStatus = (error: unknown): number | null => {
+  if (!error) return null;
+  const maybeStatus = (error as { status?: unknown })?.status;
+  if (typeof maybeStatus === 'number') return maybeStatus;
+  if (error instanceof Error) {
+    const match = error.message?.match(/(\d{3})$/);
+    if (match) {
+      const parsed = Number.parseInt(match[1], 10);
+      if (Number.isFinite(parsed)) return parsed;
+    }
+  }
+  return null;
+};
 
 const sanitizeProgress = (value: unknown): number | undefined => {
   if (value === null || value === undefined) return undefined;
@@ -501,6 +517,8 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
     try {
       const authed = await isLoggedIn().catch(() => false);
       const uploadInfo = await requestUploadUrl(file, { storeClaimToken: authed });
+      setGlobalProjectId(uploadInfo.videoId);
+      setActiveVideoId(uploadInfo.videoId);
       const controller = uploadToSignedUrl(uploadInfo.url, file, (percent) => {
         if (!hasRealProgressRef.current && percent > 0) {
           hasRealProgressRef.current = true;
@@ -529,26 +547,47 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
         ...stage,
         progress: 100,
         displayProgress: 100,
+        buttonText: 'Finalizing',
       }));
 
       let markSuccess = false;
       let markError: unknown = null;
-      for (let attempt = 0; attempt < 3 && !markSuccess; attempt += 1) {
+      for (let attempt = 0; attempt < MAX_MARK_ATTEMPTS && !markSuccess; attempt += 1) {
+        const attemptNumber = attempt + 1;
         try {
-          await markUploadReady(uploadInfo.videoId);
+          await markUploadReady(uploadInfo.videoId, attemptNumber);
           markSuccess = true;
         } catch (error) {
           markError = error;
-          await delay(500 * (attempt + 1));
+          const status = readErrorStatus(error);
+          const backoff = Math.min(MARK_RETRY_MAX_DELAY_MS, MARK_RETRY_BASE_DELAY_MS * attemptNumber);
+
+          if (status === 409) {
+            console.info('[moodclip] Source not visible yet, retrying mark', {
+              videoId: uploadInfo.videoId,
+              attempt: attemptNumber,
+            });
+            await delay(backoff);
+            continue;
+          }
+
+          if (status && status >= 500) {
+            console.warn('[moodclip] Mark upload failed, server error – retrying', {
+              videoId: uploadInfo.videoId,
+              attempt: attemptNumber,
+              status,
+            });
+            await delay(backoff);
+            continue;
+          }
+
+          break;
         }
       }
 
-      if (!markSuccess && markError) {
-        throw markError;
+      if (!markSuccess) {
+        throw markError ?? new Error('mark_failed');
       }
-
-      setGlobalProjectId(uploadInfo.videoId);
-      setActiveVideoId(uploadInfo.videoId);
 
       updateUploadStage((stage) => ({
         ...stage,
@@ -561,7 +600,13 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
       }));
     } catch (error) {
       console.error('[moodclip] upload failed', error);
-      const message = error instanceof Error ? error.message : 'Upload failed. Please try again.';
+      const status = readErrorStatus(error);
+      let message = 'Upload failed. Please try again.';
+      if (status === 409) {
+        message = 'We are still receiving your file. Please try again in a few seconds.';
+      } else if (error instanceof Error && error.message) {
+        message = error.message;
+      }
       setUploadError(message);
       updateUploadStage((stage) => ({
         ...stage,
@@ -649,9 +694,7 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
 
   const builderReady = Boolean(
     statusQuery.data?.project?.aiReady ||
-      (statusQuery.data?.clipStatuses ?? []).some((clip) =>
-        clip.status === 'completed' || Boolean(clip.url),
-      ),
+      (statusQuery.data?.clipStatuses ?? []).some((clip) => clip.status === 'completed'),
   );
 
   const handleLaunchBuilder = () => {

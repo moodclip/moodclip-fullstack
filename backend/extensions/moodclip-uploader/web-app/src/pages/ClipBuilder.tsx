@@ -8,6 +8,7 @@ import { BuildClipSection } from '@/components/clip-builder/BuildClipSection';
 import { TranscriptSection } from '@/components/clip-builder/TranscriptSection';
 import { VideoPlayerSection } from '@/components/clip-builder/VideoPlayerSection';
 import { toast } from '@/hooks/use-toast';
+import { ensureAuthed, isLoggedIn } from '@/lib/auth';
 import {
   fetchProjectStatus,
   fetchTranscriptChunk,
@@ -376,6 +377,9 @@ const ClipBuilder = () => {
     staleTime: 2000,
   });
 
+  const viewerContext = statusQuery.data?.ownership?.viewer ?? null;
+  const viewerIsAuthed = Boolean(viewerContext?.customerId);
+
   const needsTranscriptFetch = Boolean(
     videoId &&
       statusQuery.data?.transcriptMeta?.available &&
@@ -394,6 +398,7 @@ const ClipBuilder = () => {
     queryFn: () => fetchStreamUrl(videoId!),
     enabled: Boolean(videoId),
     staleTime: 5 * 60_000,
+    retry: 2,
   });
 
   const durationSec = statusQuery.data?.project?.durationSec ?? undefined;
@@ -410,8 +415,10 @@ const ClipBuilder = () => {
     [rawTranscript, durationSec],
   );
 
-  const suggestions = statusQuery.data?.aiSuggestions ?? [];
-  const clipStatuses = statusQuery.data?.clipStatuses ?? [];
+  const rawSuggestions = statusQuery.data?.aiSuggestions;
+  const suggestions = useMemo(() => rawSuggestions ?? [], [rawSuggestions]);
+  const rawClipStatuses = statusQuery.data?.clipStatuses;
+  const clipStatuses = useMemo(() => rawClipStatuses ?? [], [rawClipStatuses]);
 
   const initialBubbles = useMemo(() => {
     const aiBubbles = buildAiBubbles(transcript, suggestions, durationSec);
@@ -427,7 +434,6 @@ const ClipBuilder = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [playMode, setPlayMode] = useState<'full' | 'selection' | 'lane'>('full');
   const [currentClipIndex, setCurrentClipIndex] = useState(0);
-  const [deletedWords, setDeletedWords] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!videoId) return;
@@ -437,7 +443,6 @@ const ClipBuilder = () => {
       setBubbles(initialBubbles);
       setActiveBubbleId(initialBubbles[0]?.id ?? '');
       setSelectedWords([]);
-      setDeletedWords(new Set());
       initializedVideoIdRef.current = videoId;
       return;
     }
@@ -516,7 +521,7 @@ const ClipBuilder = () => {
     };
     setBubbles((prev) => [...prev, newBubble]);
     setActiveBubbleId(newBubble.id);
-  }, [bubbles.length]);
+  }, [bubbles]);
 
   const handleBubbleRename = useCallback((bubbleId: string, newName: string) => {
     setBubbles((prev) =>
@@ -553,13 +558,32 @@ const ClipBuilder = () => {
     () => ({
       url: streamQuery.data?.url ?? '',
       duration: durationSec ?? transcriptDuration,
+      error: streamQuery.isError ? (streamQuery.error as Error | undefined)?.message ?? 'unavailable' : null,
     }),
-    [streamQuery.data?.url, durationSec, transcriptDuration],
+    [streamQuery.data?.url, durationSec, transcriptDuration, streamQuery.isError, streamQuery.error],
   );
 
-  return (
-    <div className="min-h-screen animated-gradient-bg">
-      <div className="sticky top-0 z-50 bg-background/80 backdrop-blur border-b border-border">
+  const handleExport = useCallback(async () => {
+    if (!videoId) return;
+    const authed = await isLoggedIn().catch(() => false);
+    if (!authed) {
+      toast({
+        title: 'Sign in required',
+        description: 'Please sign in to export or download your clips.',
+      });
+      await ensureAuthed({ projectId: videoId, action: 'download' });
+      return;
+    }
+
+    toast({
+      title: 'Export coming soon',
+      description: 'Your clips are ready to preview. Export and download will be enabled shortly.',
+    });
+  }, [videoId]);
+
+    return (
+      <div className="min-h-screen animated-gradient-bg">
+        <div className="sticky top-0 z-50 bg-background/80 backdrop-blur border-b border-border">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-3">
@@ -579,6 +603,14 @@ const ClipBuilder = () => {
           </div>
         </div>
       </div>
+
+      {!viewerIsAuthed && (
+        <div className="container mx-auto px-4 py-6">
+          <div className="rounded-xl border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+            Sign in to export or download your clips. You can preview the transcript, build clips, and watch the video below.
+          </div>
+        </div>
+      )}
 
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 space-y-4 sm:space-y-8">
         {!videoId && (
@@ -618,6 +650,7 @@ const ClipBuilder = () => {
           currentClipIndex={currentClipIndex}
           currentTime={currentTime}
           onBubbleRename={handleBubbleRename}
+          onExport={handleExport}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 min-h-[400px] sm:min-h-[600px]">
@@ -627,7 +660,6 @@ const ClipBuilder = () => {
             onSelectedWordsChange={setSelectedWords}
             onAddClip={handleAddClip}
             activeBubble={activeBubble}
-            onDeletedWordsChange={setDeletedWords}
           />
 
           <VideoPlayerSection

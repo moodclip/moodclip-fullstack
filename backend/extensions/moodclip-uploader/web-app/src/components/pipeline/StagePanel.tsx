@@ -132,13 +132,13 @@ export const StagePanel = ({
   if (isUploadStage) {
     return (
       <div className="flex flex-col items-center text-center gap-3 sm:gap-5 animate-slide-fade-in">
-        <div className="w-[68rem] max-w-[98vw] h-[38rem] sm:h-[42rem] flex items-center justify-center">
-          <RiveComponent className="w-full h-full" />
-        </div>
-
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-3 order-1 mb-6 sm:mb-8">
           {renderPrimaryButton()}
           {renderSecondaryButton()}
+        </div>
+
+        <div className="w-[68rem] max-w-[98vw] h-[38rem] sm:h-[42rem] flex items-center justify-center order-2">
+          <RiveComponent className="w-full h-full" />
         </div>
       </div>
     );

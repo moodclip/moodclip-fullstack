@@ -1,5 +1,6 @@
 // app/routes/proxy.mark.$videoId.ts
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import type { DocumentData, DocumentReference } from "firebase-admin/firestore";
 import { authenticate } from "../shopify.server";
 import { Storage } from "@google-cloud/storage";
 import { db, FieldValue } from "../firebase.server";
@@ -14,6 +15,57 @@ const ok = (data: unknown, status = 200) =>
   new Response(JSON.stringify(data), { status, headers: CORS });
 const fail = (status: number, message: string) =>
   ok({ error: message }, status);
+
+const storage = new Storage();
+
+type ProjectDoc = { ref: DocumentReference; data: DocumentData };
+
+const resolveSource = async (videoId: string): Promise<{ project: ProjectDoc | null; source: any }> => {
+  const snap = await db.collection("projects").doc(videoId).get();
+  if (!snap.exists) return { project: null, source: null } as const;
+  const project = snap.data() ?? {};
+  const source = project?.source ?? null;
+  return { project: { ref: snap.ref, data: project }, source } as const;
+};
+
+const logMark = (entry: Record<string, unknown>) => {
+  console.info('[proxy.mark]', JSON.stringify(entry));
+};
+
+const ensureCanonicalSource = async (
+  videoId: string,
+  project: ProjectDoc,
+  source: any,
+  bucketFallback: string,
+) => {
+  const canonicalObject = `videos/${videoId}/source`;
+  const rawObject = typeof source?.object === 'string' ? source.object.trim() : '';
+  const needsCanonicalObject = !rawObject || !rawObject.startsWith('videos/');
+  const objectPath = needsCanonicalObject ? canonicalObject : rawObject;
+
+  const rawBucket = typeof source?.bucket === 'string' ? source.bucket.trim() : '';
+  const bucketName = rawBucket || bucketFallback;
+
+  if (needsCanonicalObject || bucketName !== rawBucket) {
+    try {
+      await project.ref.set(
+        {
+          source: {
+            ...(typeof source === 'object' && source ? source : {}),
+            object: objectPath,
+            bucket: bucketName,
+          },
+        },
+        { merge: true },
+      );
+      logMark({ phase: 'mark', videoId, object: objectPath, bucket: bucketName, outcome: 'source_normalized' });
+    } catch (error) {
+      console.warn('[proxy.mark] failed to normalize project.source', { videoId, error });
+    }
+  }
+
+  return { objectPath, bucketName } as const;
+};
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
@@ -32,39 +84,46 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
   }
 
   const videoId = (params.videoId || "").toString();
-  if (!videoId) return fail(400, "Missing videoId.");
+  if (!videoId) return fail(400, "missing_videoId");
 
-  const GCS_BUCKET = process.env.GCS_BUCKET;
-  if (!GCS_BUCKET) return fail(500, "Server missing GCS_BUCKET.");
+  const bucketFallback = process.env.GCS_BUCKET;
+  if (!bucketFallback) return fail(500, "missing_bucket");
 
   try {
-    const storage = new Storage();
-    const bucket = storage.bucket(GCS_BUCKET);
+    const { project, source } = await resolveSource(videoId);
+    if (!project) {
+      logMark({ phase: 'mark', videoId, attempt: 1, outcome: 'project_missing' });
+      return fail(404, "project_not_found");
+    }
 
-    // **Canonical source path** (no extension)
-    const srcPath = `videos/${videoId}/source`;
-    const src = bucket.file(srcPath);
+    const { objectPath, bucketName } = await ensureCanonicalSource(
+      videoId,
+      project,
+      source,
+      bucketFallback,
+    );
 
-    const [exists] = await src.exists();
-    if (!exists) return fail(404, "source_not_found");
+    const file = storage.bucket(bucketName).file(objectPath);
+    const [exists] = await file.exists();
+    logMark({ phase: 'mark', videoId, object: objectPath, bucket: bucketName, exists, attempt: 1, outcome: exists ? 'source_found' : 'source_missing' });
 
-    const nowIso = new Date().toISOString();
-    await src.setMetadata({ customTime: nowIso });
+    if (!exists) return fail(409, "source_missing");
 
-    // Also "arm" the project so finalize workers can check it if you use that pattern
-    await db.collection("projects").doc(videoId).set(
+    await file.setMetadata({ customTime: new Date().toISOString() });
+
+    await project.ref.set(
       {
         armed: true,
-        status: "processing",
+        status: "uploaded",
         updatedAt: FieldValue.serverTimestamp(),
       },
       { merge: true }
     );
 
-    console.log("[proxy.mark] ok", { videoId, source: srcPath });
-    return ok({ ok: true });
+    logMark({ phase: 'mark', videoId, object: objectPath, bucket: bucketName, exists: true, attempt: 1, outcome: 'updated' });
+    return new Response(null, { status: 204, headers: CORS });
   } catch (e: any) {
-    console.error("[proxy.mark] error", e?.message || e);
-    return fail(500, e?.message || "mark_failed");
+    console.error('[proxy.mark] error', e?.message || e);
+    return fail(500, 'mark_failed');
   }
 };

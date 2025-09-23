@@ -40,6 +40,7 @@ export interface ClipStatus {
   start?: number | null;
   end?: number | null;
   duration?: number | null;
+  downloadable?: boolean;
 }
 
 export interface AISuggestion {

@@ -1,4 +1,4 @@
-import {
+import type {
   AISuggestion,
   ClipStatus,
   MarkUploadResponse,
@@ -136,7 +136,10 @@ export const apiFetch = async <T>(path: string, init: RequestInit = {}): Promise
   if (!response.ok) {
     const errorBody = await response.text().catch(() => '');
     const error = new Error(`Request to ${path} failed with ${response.status}`);
-    (error as Error & { details?: string }).details = errorBody;
+    const enrichedError = error as Error & { details?: string; status?: number; url?: string };
+    enrichedError.details = errorBody;
+    enrichedError.status = response.status;
+    enrichedError.url = url;
     throw error;
   }
 
@@ -239,13 +242,14 @@ export const uploadToSignedUrl = (
 
 export const markUploadReady = async (
   videoId: string,
+  attempt?: number,
 ): Promise<MarkUploadResponse | undefined> => {
   console.debug('[moodclip] Marking upload ready', { videoId });
 
   return apiFetch<MarkUploadResponse>(`/proxy/mark`, {
     method: 'POST',
     headers: ensureHeaders({ 'Content-Type': 'application/json' }),
-    body: JSON.stringify({ videoId }),
+    body: JSON.stringify({ videoId, attempt }),
   }).catch((error) => {
     console.error('[moodclip] Failed to mark upload ready', { videoId, error });
     throw error;
@@ -342,33 +346,10 @@ export const claimPendingUploads = async (): Promise<void> => {
   if (!pending.length) return;
 
   claimInFlight = (async () => {
-    for (const { videoId, claimToken } of pending) {
-      let success = false;
-      try {
-        console.info('[moodclip] Attempting claim via /proxy/claim', { videoId });
-        await claimUpload(videoId, claimToken);
-        success = true;
-      } catch (primaryError) {
-        console.warn('[moodclip] Claim via /proxy/claim failed, retrying scoped endpoint', {
-          videoId,
-          error: primaryError,
-        });
-        try {
-          await claimUploadForVideo(videoId, claimToken);
-          success = true;
-        } catch (fallbackError) {
-          console.error('[moodclip] Claim via scoped endpoint failed', {
-            videoId,
-            error: fallbackError,
-          });
-        }
-      }
-
-      if (success) {
-        consumeClaimToken(videoId);
-        console.info('[moodclip] Claim token attached to upload', { videoId });
-      }
-    }
+    pending.forEach(({ videoId }) => consumeClaimToken(videoId));
+    console.info('[moodclip] Claim endpoints are disabled; cleared pending claim tokens', {
+      cleared: pending.length,
+    });
   })().finally(() => {
     claimInFlight = null;
   });

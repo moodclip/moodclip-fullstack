@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Play, Pause, Trash2, Plus, X, GripVertical } from 'lucide-react';
-import { AIClipBubble, ClipChip } from '@/data/clipBuilderData';
+import { Play, Pause, Plus, X, GripVertical } from 'lucide-react';
+import type { AIClipBubble, ClipChip } from '@/data/clipBuilderData';
 import { ProgressBar } from './ProgressBar';
 import { cn } from '@/lib/utils';
 
@@ -20,6 +20,7 @@ interface BuildClipSectionProps {
   currentClipIndex?: number;
   currentTime?: number;
   onBubbleRename?: (bubbleId: string, newName: string) => void;
+  onExport: () => void;
 }
 
 export const BuildClipSection = ({
@@ -34,7 +35,8 @@ export const BuildClipSection = ({
   isPlaying,
   currentClipIndex = 0,
   currentTime = 0,
-  onBubbleRename
+  onBubbleRename,
+  onExport,
 }: BuildClipSectionProps) => {
   const [draggedChip, setDraggedChip] = useState<string | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
@@ -150,7 +152,11 @@ export const BuildClipSection = ({
           <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
             Clear
           </Button>
-          <Button size="sm" className="bg-primary hover:bg-primary/90 flex-1 sm:flex-none">
+          <Button
+            size="sm"
+            className="bg-primary hover:bg-primary/90 flex-1 sm:flex-none"
+            onClick={onExport}
+          >
             Export
           </Button>
         </div>
@@ -213,9 +219,7 @@ export const BuildClipSection = ({
           </div>
         ) : (
           <div className="flex gap-2 sm:gap-3 overflow-x-auto scrollbar-hide pb-2">
-            {getVisualOrder().map((chip, index) => {
-              const originalIndex = activeBubble!.clips.findIndex(c => c.id === chip.id);
-              return (
+            {getVisualOrder().map((chip, index) => (
                 <div
                   key={chip.id}
                   draggable
@@ -309,8 +313,7 @@ export const BuildClipSection = ({
                   />
                 )}
               </div>
-              );
-            })}
+            ))}
           </div>
         )}
       </div>

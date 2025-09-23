@@ -1,5 +1,6 @@
 // app/routes/proxy.mark.ts
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import type { DocumentData, DocumentReference } from "firebase-admin/firestore";
 import { authenticate } from "../shopify.server";
 import { Storage } from "@google-cloud/storage";
 import { db, FieldValue } from "../firebase.server";
@@ -10,16 +11,58 @@ const CORS = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
   "Content-Type": "application/json",
 };
-const ok   = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status, headers: CORS });
 const fail = (status: number, message: string) => new Response(JSON.stringify({ error: message }), { status, headers: CORS });
 
-async function setCustomTime(videoId: string) {
-  const bucket = process.env.GCS_BUCKET;
-  if (!bucket) throw new Error("Missing env GCS_BUCKET");
-  const storage = new Storage();
-  const file = storage.bucket(bucket).file(`${videoId}/source`);
-  await file.setMetadata({ customTime: new Date().toISOString() });
-}
+const storage = new Storage();
+
+type ProjectDoc = { ref: DocumentReference; data: DocumentData };
+
+const resolveSource = async (videoId: string): Promise<{ project: ProjectDoc | null; source: any }> => {
+  const snap = await db.collection("projects").doc(videoId).get();
+  if (!snap.exists) return { project: null, source: null } as const;
+  const project = snap.data() ?? {};
+  const source = project?.source ?? null;
+  return { project: { ref: snap.ref, data: project }, source } as const;
+};
+
+const logMark = (entry: Record<string, unknown>) => {
+  console.info('[proxy.mark]', JSON.stringify(entry));
+};
+
+const ensureCanonicalSource = async (
+  videoId: string,
+  project: ProjectDoc,
+  source: any,
+  bucketFallback: string,
+) => {
+  const canonicalObject = `videos/${videoId}/source`;
+  const rawObject = typeof source?.object === 'string' ? source.object.trim() : '';
+  const needsCanonicalObject = !rawObject || !rawObject.startsWith('videos/');
+  const objectPath = needsCanonicalObject ? canonicalObject : rawObject;
+
+  const rawBucket = typeof source?.bucket === 'string' ? source.bucket.trim() : '';
+  const bucketName = rawBucket || bucketFallback;
+
+  if (needsCanonicalObject || bucketName !== rawBucket) {
+    try {
+      await project.ref.set(
+        {
+          source: {
+            ...(typeof source === 'object' && source ? source : {}),
+            object: objectPath,
+            bucket: bucketName,
+          },
+        },
+        { merge: true },
+      );
+      logMark({ phase: 'mark', videoId, object: objectPath, bucket: bucketName, outcome: 'source_normalized' });
+    } catch (error) {
+      console.warn('[proxy.mark] failed to normalize project.source', { videoId, error });
+    }
+  }
+
+  return { objectPath, bucketName } as const;
+};
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
@@ -32,20 +75,47 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   try { await authenticate.public.appProxy(request); } catch { return fail(401, "Unauthorized"); }
 
   let body: any = {};
-  try { body = await request.json(); } catch { return fail(400, "Invalid JSON"); }
+  try { body = await request.json(); } catch { return fail(400, "invalid_json"); }
   const videoId = (body?.videoId || "").toString().trim();
-  if (!videoId) return fail(400, "Missing videoId");
+  const attempt = Number(body?.attempt ?? 1) || 1;
+  if (!videoId) return fail(400, "missing_videoId");
 
-  try { await setCustomTime(videoId); }
-  catch (e) { console.error("[proxy.mark] setCustomTime failed", e); return fail(500, "Failed to mark object"); }
+  const bucketFallback = process.env.GCS_BUCKET;
+  if (!bucketFallback) return fail(500, "missing_bucket");
 
   try {
-    await db.collection("projects").doc(videoId).set(
-      { status: "uploaded", updatedAt: FieldValue.serverTimestamp() },
-      { merge: true }
-    );
-  } catch (e) { console.warn("[proxy.mark] firestore update skipped:", e); }
+    const { project, source } = await resolveSource(videoId);
+    if (!project) {
+      logMark({ phase: 'mark', videoId, attempt, outcome: 'project_missing' });
+      return fail(404, "project_not_found");
+    }
 
-  console.log("[proxy.mark] ok videoId=%s", videoId);
-  return ok({ ok: true });
+    const { objectPath, bucketName } = await ensureCanonicalSource(
+      videoId,
+      project,
+      source,
+      bucketFallback,
+    );
+
+    const file = storage.bucket(bucketName).file(objectPath);
+    const [exists] = await file.exists();
+    logMark({ phase: 'mark', videoId, object: objectPath, bucket: bucketName, exists, attempt, outcome: exists ? 'source_found' : 'source_missing' });
+
+    if (!exists) {
+      return fail(409, "source_missing");
+    }
+
+    await file.setMetadata({ customTime: new Date().toISOString() });
+
+    await project.ref.set(
+      { status: "uploaded", updatedAt: FieldValue.serverTimestamp() },
+      { merge: true },
+    );
+
+    logMark({ phase: 'mark', videoId, object: objectPath, bucket: bucketName, exists: true, attempt, outcome: 'updated' });
+    return new Response(null, { status: 204, headers: CORS });
+  } catch (e: any) {
+    console.error('[proxy.mark] error', e);
+    return fail(500, 'mark_failed');
+  }
 };

@@ -55,31 +55,46 @@ const extractTranscriptCandidate = (data: any): unknown => {
   return null;
 };
 
-async function getAuth(request: Request): Promise<{ shop: string; customerId: string } | null> {
-  // App‑Proxy first
+type AuthContext = { shop?: string; customerId?: string; via: 'app-proxy' | 'jwt' };
+
+async function getAuth(request: Request): Promise<AuthContext | null> {
   try {
     await authenticate.public.appProxy(request);
     const u = new URL(request.url);
-    const shop = normalizeShop(u.searchParams.get("shop") || request.headers.get("X-Shopify-Shop-Domain") || "");
-    const cid = u.searchParams.get("logged_in_customer_id");
-    if (shop && cid) return { shop, customerId: String(cid) };
-  } catch {}
+    const shop = normalizeShop(
+      u.searchParams.get("shop") ||
+        request.headers.get("X-Shopify-Shop-Domain") ||
+        "",
+    );
+    const cid =
+      u.searchParams.get("logged_in_customer_id") ||
+      request.headers.get("X-Shopify-Logged-In-Customer-Id") ||
+      request.headers.get("X-Shopify-Customer-Id") ||
+      undefined;
 
-  // Session token fallback
-  const auth = request.headers.get("authorization") || "";
-  const m = auth.match(/^Bearer\s+(.+)$/i);
-  if (m) {
+    return {
+      shop,
+      customerId: cid ? String(cid) : undefined,
+      via: 'app-proxy',
+    };
+  } catch (proxyError) {
+    const auth = request.headers.get("authorization") || "";
+    const m = auth.match(/^Bearer\s+(.+)$/i);
+    if (!m) return null;
+
+    const secret = process.env.SHOPIFY_API_SECRET || process.env.SHOPIFY_APP_SECRET || "";
+    if (!secret) return null;
+
     try {
-      const secret = process.env.SHOPIFY_API_SECRET || process.env.SHOPIFY_APP_SECRET || "";
-      if (!secret) return null;
       const payload: any = jwt.verify(m[1], secret, { algorithms: ["HS256"] });
       const dest = String(payload.dest || payload.iss || "");
-      const shop = normalizeShop(new URL(dest).host);
-      const cid = String(payload.sub || "");
-      if (shop && cid) return { shop, customerId: cid };
-    } catch {}
+      const shop = dest ? normalizeShop(new URL(dest).host) : undefined;
+      const cid = payload.sub ? String(payload.sub) : undefined;
+      return { shop, customerId: cid, via: 'jwt' };
+    } catch {
+      return null;
+    }
   }
-  return null;
 }
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
@@ -91,7 +106,6 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     includeParams.has("transcript") || url.searchParams.get("includeTranscript") === "true";
 
   const auth = await getAuth(request);
-  if (!auth) return fail(401, "unauthorized");
 
   const videoId = params.videoId ? String(params.videoId) : "";
   if (!videoId) return fail(400, "missing_videoId");
@@ -104,10 +118,13 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     const p = snap.data() || {};
     const ownerCustomerId = String(p.ownerCustomerId || "");
     const ownerShop = String(p.owner || p.ownerShop || p.shop || p.shopDomain || "");
+    const viewerCustomerId = auth?.customerId ? String(auth.customerId) : '';
+    const viewerShop = auth?.shop ? String(auth.shop) : '';
     const ownedByYou =
+      !!viewerCustomerId &&
       !!ownerCustomerId &&
-      ownerCustomerId === auth.customerId &&
-      (!ownerShop || ownerShop === auth.shop);
+      ownerCustomerId === viewerCustomerId &&
+      (!ownerShop || !viewerShop || ownerShop === viewerShop);
 
     const project = {
       status: p.status || null,
@@ -124,10 +141,12 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
       const clips = await ref.collection("clips").orderBy("createdAt", "desc").limit(50).get();
       clips.forEach((c) => {
         const d = c.data() || {};
+        const downloadable = ownedByYou && !!d.url;
         clipStatuses.push({
           id: c.id,
           status: d.status || null,
-          url: d.url || null,
+          url: downloadable ? d.url || null : null,
+          downloadable,
           progress: d.progress ?? null,
         });
       });
@@ -189,7 +208,11 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
       transcript,
       transcriptMeta,
       transcriptUpdatedAt,
-      ownership: { ownedByYou, claimable: !ownerCustomerId },
+      ownership: {
+        ownedByYou,
+        claimable: !ownerCustomerId,
+        viewer: viewerCustomerId ? { customerId: viewerCustomerId, shop: viewerShop || null } : null,
+      },
     });
   } catch (e) {
     console.error("[proxy.status] failed:", e);
