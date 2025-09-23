@@ -9,6 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   root: __dirname,
+  assetsInclude: ["**/*.riv"],
   server: {
     host: "::",
     port: 8080,

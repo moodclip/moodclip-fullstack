@@ -1,8 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
 import { Typewriter } from '@/components/ui/Typewriter';
 import { fetchProjectStatus } from '@/lib/api';
+import { useClaimTokensOnAuth } from '@/hooks/useClaimTokens';
+import { readGlobalProjectId } from '@/lib/project-id';
 import type { ClipStatus, ProjectStatusResponse } from '@/types/backend';
 import type { PipelineData, PipelineStage } from '@/types/pipeline';
 import { ProgressTrack } from './ProgressTrack';
@@ -194,6 +197,9 @@ const buildPipelineFromStatus = ({
 };
 
 export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
+  useClaimTokensOnAuth();
+
+  const navigate = useNavigate();
   const stageBlueprints = useMemo(
     () => initialData.stages.map((stage) => ({ ...stage })),
     [initialData.stages],
@@ -203,7 +209,7 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
   const [manualStageId, setManualStageId] = useState<number | null>(null);
   const [maxUnlockedStage, setMaxUnlockedStage] = useState<number>(1);
   const [autoStageId, setAutoStageId] = useState<number>(1);
-  const [activeVideoId, setActiveVideoId] = useState<string | null>(() => readGlobalVideoId());
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(() => readGlobalProjectId());
   const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [rippleActive, setRippleActive] = useState(false);
@@ -212,7 +218,7 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
     if (typeof window === 'undefined') return;
 
     const syncVideoId = () => {
-      const nextId = readGlobalVideoId();
+      const nextId = readGlobalProjectId();
       setActiveVideoId((prev) => (prev === nextId ? prev : nextId));
     };
 
@@ -240,7 +246,7 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
     queryKey: ['project-status', activeVideoId],
     queryFn: ({ signal }) => {
       if (!activeVideoId) throw new Error('Missing video id for status query');
-      return fetchProjectStatus(activeVideoId, signal);
+      return fetchProjectStatus(activeVideoId, { signal });
     },
     enabled: shouldPoll,
     refetchInterval: POLL_INTERVAL_MS,
@@ -345,6 +351,18 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
   const currentStageData = pipelineData.stages.find((stage) => stage.id === pipelineData.currentStage);
   if (!currentStageData) return null;
 
+  const builderReady = Boolean(
+    statusQuery.data?.project?.aiReady ||
+      (statusQuery.data?.clipStatuses ?? []).some((clip) =>
+        clip.status === 'completed' || Boolean(clip.url),
+      ),
+  );
+
+  const handleLaunchBuilder = () => {
+    if (!activeVideoId) return;
+    navigate(`/build-clip?videoId=${encodeURIComponent(activeVideoId)}`);
+  };
+
   const getBackgroundState = () => {
     if (currentStageData.ctaStatus === 'pro') return 'pro-preview';
     if (currentStageData.ctaStatus === 'running') return 'processing';
@@ -391,7 +409,12 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
             Last updated {lastUpdatedAt.toLocaleTimeString()}
           </span>
         )}
-        <StagePanel stage={currentStageData} onContinue={handleContinue} />
+        <StagePanel
+          stage={currentStageData}
+          onPrimaryAction={handleContinue}
+          onLaunchBuilder={builderReady ? handleLaunchBuilder : undefined}
+          builderReady={builderReady}
+        />
       </div>
     </div>
   );

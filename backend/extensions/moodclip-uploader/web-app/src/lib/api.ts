@@ -6,6 +6,7 @@ import {
   ProjectSummary,
   ProjectsResponse,
   TranscriptChunkResponse,
+  StreamUrlResponse,
   UploadUrlResponse,
 } from '@/types/backend';
 
@@ -290,6 +291,12 @@ export const fetchTranscriptChunk = async (
   const suffix = query.toString() ? `?${query.toString()}` : '';
 
   return apiFetch<TranscriptChunkResponse>(`/proxy/transcript/${videoId}${suffix}`, {
+    method: 'GET',
+  });
+};
+
+export const fetchStreamUrl = async (videoId: string): Promise<StreamUrlResponse> => {
+  return apiFetch<StreamUrlResponse>(`/proxy/stream/${videoId}`, {
     method: 'GET',
   });
 };

@@ -88,3 +88,8 @@ export interface TranscriptChunkResponse {
   transcript?: unknown;
   transcriptUpdatedAt?: string | null;
 }
+
+export interface StreamUrlResponse {
+  url: string;
+  expiresAt?: number | null;
+}
