@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRive } from '@rive-app/react-canvas';
+import uploaderAnimation from '@/assets/uploader.riv';
 
 interface StagePanelProps {
   stage: PipelineStage;
@@ -119,7 +120,7 @@ export const StagePanel = ({ stage, onContinue }: StagePanelProps) => {
 
   // Rive animation for upload stage
   const { RiveComponent } = useRive({
-    src: '/src/assets/uploader.riv',
+    src: uploaderAnimation,
     autoplay: true,
   });
 
@@ -139,46 +140,74 @@ export const StagePanel = ({ stage, onContinue }: StagePanelProps) => {
 
   // Key prop forces re-render with animation when stage changes
   const stageKey = `stage-${stage.id}`;
+  const isUploadStage = stage.id === 1;
+
+  if (isUploadStage) {
+    return (
+      <div key={stageKey} className="flex flex-col items-center text-center gap-8 sm:gap-10 animate-slide-fade-in">
+        <div className="w-[42rem] max-w-[94vw] h-[28rem] sm:h-[30rem] flex items-center justify-center">
+          <RiveComponent className="w-full h-full" />
+        </div>
+
+        <div className="space-y-6 sm:space-y-8 max-w-[42rem] mx-auto">
+          <h2 className="font-heading text-6xl font-semibold text-foreground">
+            {stage.title}
+          </h2>
+          <p className={`text-2xl text-muted-foreground/80 transition-smooth ${stage.ctaStatus === 'running' ? 'animate-pulse' : ''}`}>
+            {getSubheadingText(stage, currentSubheading)}
+          </p>
+
+          <div className="pt-4 flex flex-col items-center gap-6">
+            <Button 
+              onClick={onContinue}
+              size="lg"
+              className="w-full max-w-xs font-semibold text-xl px-10 py-6 rounded-3xl text-white border-0 transition-all duration-500 ease-out hover:scale-105"
+              style={{
+                background: getCtaBackground(stage.ctaStatus, stage.progress)
+              }}
+            >
+              {getButtonText(stage)}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div key={stageKey} className="pipeline-focus-card w-96 h-96 mx-auto transition-smooth animate-slide-fade-in">
+    <div
+      key={stageKey}
+      className="pipeline-focus-card w-[40rem] max-w-[95vw] min-h-[40rem] mx-auto px-14 py-14 transition-smooth animate-slide-fade-in"
+    >
       {/* Stage Icon */}
-      <div className="flex justify-center mb-8">
-        {stage.id === 1 ? (
-          // Large Rive animation for upload stage
-          <div className="w-80 h-32 flex items-center justify-center">
-            <RiveComponent className="w-full h-full" />
-          </div>
-        ) : (
-          // Regular icon for other stages
-          <div className="w-24 h-24 flex items-center justify-center gradient-glow rounded-full">
-            <img 
-              src={stage.icon} 
-              alt={`${stage.title} icon`}
-              className="w-20 h-20 object-contain filter drop-shadow-lg transition-smooth hover:scale-110"
-            />
-          </div>
-        )}
+      <div className="flex justify-center mb-14">
+        <div className="w-48 h-48 flex items-center justify-center gradient-glow rounded-full">
+          <img 
+            src={stage.icon} 
+            alt={`${stage.title} icon`}
+            className="w-40 h-40 object-contain filter drop-shadow-2xl transition-smooth hover:scale-110"
+          />
+        </div>
       </div>
 
       {/* Stage Content */}
-      <div className="text-center space-y-6">
+      <div className="text-center space-y-10">
         <div>
-          <h2 className="font-heading text-3xl font-semibold mb-4 text-foreground">
+          <h2 className="font-heading text-6xl font-semibold mb-6 text-foreground">
             {stage.title}
           </h2>
           {/* Dynamic thinking subheading */}
-          <p className={`text-lg text-muted-foreground/80 transition-smooth ${stage.ctaStatus === 'running' ? 'animate-pulse' : ''}`}>
+          <p className={`text-2xl text-muted-foreground/80 transition-smooth ${stage.ctaStatus === 'running' ? 'animate-pulse' : ''}`}>
             {getSubheadingText(stage, currentSubheading)}
           </p>
         </div>
 
         {/* Primary Action Button */}
-        <div className="pt-4 space-y-4">
+        <div className="pt-6 flex flex-col items-center gap-6">
           <Button 
             onClick={onContinue}
             size="lg"
-            className="font-semibold px-12 py-4 rounded-2xl text-white border-0 transition-all duration-500 ease-out hover:scale-105"
+            className="w-full max-w-xs font-semibold text-xl px-10 py-6 rounded-3xl text-white border-0 transition-all duration-500 ease-out hover:scale-105"
             style={{
               background: getCtaBackground(stage.ctaStatus, stage.progress)
             }}
@@ -192,7 +221,7 @@ export const StagePanel = ({ stage, onContinue }: StagePanelProps) => {
               onClick={() => navigate('/build-clip')}
               variant="outline"
               size="lg"
-              className="font-semibold px-12 py-4 rounded-2xl border-2 transition-all duration-500 ease-out hover:scale-105"
+              className="w-full max-w-xs font-semibold text-xl px-10 py-6 rounded-3xl border-2 transition-all duration-500 ease-out hover:scale-105"
             >
               Build clips
             </Button>
@@ -200,8 +229,8 @@ export const StagePanel = ({ stage, onContinue }: StagePanelProps) => {
 
           {/* Upgrade CTA for Export stage */}
           {stage.id === 7 && (
-            <div className="text-center space-y-3">
-              <button className="text-sm text-primary font-medium hover:text-primary/80 transition-colors underline">
+            <div className="text-center space-y-2">
+              <button className="text-lg text-primary font-medium hover:text-primary/80 transition-colors underline">
                 Upgrade to Pro →
               </button>
             </div>

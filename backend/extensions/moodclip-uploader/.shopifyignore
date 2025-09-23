@@ -6,6 +6,12 @@ src
 vite.config.js
 package.json
 package-lock.json
+web-app
+tsconfig.json
+tsconfig.app.json
+tsconfig.node.json
+tailwind.config.ts
+postcss.config.js
 
 # Ignore IDE and OS files
 .DS_Store

@@ -1,14 +1,19 @@
 import type { Config } from "tailwindcss";
 import animatePlugin from "tailwindcss-animate";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const resolveFromRoot = (glob: string) => path.join(__dirname, glob);
 
 const config: Config = {
   darkMode: ["class"],
   content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx,js,jsx}",
-    "./web-app/src/**/*.{ts,tsx,js,jsx}"
+    resolveFromRoot("pages/**/*.{ts,tsx}"),
+    resolveFromRoot("components/**/*.{ts,tsx}"),
+    resolveFromRoot("app/**/*.{ts,tsx}"),
+    resolveFromRoot("src/**/*.{ts,tsx,js,jsx}"),
+    resolveFromRoot("web-app/src/**/*.{ts,tsx,js,jsx}")
   ],
   prefix: "",
   theme: {

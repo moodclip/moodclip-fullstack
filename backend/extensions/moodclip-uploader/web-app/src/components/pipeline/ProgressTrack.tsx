@@ -21,10 +21,10 @@ const isProStage = (index: number) => index >= 3; // Stages 4, 5, 6 are Pro
 
 export const ProgressTrack = ({ stages, onStageClick }: ProgressTrackProps) => {
   return (
-    <div className="flex flex-col items-center w-full max-w-4xl mx-auto">
+    <div className="flex flex-col items-center w-full max-w-5xl mx-auto">
       {/* Progress Track */}
-      <div className="flex items-center justify-center w-full max-w-6xl mx-auto px-4">
-        <div className="flex items-center justify-between w-full max-w-4xl">
+      <div className="flex items-center justify-center w-full max-w-6xl mx-auto px-6">
+        <div className="flex items-center justify-between w-full max-w-5xl">
           {stages.slice(0, 6).map((stage, index) => (
             <div key={stage.id} className="flex items-center">
               {/* Stage Dot with Label */}
@@ -32,7 +32,7 @@ export const ProgressTrack = ({ stages, onStageClick }: ProgressTrackProps) => {
                 <button
                   onClick={() => onStageClick(stage.id)}
                   className={cn(
-                    "relative w-3 h-3 rounded-full border-2 transition-smooth focus:outline-none focus:ring-2 focus:ring-primary/50 hover:scale-110 mb-2",
+                    "relative w-6 h-6 rounded-full border-[3px] transition-smooth focus:outline-none focus:ring-4 focus:ring-primary/40 hover:scale-110 mb-3",
                     {
                       'stage-dot-completed': stage.status === 'completed',
                       'stage-dot-active pulse-glow': stage.status === 'active',
@@ -43,15 +43,15 @@ export const ProgressTrack = ({ stages, onStageClick }: ProgressTrackProps) => {
                   aria-label={`Stage ${stage.id}: ${stageLabels[index]}`}
                 >
                   {stage.status === 'completed' && (
-                    <Check className="w-2 h-2 text-white absolute inset-0 m-auto" strokeWidth={3} />
+                    <Check className="w-4 h-4 text-white absolute inset-0 m-auto" strokeWidth={3} />
                   )}
                 </button>
                 
                 {/* Stage Label */}
-                <div className="flex items-center gap-1 whitespace-nowrap">
+                <div className="flex items-center gap-2 whitespace-nowrap">
                   <span 
                     className={cn(
-                      "text-xs md:text-sm font-medium transition-smooth",
+                      "text-sm md:text-lg font-semibold transition-smooth",
                       {
                         'text-[#24D77E]': stage.status === 'completed',
                         'text-[#A020F0]': stage.status === 'active', 
@@ -62,14 +62,14 @@ export const ProgressTrack = ({ stages, onStageClick }: ProgressTrackProps) => {
                     {stageLabels[index]}
                   </span>
                   {isProStage(index) && (
-                    <Crown className="w-3 h-3 text-[#A020F0]" />
+                    <Crown className="w-5 h-5 text-[#A020F0]" />
                   )}
                 </div>
               </div>
 
               {/* Connecting Line - Dotted */}
               {index < 5 && (
-                <div className="relative flex-1 h-px mx-2 md:mx-4 overflow-hidden">
+                <div className="relative flex-1 h-0.5 mx-4 md:mx-6 overflow-hidden">
                   {/* Background dotted line */}
                   <div 
                     className="absolute inset-0 border-t-2 border-dotted border-muted"

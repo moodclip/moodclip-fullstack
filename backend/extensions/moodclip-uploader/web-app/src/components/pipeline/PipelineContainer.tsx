@@ -185,13 +185,13 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
   return (
     <div 
       ref={containerRef}
-      className={`min-h-screen w-full flex flex-col items-center justify-center p-4 sm:p-8 space-y-8 sm:space-y-16 relative overflow-hidden dark-gradient-bg bg-ripple ${rippleActive ? 'active' : ''}`}
+      className={`min-h-screen w-full flex flex-col items-center justify-start pt-12 sm:pt-16 pb-16 sm:pb-20 px-4 sm:px-8 gap-16 sm:gap-[6.5rem] relative overflow-hidden dark-gradient-bg bg-ripple ${rippleActive ? 'active' : ''}`}
     >
       {/* Background glow */}
       <div className="absolute inset-0 gradient-glow opacity-20" />
       
       {/* Progress Track */}
-      <div className="relative z-10 -mb-8">
+      <div className="relative z-10 mb-6 sm:mb-10">
         <ProgressTrack 
           stages={pipelineData.stages} 
           onStageClick={(stageId) => handleStageClick(stageId)}
@@ -200,7 +200,7 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
 
       {/* Typewriter Effect - Only on Upload stage */}
       {pipelineData.currentStage === 1 && (
-        <div className="relative z-10 -mt-8 mb-1">
+        <div className="relative z-10 mt-2 sm:mt-4">
           <Typewriter
             baseText="Create Me Short Clips from my "
             texts={[
@@ -215,7 +215,7 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
             typingSpeed={80}
             deletingSpeed={40}
             pauseDuration={1800}
-            className="max-w-4xl mx-auto"
+            className="max-w-5xl mx-auto"
           />
         </div>
       )}
