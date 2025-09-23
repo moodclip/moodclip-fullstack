@@ -50,11 +50,11 @@ export interface StagePanelProps {
 
 const NonUploadStageFallback = () => (
   <div
-    className="pipeline-focus-card w-[40rem] max-w-[95vw] min-h-[40rem] mx-auto px-14 py-14 animate-pulse"
+    className="pipeline-focus-card w-[52rem] max-w-[94vw] min-h-[44rem] mx-auto px-16 py-14 animate-pulse"
     aria-hidden="true"
   >
     <div className="flex justify-center mb-14">
-      <div className="w-48 h-48 rounded-full bg-muted/20" />
+      <div className="w-56 h-56 rounded-full bg-muted/20" />
     </div>
     <div className="space-y-6 text-center">
       <div className="h-12 bg-muted/20 rounded-full mx-auto w-3/4" />

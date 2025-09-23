@@ -668,7 +668,7 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
   return (
     <div
       ref={containerRef}
-      className={`min-h-screen w-full flex flex-col items-center justify-start pt-12 sm:pt-16 pb-16 sm:pb-20 px-4 sm:px-8 gap-12 sm:gap-[5.5rem] relative overflow-hidden dark-gradient-bg bg-ripple ${rippleActive ? 'active' : ''}`}
+      className={`min-h-screen w-full flex flex-col items-center justify-start pt-10 sm:pt-12 pb-14 sm:pb-[4.5rem] px-6 sm:px-12 gap-10 sm:gap-16 relative overflow-hidden dark-gradient-bg bg-ripple ${rippleActive ? 'active' : ''}`}
       data-background-state={getBackgroundState()}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
@@ -699,7 +699,7 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
       </div>
 
       {pipelineData.currentStage === 1 && (
-        <div className="relative z-10">
+        <div className="relative z-10 w-full max-w-6xl px-4">
           <Typewriter
             baseText="Create Me Short Clips from my "
             texts={[
@@ -714,12 +714,12 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
             typingSpeed={80}
             deletingSpeed={40}
             pauseDuration={1800}
-            className="max-w-5xl mx-auto"
+            className="max-w-6xl mx-auto"
           />
         </div>
       )}
 
-      <div className="relative z-10 w-full flex flex-col items-center gap-4" key={currentStageData.id}>
+      <div className="relative z-10 w-full flex flex-col items-center gap-5" key={currentStageData.id}>
         {lastUpdatedAt && (
           <span className="text-sm text-muted-foreground">
             Last updated {lastUpdatedAt.toLocaleTimeString()}
