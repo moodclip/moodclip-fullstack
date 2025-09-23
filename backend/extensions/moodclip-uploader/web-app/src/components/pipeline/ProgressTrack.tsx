@@ -24,10 +24,10 @@ const isProStage = (index: number) => index >= 3; // Stages 4, 5, 6 are Pro
 
 export const ProgressTrack = ({ stages, onStageClick, autoStageId }: ProgressTrackProps) => {
   return (
-    <div className="flex flex-col items-center w-full max-w-5xl mx-auto">
+    <div className="flex flex-col items-center w-full max-w-6xl mx-auto">
       {/* Progress Track */}
-      <div className="flex items-center justify-center w-full max-w-6xl mx-auto px-6">
-        <div className="flex items-center justify-between w-full max-w-5xl">
+      <div className="flex items-center justify-center w-full max-w-6xl mx-auto px-4 sm:px-8">
+        <div className="flex items-center justify-between w-full max-w-6xl">
           {stages.slice(0, 6).map((stage, index) => {
             const stageNumber = stage.id;
             let effectiveStatus = stage.status;

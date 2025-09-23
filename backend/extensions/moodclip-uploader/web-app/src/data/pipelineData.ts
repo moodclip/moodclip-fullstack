@@ -15,7 +15,7 @@ export const initialPipelineData: PipelineData = {
       id: 1,
       title: "Upload",
       description: "Select your audio file to begin processing",
-      buttonText: "Uploading",
+      buttonText: "Upload",
       icon: uploadIcon,
       status: 'active',
       ctaStatus: 'ready',

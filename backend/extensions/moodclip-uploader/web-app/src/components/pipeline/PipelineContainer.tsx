@@ -3,13 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
 import { Typewriter } from '@/components/ui/Typewriter';
-import { fetchProjectStatus } from '@/lib/api';
+import {
+  claimPendingUploads,
+  fetchProjectStatus,
+  markUploadReady,
+  requestUploadUrl,
+  uploadToSignedUrl,
+} from '@/lib/api';
+import { isLoggedIn } from '@/lib/auth';
 import { useClaimTokensOnAuth } from '@/hooks/useClaimTokens';
-import { readGlobalProjectId } from '@/lib/project-id';
 import type { ClipStatus, ProjectStatusResponse } from '@/types/backend';
 import type { PipelineData, PipelineStage } from '@/types/pipeline';
 import { ProgressTrack } from './ProgressTrack';
 import { StagePanel } from './StagePanel';
+import type { UploadController } from '@/lib/api';
 
 interface PipelineContainerProps {
   initialData: PipelineData;
@@ -39,6 +46,8 @@ const includesAny = (value: string, tokens: string[]): boolean => {
   return tokens.some((token) => value.includes(token));
 };
 
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const readGlobalVideoId = (): string | null => {
   if (typeof window === 'undefined') return null;
   try {
@@ -60,6 +69,7 @@ const createBasePipeline = (blueprints: PipelineStage[]): PipelineData => ({
   currentStage: 1,
   stages: blueprints.map((stage) => ({
     ...stage,
+    buttonText: stage.id === 1 ? 'Upload' : stage.buttonText,
     status: stage.id === 1 ? 'active' : 'upcoming',
     ctaStatus:
       stage.ctaStatus === 'pro'
@@ -70,6 +80,7 @@ const createBasePipeline = (blueprints: PipelineStage[]): PipelineData => ({
             ? 'ready'
             : 'waiting',
     progress: stage.id === 1 ? 0 : undefined,
+    displayProgress: stage.id === 1 ? 0 : stage.displayProgress,
   })),
 });
 
@@ -143,7 +154,8 @@ const buildPipelineFromStatus = ({
   const stages = base.stages.map((stage) => ({ ...stage }));
 
   const uploadStage = stages.find((stage) => stage.id === 1)!;
-  const uploadStarted = Boolean(activeVideoId) || uploadProgress !== undefined || includesAny(normalizedStage, ['upload', 'initial']);
+  const uploadStarted =
+    uploadProgress !== undefined || includesAny(normalizedStage, ['upload', 'initial']);
 
   if (isFailure) {
     uploadStage.status = 'completed';
@@ -159,6 +171,14 @@ const buildPipelineFromStatus = ({
     uploadStage.ctaStatus = uploadStarted ? 'running' : 'ready';
     uploadStage.progress = uploadStarted ? uploadProgress ?? 0 : undefined;
   }
+
+  uploadStage.buttonText = uploadStage.ctaStatus === 'running' ? 'Uploading' : 'Upload';
+  uploadStage.displayProgress =
+    uploadStage.ctaStatus === 'running'
+      ? uploadStage.progress ?? 0
+      : uploadStage.ctaStatus === 'completed'
+        ? 100
+        : 0;
 
   const transcribeStage = stages.find((stage) => stage.id === 2)!;
   if (effectiveStage > 1) {
@@ -209,16 +229,73 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
   const [manualStageId, setManualStageId] = useState<number | null>(null);
   const [maxUnlockedStage, setMaxUnlockedStage] = useState<number>(1);
   const [autoStageId, setAutoStageId] = useState<number>(1);
-  const [activeVideoId, setActiveVideoId] = useState<string | null>(() => readGlobalProjectId());
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(() => readGlobalVideoId());
   const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [rippleActive, setRippleActive] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadControllerRef = useRef<UploadController | null>(null);
+  const bootstrapFrameRef = useRef<number | null>(null);
+  const bootstrapStartRef = useRef<number | null>(null);
+  const hasRealProgressRef = useRef(false);
+  const dragDepthRef = useRef(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const mapProgressToDisplay = (percent: number) => {
+    const clamped = Math.max(0, Math.min(100, percent));
+    return 30 + (clamped / 100) * 70;
+  };
+
+  const updateUploadStage = (mutator: (stage: PipelineStage) => PipelineStage) => {
+    setPipelineData((prev) => ({
+      ...prev,
+      stages: prev.stages.map((stage) => (stage.id === 1 ? mutator(stage) : stage)),
+    }));
+  };
+
+  const stopBootstrap = () => {
+    if (bootstrapFrameRef.current !== null) {
+      cancelAnimationFrame(bootstrapFrameRef.current);
+      bootstrapFrameRef.current = null;
+    }
+    bootstrapStartRef.current = null;
+  };
+
+  const startBootstrap = () => {
+    stopBootstrap();
+    hasRealProgressRef.current = false;
+    bootstrapStartRef.current = performance.now();
+
+    const tick = (now: number) => {
+      if (hasRealProgressRef.current) return;
+      const start = bootstrapStartRef.current ?? now;
+      const elapsed = now - start;
+      const duration = 600;
+      const normalized = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - normalized, 3);
+      const progress = Math.min(30, eased * 30);
+
+      updateUploadStage((stage) => {
+        if (stage.ctaStatus !== 'running') return stage;
+        const nextDisplay = Math.max(stage.displayProgress ?? 0, progress);
+        return { ...stage, displayProgress: nextDisplay };
+      });
+
+      if (!hasRealProgressRef.current && normalized < 1) {
+        bootstrapFrameRef.current = requestAnimationFrame(tick);
+      }
+    };
+
+    bootstrapFrameRef.current = requestAnimationFrame(tick);
+  };
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     const syncVideoId = () => {
-      const nextId = readGlobalProjectId();
+      const nextId = readGlobalVideoId();
       setActiveVideoId((prev) => (prev === nextId ? prev : nextId));
     };
 
@@ -233,12 +310,40 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
   }, []);
 
   useEffect(() => {
-    setPipelineData(createBasePipeline(stageBlueprints));
-    setManualStageId(null);
-    setAutoStageId(1);
-    setMaxUnlockedStage(1);
-    setLastUpdatedAt(null);
-  }, [activeVideoId, stageBlueprints]);
+    const handleWindowDragOver = (event: DragEvent) => {
+      event.preventDefault();
+    };
+    const handleWindowDrop = (event: DragEvent) => {
+      event.preventDefault();
+    };
+
+    window.addEventListener('dragover', handleWindowDragOver);
+    window.addEventListener('drop', handleWindowDrop);
+
+    return () => {
+      window.removeEventListener('dragover', handleWindowDragOver);
+      window.removeEventListener('drop', handleWindowDrop);
+    };
+  }, []);
+
+  const shouldContinuePolling = (data?: ProjectStatusResponse): boolean => {
+    if (!data?.project) return true;
+    const normalized = String(data.project.stage || data.project.status || '').toLowerCase();
+    const projectTerminal =
+      normalized.includes('fail') ||
+      normalized.includes('error') ||
+      normalized.includes('complete') ||
+      normalized.includes('ready');
+
+    if (!projectTerminal) return true;
+
+    const hasActiveClips = (data.clipStatuses ?? []).some((clip) => {
+      const state = String(clip.status || '').toLowerCase();
+      return state === 'queued' || state === 'rendering' || state === 'processing' || state === 'running';
+    });
+
+    return hasActiveClips;
+  };
 
   const shouldPoll = Boolean(activeVideoId);
 
@@ -249,9 +354,9 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
       return fetchProjectStatus(activeVideoId, { signal });
     },
     enabled: shouldPoll,
-    refetchInterval: POLL_INTERVAL_MS,
+    refetchInterval: (data) => (shouldContinuePolling(data as ProjectStatusResponse | undefined) ? POLL_INTERVAL_MS : false),
     refetchIntervalInBackground: true,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
   });
 
   useEffect(() => {
@@ -281,13 +386,15 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
 
     setLastUpdatedAt(new Date());
 
-    console.debug('[moodclip] status poll', {
-      videoId: activeVideoId,
-      stage: statusQuery.data.project?.stage ?? statusQuery.data.project?.status ?? null,
-      observedStage: result.observedStage,
-      unlockedStage: result.unlockedStage,
-      fetchedAt: new Date().toISOString(),
-    });
+    if (import.meta.env.DEV) {
+      console.debug('[moodclip] status poll', {
+        videoId: activeVideoId,
+        stage: statusQuery.data.project?.stage ?? statusQuery.data.project?.status ?? null,
+        observedStage: result.observedStage,
+        unlockedStage: result.unlockedStage,
+        fetchedAt: new Date().toISOString(),
+      });
+    }
   }, [statusQuery.data, activeVideoId, stageBlueprints, manualStageId, maxUnlockedStage]);
 
   const triggerRipple = (event: React.MouseEvent) => {
@@ -347,6 +454,194 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
     setManualStageId(nextStage);
     setPipelineData((prev) => ({ ...prev, currentStage: nextStage }));
   };
+  const resetFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const resetUploadState = () => {
+    stopBootstrap();
+    uploadControllerRef.current?.abort();
+    uploadControllerRef.current = null;
+    setIsUploading(false);
+    hasRealProgressRef.current = false;
+  };
+
+  const setGlobalProjectId = (videoId: string) => {
+    if (typeof window === 'undefined') return;
+    (window as typeof window & { __mc_project?: string }).__mc_project = videoId;
+    const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    params.set('pid', videoId);
+    const nextHash = params.toString();
+    window.location.hash = nextHash;
+  };
+
+  const beginUpload = async (file: File) => {
+    if (!file) return;
+    if (isUploading) {
+      resetUploadState();
+    }
+
+    setUploadError(null);
+    setManualStageId(1);
+    updateUploadStage((stage) => ({
+      ...stage,
+      ctaStatus: 'running',
+      status: 'active',
+      buttonText: 'Uploading',
+      progress: 0,
+      displayProgress: 0,
+      secondaryButtonText: undefined,
+    }));
+    setIsUploading(true);
+    startBootstrap();
+
+    try {
+      const uploadInfo = await requestUploadUrl(file);
+      const controller = uploadToSignedUrl(uploadInfo.url, file, (percent) => {
+        if (!hasRealProgressRef.current && percent > 0) {
+          hasRealProgressRef.current = true;
+          stopBootstrap();
+        }
+        updateUploadStage((stage) => {
+          if (stage.ctaStatus !== 'running') return stage;
+          const realProgress = Math.max(0, Math.min(100, percent));
+          const display = mapProgressToDisplay(realProgress);
+          return {
+            ...stage,
+            progress: realProgress,
+            displayProgress: Math.max(stage.displayProgress ?? 0, display),
+          };
+        });
+      });
+
+      uploadControllerRef.current = controller;
+      await controller.promise;
+
+      const authed = await isLoggedIn().catch(() => false);
+      if (authed) {
+        await claimPendingUploads();
+      }
+      stopBootstrap();
+      updateUploadStage((stage) => ({
+        ...stage,
+        progress: 100,
+        displayProgress: 100,
+      }));
+
+      let markSuccess = false;
+      let markError: unknown = null;
+      for (let attempt = 0; attempt < 3 && !markSuccess; attempt += 1) {
+        try {
+          await markUploadReady(uploadInfo.videoId);
+          markSuccess = true;
+        } catch (error) {
+          markError = error;
+          await delay(500 * (attempt + 1));
+        }
+      }
+
+      if (!markSuccess && markError) {
+        throw markError;
+      }
+
+      setGlobalProjectId(uploadInfo.videoId);
+      setActiveVideoId(uploadInfo.videoId);
+
+      updateUploadStage((stage) => ({
+        ...stage,
+        ctaStatus: 'completed',
+        status: 'completed',
+        buttonText: 'Upload',
+        progress: 100,
+        displayProgress: 100,
+        secondaryButtonText: 'Upload another',
+      }));
+    } catch (error) {
+      console.error('[moodclip] upload failed', error);
+      const message = error instanceof Error ? error.message : 'Upload failed. Please try again.';
+      setUploadError(message);
+      updateUploadStage((stage) => ({
+        ...stage,
+        ctaStatus: 'failed',
+        status: 'active',
+        buttonText: 'Upload',
+        progress: 0,
+        displayProgress: 0,
+        secondaryButtonText: 'Try again',
+      }));
+    } finally {
+      resetUploadState();
+      resetFileInput();
+    }
+  };
+
+  const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      void beginUpload(file);
+    }
+  };
+
+  const openFilePicker = () => {
+    if (isUploading) return;
+    fileInputRef.current?.click();
+  };
+
+  const handleSecondaryUpload = () => {
+    if (isUploading) return;
+    updateUploadStage((stage) => ({
+      ...stage,
+      ctaStatus: 'ready',
+      status: 'active',
+      buttonText: 'Upload',
+      progress: 0,
+      displayProgress: 0,
+      secondaryButtonText: undefined,
+    }));
+    openFilePicker();
+  };
+
+  const handleDragEnter = (event: React.DragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dragDepthRef.current += 1;
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (event: React.DragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dragDepthRef.current = Math.max(0, dragDepthRef.current - 1);
+    if (dragDepthRef.current === 0) {
+      setIsDragging(false);
+    }
+  };
+
+  const handleDragOver = (event: React.DragEvent) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+  };
+
+  const handleDrop = (event: React.DragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dragDepthRef.current = 0;
+    setIsDragging(false);
+    const file = event.dataTransfer.files?.[0];
+    if (file) {
+      void beginUpload(file);
+    }
+  };
+
+
+  useEffect(() => {
+    return () => {
+      resetUploadState();
+    };
+  }, []);
+
 
   const currentStageData = pipelineData.stages.find((stage) => stage.id === pipelineData.currentStage);
   if (!currentStageData) return null;
@@ -375,7 +670,28 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
       ref={containerRef}
       className={`min-h-screen w-full flex flex-col items-center justify-start pt-12 sm:pt-16 pb-16 sm:pb-20 px-4 sm:px-8 gap-12 sm:gap-[5.5rem] relative overflow-hidden dark-gradient-bg bg-ripple ${rippleActive ? 'active' : ''}`}
       data-background-state={getBackgroundState()}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
     >
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="audio/*,video/*"
+        className="hidden"
+        onChange={handleFileInputChange}
+      />
+
+      {isDragging && (
+        <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-background/80 backdrop-blur-sm border-2 border-dashed border-primary rounded-3xl m-4">
+          <div className="text-center space-y-2">
+            <p className="text-2xl font-semibold">Drop your file to start uploading</p>
+            <p className="text-sm text-muted-foreground">We'll handle the rest.</p>
+          </div>
+        </div>
+      )}
+
       <div className="absolute inset-0 gradient-glow opacity-20" />
 
       <div className="relative z-10 mb-6 sm:mb-10 w-full">
@@ -409,9 +725,19 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
             Last updated {lastUpdatedAt.toLocaleTimeString()}
           </span>
         )}
+        {uploadError && pipelineData.currentStage === 1 && (
+          <span className="text-sm text-destructive">{uploadError}</span>
+        )}
         <StagePanel
           stage={currentStageData}
-          onPrimaryAction={handleContinue}
+          onPrimaryAction={
+            currentStageData.id === 1 ? openFilePicker : handleContinue
+          }
+          onSecondaryAction={
+            currentStageData.id === 1 && currentStageData.ctaStatus !== 'running'
+              ? handleSecondaryUpload
+              : undefined
+          }
           onLaunchBuilder={builderReady ? handleLaunchBuilder : undefined}
           builderReady={builderReady}
         />
