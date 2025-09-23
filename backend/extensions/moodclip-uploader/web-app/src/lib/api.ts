@@ -147,9 +147,14 @@ export const apiFetch = async <T>(path: string, init: RequestInit = {}): Promise
   return parseJsonSafely<T>(response);
 };
 
+interface RequestUploadOptions {
+  signal?: AbortSignal;
+  storeClaimToken?: boolean;
+}
+
 export const requestUploadUrl = async (
   file: File,
-  signal?: AbortSignal,
+  options?: RequestUploadOptions,
 ): Promise<UploadUrlResponse> => {
   const params = new URLSearchParams({
     name: file.name,
@@ -164,7 +169,7 @@ export const requestUploadUrl = async (
 
   const response = await apiFetch<UploadUrlResponse>(`/proxy/uploads?${params.toString()}`, {
     method: 'GET',
-    signal,
+    signal: options?.signal,
   });
 
   console.debug('[moodclip] Received signed upload URL', {
@@ -172,7 +177,7 @@ export const requestUploadUrl = async (
     hasClaimToken: Boolean(response.claimToken),
   });
 
-  if (response.claimToken) {
+  if (options?.storeClaimToken !== false && response.claimToken) {
     storeClaimToken(response.videoId, response.claimToken);
   }
 

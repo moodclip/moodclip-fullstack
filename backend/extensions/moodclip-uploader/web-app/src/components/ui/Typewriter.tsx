@@ -58,7 +58,7 @@ export const Typewriter = ({
 
   return (
     <div className={`font-heading text-center ${className}`}>
-      <h2 className="text-6xl md:text-7xl xl:text-8xl font-bold leading-tight tracking-tight">
+      <h2 className="text-5xl md:text-6xl xl:text-7xl font-bold leading-tight tracking-tight">
         <span className="text-foreground">Create Me </span>
         <span className="bg-gradient-to-r from-[hsl(var(--primary))] via-[hsl(300_95%_70%)] to-[hsl(var(--accent))] bg-clip-text text-transparent">
           Short Clips
@@ -69,7 +69,7 @@ export const Typewriter = ({
           {currentText}
         </span>
         <span
-          className={`inline-block w-1 h-12 md:h-16 xl:h-20 ml-3 bg-primary transition-opacity duration-100 ${
+          className={`inline-block w-1 h-10 md:h-14 xl:h-16 ml-3 bg-primary transition-opacity duration-100 ${
             showCursor ? 'opacity-100' : 'opacity-0'
           }`}
         />

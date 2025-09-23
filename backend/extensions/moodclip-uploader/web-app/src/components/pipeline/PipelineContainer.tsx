@@ -11,6 +11,7 @@ import {
   uploadToSignedUrl,
 } from '@/lib/api';
 import { isLoggedIn } from '@/lib/auth';
+import { isLoggedIn } from '@/lib/auth';
 import { useClaimTokensOnAuth } from '@/hooks/useClaimTokens';
 import type { ClipStatus, ProjectStatusResponse } from '@/types/backend';
 import type { PipelineData, PipelineStage } from '@/types/pipeline';
@@ -498,7 +499,8 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
     startBootstrap();
 
     try {
-      const uploadInfo = await requestUploadUrl(file);
+      const authed = await isLoggedIn().catch(() => false);
+      const uploadInfo = await requestUploadUrl(file, { storeClaimToken: authed });
       const controller = uploadToSignedUrl(uploadInfo.url, file, (percent) => {
         if (!hasRealProgressRef.current && percent > 0) {
           hasRealProgressRef.current = true;
@@ -519,7 +521,6 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
       uploadControllerRef.current = controller;
       await controller.promise;
 
-      const authed = await isLoggedIn().catch(() => false);
       if (authed) {
         await claimPendingUploads();
       }
@@ -699,7 +700,7 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
       </div>
 
       {pipelineData.currentStage === 1 && (
-        <div className="relative z-10 w-full max-w-6xl px-4">
+        <div className="relative z-10 w-full max-w-6xl px-4 -mt-2 sm:-mt-4">
           <Typewriter
             baseText="Create Me Short Clips from my "
             texts={[

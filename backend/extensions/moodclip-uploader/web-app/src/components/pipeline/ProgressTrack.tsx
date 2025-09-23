@@ -14,7 +14,7 @@ interface ProgressTrackProps {
 const stageLabels = [
   'Uploading',
   'Transcribing', 
-  'Finding clips',
+  'Creating clips',
   'Captions',
   'Audio',
   'B-roll'

@@ -35,7 +35,7 @@ export const initialPipelineData: PipelineData = {
       id: 3,
       title: "Find Clips",
       description: "Identify key video segments",
-      buttonText: "Finding Clips",
+      buttonText: "Creating Clips",
       icon: analyzeIcon,
       status: 'upcoming',
       ctaStatus: 'waiting',
