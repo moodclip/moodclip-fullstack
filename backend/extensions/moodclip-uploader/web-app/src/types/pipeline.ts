@@ -6,6 +6,7 @@ export interface PipelineStage {
   icon: string;
   status: 'completed' | 'active' | 'upcoming';
   progress?: number; // 0-100 for running status
+  displayProgress?: number; // UI-smoothed progress for gradients
   ctaStatus?: 'ready' | 'running' | 'waiting' | 'completed' | 'failed' | 'pro';
   secondaryButtonText?: string;
 }

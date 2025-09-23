@@ -7,7 +7,8 @@ import uploaderAnimation from '@/assets/uploader.riv';
 
 interface StagePanelProps {
   stage: PipelineStage;
-  onContinue: () => void;
+  onPrimaryAction?: () => void;
+  onSecondaryAction?: () => void;
 }
 
 // Helper to get dynamic gradient background based on status and progress
@@ -21,10 +22,10 @@ const getCtaBackground = (status: string = 'waiting', progress: number = 0) => {
       return 'linear-gradient(135deg, hsl(0 84% 60%), hsl(15 85% 65%))';
     case 'running':
       // Left-to-right fill: filled portion (accent) + empty portion (muted)
-      return `linear-gradient(90deg, 
-        hsl(320 100% 65%) 0%, 
-        hsl(280 100% 70%) ${progress}%, 
-        hsl(220 20% 15%) ${progress}%, 
+      return `linear-gradient(90deg,
+        hsl(320 100% 65%) 0%,
+        hsl(280 100% 70%) ${progress}%,
+        hsl(220 20% 15%) ${progress}%,
         hsl(220 15% 12%) 100%)`;
     case 'pro':
       return 'linear-gradient(135deg, hsl(280 100% 65%), hsl(320 100% 70%))';
@@ -42,8 +43,9 @@ const getButtonText = (stage: PipelineStage) => {
   if (stage.ctaStatus === 'failed') {
     return 'Retry';
   }
-  if (stage.ctaStatus === 'running' && stage.progress !== undefined) {
-    return `${stage.buttonText} ${Math.round(stage.progress)}%`;
+  const progressForDisplay = stage.displayProgress ?? stage.progress;
+  if (stage.ctaStatus === 'running' && progressForDisplay !== undefined) {
+    return `${stage.buttonText} ${Math.round(progressForDisplay)}%`;
   }
   return stage.buttonText;
 };
@@ -113,7 +115,7 @@ const getSubheadingText = (stage: PipelineStage, currentMessageIndex: number) =>
   return stage.description;
 };
 
-export const StagePanel = ({ stage, onContinue }: StagePanelProps) => {
+export const StagePanel = ({ stage, onPrimaryAction, onSecondaryAction }: StagePanelProps) => {
   const navigate = useNavigate();
   const [currentSubheading, setCurrentSubheading] = useState(0);
   const stageMessages = getStageMessages(stage.id);
@@ -141,34 +143,39 @@ export const StagePanel = ({ stage, onContinue }: StagePanelProps) => {
   // Key prop forces re-render with animation when stage changes
   const stageKey = `stage-${stage.id}`;
   const isUploadStage = stage.id === 1;
+  const gradientProgress = stage.displayProgress ?? stage.progress ?? 0;
+  const disablePrimary = stage.ctaStatus === 'running' || stage.ctaStatus === 'completed';
 
   if (isUploadStage) {
     return (
-      <div key={stageKey} className="flex flex-col items-center text-center gap-8 sm:gap-10 animate-slide-fade-in">
-        <div className="w-[42rem] max-w-[94vw] h-[28rem] sm:h-[30rem] flex items-center justify-center">
+      <div key={stageKey} className="flex flex-col items-center text-center gap-6 sm:gap-8 animate-slide-fade-in">
+        <div className="w-[50rem] max-w-[96vw] h-[32rem] sm:h-[36rem] flex items-center justify-center">
           <RiveComponent className="w-full h-full" />
         </div>
 
-        <div className="space-y-6 sm:space-y-8 max-w-[42rem] mx-auto">
-          <h2 className="font-heading text-6xl font-semibold text-foreground">
-            {stage.title}
-          </h2>
-          <p className={`text-2xl text-muted-foreground/80 transition-smooth ${stage.ctaStatus === 'running' ? 'animate-pulse' : ''}`}>
-            {getSubheadingText(stage, currentSubheading)}
-          </p>
+        <div className="pt-2 flex flex-col items-center gap-6">
+          <Button 
+            onClick={onPrimaryAction}
+            disabled={disablePrimary}
+            size="lg"
+            className="w-full max-w-sm font-semibold text-2xl px-16 py-7 rounded-[2.5rem] text-white border-0 transition-all duration-500 ease-out hover:scale-105"
+            style={{
+              background: getCtaBackground(stage.ctaStatus, gradientProgress)
+            }}
+          >
+            {getButtonText(stage)}
+          </Button>
 
-          <div className="pt-4 flex flex-col items-center gap-6">
-            <Button 
-              onClick={onContinue}
+          {stage.secondaryButtonText && onSecondaryAction && (
+            <Button
+              onClick={onSecondaryAction}
+              variant="outline"
               size="lg"
-              className="w-full max-w-xs font-semibold text-xl px-10 py-6 rounded-3xl text-white border-0 transition-all duration-500 ease-out hover:scale-105"
-              style={{
-                background: getCtaBackground(stage.ctaStatus, stage.progress)
-              }}
+              className="w-full max-w-sm font-semibold text-xl px-16 py-6 rounded-[2.5rem] border-2 transition-all duration-500 ease-out hover:scale-105"
             >
-              {getButtonText(stage)}
+              {stage.secondaryButtonText}
             </Button>
-          </div>
+          )}
         </div>
       </div>
     );
@@ -205,15 +212,27 @@ export const StagePanel = ({ stage, onContinue }: StagePanelProps) => {
         {/* Primary Action Button */}
         <div className="pt-6 flex flex-col items-center gap-6">
           <Button 
-            onClick={onContinue}
+            onClick={onPrimaryAction}
+            disabled={disablePrimary}
             size="lg"
             className="w-full max-w-xs font-semibold text-xl px-10 py-6 rounded-3xl text-white border-0 transition-all duration-500 ease-out hover:scale-105"
             style={{
-              background: getCtaBackground(stage.ctaStatus, stage.progress)
+              background: getCtaBackground(stage.ctaStatus, gradientProgress)
             }}
           >
             {getButtonText(stage)}
           </Button>
+
+          {stage.secondaryButtonText && onSecondaryAction && (
+            <Button
+              onClick={onSecondaryAction}
+              variant="outline"
+              size="lg"
+              className="w-full max-w-xs font-semibold text-xl px-10 py-6 rounded-3xl border-2 transition-all duration-500 ease-out hover:scale-105"
+            >
+              {stage.secondaryButtonText}
+            </Button>
+          )}
 
           {/* Build Clips Button - Show for "Find Clips" stage when completed or available */}
           {stage.id === 3 && (stage.ctaStatus === 'completed' || stage.ctaStatus === 'ready') && (

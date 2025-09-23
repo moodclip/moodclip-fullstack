@@ -5,6 +5,7 @@ import {
   ProjectStatusResponse,
   ProjectSummary,
   ProjectsResponse,
+  TranscriptChunkResponse,
   UploadUrlResponse,
 } from '@/types/backend';
 
@@ -52,6 +53,41 @@ const writeSessionValue = (key: string, value: string | null) => {
 
 const getMcToken = (): string | null => readSessionValue(MC_TOKEN_STORAGE_KEY);
 
+const readClaimTokenMap = (): Record<string, string> => {
+  const raw = readSessionValue(CLAIM_TOKEN_STORAGE_KEY);
+  if (!raw) return {};
+  try {
+    const parsed = JSON.parse(raw) as Record<string, string>;
+    if (parsed && typeof parsed === 'object') return parsed;
+  } catch (error) {
+    console.warn('Failed to parse claim token storage', error);
+  }
+  writeSessionValue(CLAIM_TOKEN_STORAGE_KEY, null);
+  return {};
+};
+
+const writeClaimTokenMap = (map: Record<string, string>) => {
+  writeSessionValue(CLAIM_TOKEN_STORAGE_KEY, JSON.stringify(map));
+};
+
+export const storeClaimToken = (videoId: string, claimToken?: string | null) => {
+  if (!claimToken) return;
+  const current = readClaimTokenMap();
+  current[videoId] = claimToken;
+  writeClaimTokenMap(current);
+  console.info('[moodclip] Stored claim token', { videoId });
+};
+
+export const consumeClaimToken = (videoId: string): string | undefined => {
+  const current = readClaimTokenMap();
+  const token = current[videoId];
+  if (!token) return undefined;
+  delete current[videoId];
+  writeClaimTokenMap(current);
+  console.info('[moodclip] Consumed claim token', { videoId });
+  return token;
+};
+
 const ensureHeaders = (input?: HeadersInit): Headers => {
   const headers = new Headers(input ?? {});
   if (!headers.has('Accept')) headers.set('Accept', defaultAccept);
@@ -80,7 +116,17 @@ const parseJsonSafely = async <T>(response: Response): Promise<T> => {
 
 export const apiFetch = async <T>(path: string, init: RequestInit = {}): Promise<T> => {
   const headers = ensureHeaders(init.headers);
-  const response = await fetch(buildUrl(path), {
+  const url = buildUrl(path);
+
+  if (path.startsWith('/proxy/uploads') || path.startsWith('/proxy/mark')) {
+    console.info('[moodclip] API request', {
+      url,
+      method: (init.method ?? 'GET').toUpperCase(),
+      hasMcToken: headers.has('X-MC-Token'),
+    });
+  }
+
+  const response = await fetch(url, {
     credentials: init.credentials ?? 'include',
     ...init,
     headers,
@@ -124,6 +170,10 @@ export const requestUploadUrl = async (
     videoId: response.videoId,
     hasClaimToken: Boolean(response.claimToken),
   });
+
+  if (response.claimToken) {
+    storeClaimToken(response.videoId, response.claimToken);
+  }
 
   return response;
 };
@@ -198,11 +248,17 @@ export const markUploadReady = async (
 
 export const fetchProjectStatus = async (
   videoId: string,
-  signal?: AbortSignal,
+  options?: { signal?: AbortSignal; includeTranscript?: boolean },
 ): Promise<ProjectStatusResponse> => {
-  return apiFetch<ProjectStatusResponse>(`/proxy/status/${videoId}`, {
+  const params = new URLSearchParams();
+  if (options?.includeTranscript) {
+    params.append('include', 'transcript');
+  }
+  const suffix = params.toString() ? `?${params.toString()}` : '';
+
+  return apiFetch<ProjectStatusResponse>(`/proxy/status/${videoId}${suffix}`, {
     method: 'GET',
-    signal,
+    signal: options?.signal,
   });
 };
 
@@ -223,6 +279,21 @@ export const fetchProjects = async (
   });
 };
 
+export const fetchTranscriptChunk = async (
+  videoId: string,
+  params?: { part?: number; chunkSize?: number; format?: 'raw' | 'array' },
+): Promise<TranscriptChunkResponse> => {
+  const query = new URLSearchParams();
+  if (params?.part !== undefined) query.set('part', String(params.part));
+  if (params?.chunkSize !== undefined) query.set('chunkSize', String(params.chunkSize));
+  if (params?.format) query.set('format', params.format);
+  const suffix = query.toString() ? `?${query.toString()}` : '';
+
+  return apiFetch<TranscriptChunkResponse>(`/proxy/transcript/${videoId}${suffix}`, {
+    method: 'GET',
+  });
+};
+
 export const claimUpload = async (
   videoId: string,
   claimToken: string,
@@ -234,36 +305,63 @@ export const claimUpload = async (
   });
 };
 
-const readClaimTokenMap = (): Record<string, string> => {
-  const raw = readSessionValue(CLAIM_TOKEN_STORAGE_KEY);
-  if (!raw) return {};
-  try {
-    return JSON.parse(raw) as Record<string, string>;
-  } catch (error) {
-    console.warn('Failed to parse claim token storage', error);
-    writeSessionValue(CLAIM_TOKEN_STORAGE_KEY, null);
-    return {};
-  }
+export const claimUploadForVideo = async (
+  videoId: string,
+  claimToken: string,
+): Promise<{ ok: boolean }> => {
+  return apiFetch<{ ok: boolean }>(`/proxy/claim/${videoId}`, {
+    method: 'POST',
+    headers: ensureHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ claimToken }),
+  });
 };
 
-const writeClaimTokenMap = (map: Record<string, string>) => {
-  writeSessionValue(CLAIM_TOKEN_STORAGE_KEY, JSON.stringify(map));
-};
+export const getPendingClaimTokens = () =>
+  Object.entries(readClaimTokenMap()).map(([videoId, claimToken]) => ({ videoId, claimToken }));
 
-export const storeClaimToken = (videoId: string, claimToken?: string | null) => {
-  if (!claimToken) return;
-  const current = readClaimTokenMap();
-  current[videoId] = claimToken;
-  writeClaimTokenMap(current);
-};
+export const hasPendingClaimTokens = () => getPendingClaimTokens().length > 0;
 
-export const consumeClaimToken = (videoId: string): string | undefined => {
-  const current = readClaimTokenMap();
-  const token = current[videoId];
-  if (!token) return undefined;
-  delete current[videoId];
-  writeClaimTokenMap(current);
-  return token;
+let claimInFlight: Promise<void> | null = null;
+
+export const claimPendingUploads = async (): Promise<void> => {
+  if (claimInFlight) return claimInFlight;
+
+  const pending = getPendingClaimTokens();
+  if (!pending.length) return;
+
+  claimInFlight = (async () => {
+    for (const { videoId, claimToken } of pending) {
+      let success = false;
+      try {
+        console.info('[moodclip] Attempting claim via /proxy/claim', { videoId });
+        await claimUpload(videoId, claimToken);
+        success = true;
+      } catch (primaryError) {
+        console.warn('[moodclip] Claim via /proxy/claim failed, retrying scoped endpoint', {
+          videoId,
+          error: primaryError,
+        });
+        try {
+          await claimUploadForVideo(videoId, claimToken);
+          success = true;
+        } catch (fallbackError) {
+          console.error('[moodclip] Claim via scoped endpoint failed', {
+            videoId,
+            error: fallbackError,
+          });
+        }
+      }
+
+      if (success) {
+        consumeClaimToken(videoId);
+        console.info('[moodclip] Claim token attached to upload', { videoId });
+      }
+    }
+  })().finally(() => {
+    claimInFlight = null;
+  });
+
+  return claimInFlight;
 };
 
 export type ProjectStatus = ProjectStatusResponse['project'];

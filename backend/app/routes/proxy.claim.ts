@@ -46,6 +46,9 @@ function verifyMcCust(req: Request) {
   } catch { return null; }
 }
 
+const hashClaimToken = (token: string) =>
+  crypto.createHash("sha256").update(token).digest("hex");
+
 async function clearCustomTime(videoId: string) {
   const bucket = process.env.GCS_BUCKET;
   if (!bucket) throw new Error("Missing env GCS_BUCKET");
@@ -70,26 +73,52 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const videoId = (body?.videoId || "").toString().trim();
   if (!videoId) return fail(400, "Missing videoId");
 
+  const claimToken = (body?.claimToken || "").toString().trim();
+  if (!claimToken) return fail(400, "missing_claim_token");
+  const claimHash = hashClaimToken(claimToken);
+
   try {
+    let cleared = false;
     await db.runTransaction(async (tx) => {
       const ref = db.collection("projects").doc(videoId);
       const snap = await tx.get(ref);
       if (!snap.exists) throw new Error("not_found");
       const data = snap.data() || {};
-      if (data.ownerCustomerId) throw new Error("already_owned");
+
+      const existingOwner: string | null = data.ownerCustomerId || data.owner || null;
+      const storedHash: string | null = data.claimTokenHash || null;
+      if (existingOwner && existingOwner !== cust.id) throw new Error("already_owned");
+      if (!storedHash) throw new Error("claim_token_missing");
+      if (storedHash !== claimHash) throw new Error("claim_token_invalid");
+
       tx.update(ref, {
         ownerCustomerId: cust.id,
+        owner: cust.id,
         ownerEmail: cust.email,
+        claimTokenHash: FieldValue.delete(),
+        claimTokenIssuedAt: FieldValue.delete(),
+        claimTokenLastSeen: FieldValue.delete(),
+        claimTokenConsumedAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
         status: data.status || "uploaded",
       });
+      cleared = true;
     });
-    await clearCustomTime(videoId);
+
+    if (cleared) await clearCustomTime(videoId);
+
     console.log("[proxy.claim] ok videoId=%s owner=%s", videoId, cust.id);
     return ok({ ok: true });
   } catch (e: any) {
-    const code = e?.message || "claim_failed";
-    const status = code === "not_found" ? 404 : 400;
+    const code = String(e?.message || "claim_failed");
+    const status =
+      code === "not_found"
+        ? 404
+        : code === "claim_token_invalid"
+        ? 403
+        : code === "already_owned"
+        ? 409
+        : 400;
     console.error("[proxy.claim] error", code, { videoId, cust: cust?.id });
     return fail(status, code);
   }

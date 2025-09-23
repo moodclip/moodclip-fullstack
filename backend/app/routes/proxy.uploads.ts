@@ -8,6 +8,16 @@ import crypto from "node:crypto";
 
 const db = new Firestore();
 
+const CLAIM_TOKEN_BYTES = 24;
+
+const hashClaimToken = (token: string) =>
+  crypto.createHash("sha256").update(token).digest("hex");
+
+const createClaimToken = () => {
+  const token = crypto.randomBytes(CLAIM_TOKEN_BYTES).toString("base64url");
+  return { token, hash: hashClaimToken(token) };
+};
+
 /* ---------------- CORS (permissive for CA sandbox/CDN) ---------------- */
 // shared CORS helpers (inline in each route is fine)
 function corsHeaders(req: Request) {
@@ -146,10 +156,12 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const bearer = await tryCustomerToken(request);
   const ap = bearer ? null : await tryAppProxyAuth(request);
   const auth = bearer || ap;
-  if (!auth?.customerId) return fail(request, 401, "auth_required");
+  const isAuthed = Boolean(auth?.customerId);
 
   const videoId = providedId || crypto.randomUUID();
   const objectPath = `videos/${videoId}/source`;
+
+  const claimToken = isAuthed ? null : createClaimToken();
 
   try {
     // 1) Create a V4 signed URL for direct upload (PUT)
@@ -166,34 +178,56 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
     // 2) Index the project (owner → project mapping) so Projects page can read it immediately
     try {
-      await db.collection("projects").doc(videoId).set(
-        {
-          ownerCustomerId: auth.customerId,     // canonical numeric id
-          owner: String(auth.customerId),       // duplicate for legacy readers
-          ownerShop: auth.shop || null,
-          fileName: name,
-          type,
-          status: "uploading",                  // your pipeline will advance this
-          source: { bucket: bucketName, object: objectPath, contentType: type },
-          createdAt: FieldValue.serverTimestamp(),
-          updatedAt: FieldValue.serverTimestamp(),
-        },
-        { merge: true }
-      );
-      console.log(`[proxy.uploads] indexed ${videoId} for owner ${auth.customerId}`);
+      const ownerCustomerId = isAuthed && auth?.customerId ? String(auth.customerId) : null;
+      const ownerShop = isAuthed ? auth?.shop || null : null;
+
+      const payload: Record<string, any> = {
+        fileName: name,
+        type,
+        status: "uploading", // your pipeline will advance this
+        source: { bucket: bucketName, object: objectPath, contentType: type },
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+      };
+
+      if (isAuthed) {
+        payload.ownerCustomerId = ownerCustomerId;
+        payload.owner = ownerCustomerId;
+        payload.ownerShop = ownerShop;
+        payload.claimTokenHash = FieldValue.delete();
+        payload.claimTokenIssuedAt = FieldValue.delete();
+        payload.claimTokenLastSeen = FieldValue.delete();
+      } else {
+        payload.ownerCustomerId = null;
+        payload.owner = null;
+        payload.ownerShop = null;
+        if (claimToken) {
+          payload.claimTokenHash = claimToken.hash;
+          payload.claimTokenIssuedAt = FieldValue.serverTimestamp();
+          payload.claimTokenLastSeen = FieldValue.serverTimestamp();
+        }
+      }
+
+      await db.collection("projects").doc(videoId).set(payload, { merge: true });
+      const ownerLog = ownerCustomerId || "anonymous";
+      console.log(`[proxy.uploads] indexed ${videoId} for owner ${ownerLog}`);
     } catch (e) {
       console.warn("[proxy.uploads] failed to index project in Firestore", e);
     }
 
     console.log("[proxy.uploads] ok", {
       videoId,
-      owner: auth.customerId,
+      owner: auth?.customerId || null,
       object: objectPath,
       type,
-      via: auth?.via || "authed",
+      via: auth?.via || (claimToken ? "claim-token" : "authed"),
     });
 
-    return ok(request, { url: signed, videoId });
+    return ok(request, {
+      url: signed,
+      videoId,
+      claimToken: claimToken?.token ?? undefined,
+    });
   } catch (e: any) {
     console.error("[proxy.uploads] error", e?.message || e);
     return fail(request, 500, "sign_failed");

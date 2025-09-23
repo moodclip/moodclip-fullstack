@@ -57,11 +57,34 @@ export interface ProjectOwnership {
   claimable?: boolean;
 }
 
+export interface TranscriptMeta {
+  available: boolean;
+  inline?: boolean;
+  size?: number;
+  partCount?: number;
+  truncated?: boolean;
+  reason?: string;
+  source?: string;
+}
+
 export interface ProjectStatusResponse {
   project: ProjectSummary;
   clipStatuses?: ClipStatus[];
   aiSuggestions?: AISuggestion[];
-  transcript?: string;
+  transcript?: unknown;
   transcriptUpdatedAt?: string;
+  transcriptMeta?: TranscriptMeta;
   ownership?: ProjectOwnership;
+}
+
+export interface TranscriptChunkResponse {
+  rootKind: 'array' | 'paragraphs' | 'segments' | 'raw';
+  part?: number;
+  totalParts?: number;
+  chunkSize?: number;
+  count?: number;
+  items?: unknown[];
+  metadata?: Record<string, unknown> | null;
+  transcript?: unknown;
+  transcriptUpdatedAt?: string | null;
 }

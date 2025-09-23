@@ -9,7 +9,7 @@ import masterIcon from '@/assets/master-icon.png';
 import exportIcon from '@/assets/export-icon.png';
 
 export const initialPipelineData: PipelineData = {
-  currentStage: 3,
+  currentStage: 1,
   stages: [
     {
       id: 1,
@@ -18,7 +18,7 @@ export const initialPipelineData: PipelineData = {
       buttonText: "Uploading",
       icon: uploadIcon,
       status: 'active',
-      ctaStatus: 'running',
+      ctaStatus: 'ready',
       progress: 0
     },
     {
@@ -28,7 +28,7 @@ export const initialPipelineData: PipelineData = {
       buttonText: "Transcribing",
       icon: denoiseIcon,
       status: 'upcoming',
-      ctaStatus: 'running',
+      ctaStatus: 'waiting',
       progress: 0
     },
     {
@@ -37,9 +37,9 @@ export const initialPipelineData: PipelineData = {
       description: "Identify key video segments",
       buttonText: "Finding Clips",
       icon: analyzeIcon,
-      status: 'completed',
-      ctaStatus: 'completed',
-      progress: 100
+      status: 'upcoming',
+      ctaStatus: 'waiting',
+      progress: 0
     },
     {
       id: 4,

@@ -3,6 +3,8 @@ import { authenticate } from "../shopify.server";
 import jwt from "jsonwebtoken";
 import { db } from "../firebase.server";
 
+const MAX_INLINE_TRANSCRIPT_BYTES = 250_000; // ~250 KB inline cap
+
 /** CORS */
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -19,6 +21,39 @@ function normalizeShop(host: string): string {
   const m = h.match(/^([^.]+)\.account\.myshopify\.com$/);
   return m ? `${m[1]}.myshopify.com` : h;
 }
+
+const toIso = (value: any): string | null => {
+  if (!value) return null;
+  try {
+    if (typeof value.toDate === "function") return value.toDate().toISOString();
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return null;
+    return date.toISOString();
+  } catch {
+    return null;
+  }
+};
+
+const extractTranscriptCandidate = (data: any): unknown => {
+  if (!data || typeof data !== "object") return null;
+
+  const candidates = [
+    data.transcriptNormalized,
+    data.transcript,
+    data.transcriptParagraphs,
+    data.transcriptParts,
+    data.transcriptData,
+    data.fullTranscript,
+  ];
+
+  for (const candidate of candidates) {
+    if (candidate !== undefined && candidate !== null) {
+      return candidate;
+    }
+  }
+
+  return null;
+};
 
 async function getAuth(request: Request): Promise<{ shop: string; customerId: string } | null> {
   // App‑Proxy first
@@ -50,6 +85,11 @@ async function getAuth(request: Request): Promise<{ shop: string; customerId: st
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
 
+  const url = new URL(request.url);
+  const includeParams = new Set(url.searchParams.getAll("include").map((v) => v.toLowerCase()));
+  const includeTranscript =
+    includeParams.has("transcript") || url.searchParams.get("includeTranscript") === "true";
+
   const auth = await getAuth(request);
   if (!auth) return fail(401, "unauthorized");
 
@@ -71,6 +111,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 
     const project = {
       status: p.status || null,
+      stage: p.stage || null,
       progress: p.progress ?? null,
       aiReady: !!p.aiReady,
       aiError: !!p.aiError,
@@ -94,10 +135,60 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 
     const aiSuggestions = Array.isArray(p.aiSuggestions) ? p.aiSuggestions : [];
 
+    const transcriptCandidate = extractTranscriptCandidate(p);
+    let transcript: unknown = undefined;
+    const transcriptMeta: Record<string, unknown> = { available: false };
+
+    if (transcriptCandidate !== null) {
+      transcriptMeta.available = true;
+      transcriptMeta.source = "project_doc";
+
+      let serialized: string | null = null;
+      try {
+        serialized = JSON.stringify(transcriptCandidate);
+      } catch {
+        serialized = null;
+      }
+
+      if (serialized) {
+        const size = Buffer.byteLength(serialized, "utf8");
+        transcriptMeta.size = size;
+        const inline = includeTranscript || size <= MAX_INLINE_TRANSCRIPT_BYTES;
+        transcriptMeta.inline = inline;
+        if (Array.isArray(p.transcriptParts)) {
+          transcriptMeta.partCount = p.transcriptParts.length;
+        }
+
+        if (inline) {
+          transcript = transcriptCandidate;
+        } else {
+          transcriptMeta.truncated = true;
+          transcriptMeta.reason = "too_large";
+        }
+      } else {
+        transcriptMeta.inline = false;
+        transcriptMeta.truncated = true;
+        transcriptMeta.reason = "serialization_error";
+      }
+    }
+    if (transcriptMeta.available === false) {
+      transcriptMeta.reason = "missing";
+    }
+
+    const transcriptUpdatedAt =
+      toIso(p.transcriptUpdatedAt) ||
+      toIso(p.transcriptUpdatedAtMs) ||
+      toIso(p.transcriptUpdatedAtIso) ||
+      toIso(p.updatedAt) ||
+      null;
+
     return ok({
       project,
       clipStatuses,
       aiSuggestions,
+      transcript,
+      transcriptMeta,
+      transcriptUpdatedAt,
       ownership: { ownedByYou, claimable: !ownerCustomerId },
     });
   } catch (e) {
