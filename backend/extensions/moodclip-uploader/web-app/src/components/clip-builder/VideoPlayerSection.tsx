@@ -217,6 +217,53 @@ export const VideoPlayerSection = ({
     }
   }, [selectedWords.length, playMode, onPlayModeChange]);
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !sourceVideo.url) return;
+
+    if (isPlaying) {
+      ensurePlayMode();
+      let targetTime: number;
+      if (playMode === 'selection' && selectionBounds) {
+        targetTime = clamp(
+          selectionBounds.start + currentTime,
+          selectionBounds.start,
+          selectionBounds.end,
+        );
+      } else if (playMode === 'lane' && activeClip) {
+        targetTime = clamp(
+          activeClip.startTime + currentTime,
+          activeClip.startTime,
+          activeClip.endTime,
+        );
+      } else {
+        targetTime = clamp(currentTime, 0, effectiveDuration || Number.MAX_SAFE_INTEGER);
+      }
+
+      if (Math.abs(video.currentTime - targetTime) > 0.01) {
+        video.currentTime = targetTime;
+      }
+
+      if (video.paused) {
+        void video.play().catch(() => {
+          onPlayingChange(false);
+        });
+      }
+    } else if (!video.paused) {
+      video.pause();
+    }
+  }, [
+    isPlaying,
+    playMode,
+    currentTime,
+    selectionBounds,
+    activeClip,
+    ensurePlayMode,
+    effectiveDuration,
+    sourceVideo.url,
+    onPlayingChange,
+  ]);
+
   const handlePlayPause = useCallback(() => {
     const video = videoRef.current;
     if (!video || !sourceVideo.url) return;
@@ -303,11 +350,11 @@ export const VideoPlayerSection = ({
         )}
 
         {!videoUnavailable && (
-          <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200">
+          <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200 pointer-events-none">
             <Button
               size="lg"
-              onClick={handlePlayPause}
-              className="rounded-full w-12 h-12 sm:w-16 sm:h-16 bg-white/20 backdrop-blur hover:bg-white/30 touch-manipulation"
+              onPress={handlePlayPause}
+              className="rounded-full w-12 h-12 sm:w-16 sm:h-16 bg-white/20 backdrop-blur hover:bg-white/30 touch-manipulation pointer-events-auto"
               type="button"
             >
               {isPlaying ? (

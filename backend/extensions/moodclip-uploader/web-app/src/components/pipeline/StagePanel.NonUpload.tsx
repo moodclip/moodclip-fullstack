@@ -26,13 +26,17 @@ const StagePanelNonUploadComponent = ({
   const gradientProgress = stage.displayProgress ?? stage.progress ?? 0;
   const disablePrimary = !onPrimaryAction || stage.ctaStatus === 'running';
 
-  const primaryButtonClasses = 'w-full max-w-sm font-semibold text-xl px-12 py-6 rounded-[2.75rem] text-white border-0 transition-all duration-500 ease-out hover:scale-105 disabled:opacity-60';
-  const secondaryButtonClasses = 'w-full max-w-sm font-semibold text-xl px-12 py-6 rounded-[2.75rem] border-2 transition-all duration-500 ease-out hover:scale-105';
+  const primaryToneClass = stage.ctaStatus === 'completed' ? 'mc-cta-success' : 'mc-cta-primary';
+  const primaryButtonClasses = `w-full max-w-sm text-xl mc-cta-button ${primaryToneClass} rounded-[9999px] text-white hover:bg-transparent hover:text-white disabled:opacity-70`;
+  const baseSecondaryClasses = 'w-full max-w-sm text-xl mc-cta-button rounded-[9999px] text-white hover:bg-transparent hover:text-white';
+  const secondaryButtonClasses = `${baseSecondaryClasses} mc-cta-primary`;
+  const buildClipsButtonClasses = `${baseSecondaryClasses} mc-cta-success`;
 
   const renderPrimaryButton = () => (
     <Button
       onClick={onPrimaryAction}
       disabled={disablePrimary}
+      variant="ghost"
       size="lg"
       className={primaryButtonClasses}
       style={{ background: getCtaBackground(stage.ctaStatus, gradientProgress) }}
@@ -46,9 +50,10 @@ const StagePanelNonUploadComponent = ({
     return (
       <Button
         onClick={onSecondaryAction}
-        variant="outline"
+        variant="ghost"
         size="lg"
         className={secondaryButtonClasses}
+        style={{ background: getCtaBackground('ready') }}
       >
         {stage.secondaryButtonText}
       </Button>
@@ -61,9 +66,10 @@ const StagePanelNonUploadComponent = ({
       return (
         <Button
           onClick={onLaunchBuilder}
-          variant="outline"
+          variant="ghost"
           size="lg"
-          className={secondaryButtonClasses}
+          className={buildClipsButtonClasses}
+          style={{ background: getCtaBackground('completed') }}
         >
           Build clips
         </Button>
@@ -74,9 +80,10 @@ const StagePanelNonUploadComponent = ({
       return (
         <Button
           onClick={onNavigateToBuilder}
-          variant="outline"
+          variant="ghost"
           size="lg"
-          className={secondaryButtonClasses}
+          className={buildClipsButtonClasses}
+          style={{ background: getCtaBackground('completed') }}
         >
           Build clips
         </Button>

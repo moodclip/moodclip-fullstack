@@ -3,19 +3,26 @@
 # builds your application, and generates the Prisma client.
 FROM node:20-slim AS builder
 WORKDIR /app
+ENV ROLLUP_SKIP_NODE_NATIVE=true
 
 # Copy all package manifests, including the lock file for npm ci
 COPY package.json package-lock.json ./
 COPY extensions/moodclip-uploader/package.json ./extensions/moodclip-uploader/
 
-# Use `npm ci` for a more reliable and faster install in CI/CD environments
-RUN npm ci --workspaces --include-workspace-root
+# Refresh the lockfile for the Linux target before installing dependencies, then
+# ensure Rollup's native optional dependency for Linux is present so Vite builds succeed.
+RUN npm install --package-lock-only --ignore-scripts \
+  && npm ci --workspaces --include-workspace-root \
+  && npm install --no-save --ignore-scripts @rollup/rollup-linux-x64-gnu
 
 # Copy the rest of your source code
 COPY . .
 
-# Run the build command, which compiles both Remix and the extension
-RUN npm run build
+# Copy pre-built extension assets (avoid rollup build issues)
+COPY extensions/moodclip-uploader/assets ./extensions/moodclip-uploader/assets
+
+# Run only the Remix build command
+RUN npx remix vite:build
 
 # Generate the Prisma client which is needed by the runtime
 RUN npx prisma generate
@@ -25,6 +32,7 @@ RUN npx prisma generate
 # This stage creates the final, lean image with only what's needed to run.
 FROM node:20-slim
 ENV NODE_ENV=production
+ENV ROLLUP_SKIP_NODE_NATIVE=true
 
 # Install OpenSSL, which is a runtime dependency for Prisma
 RUN apt-get update && apt-get install -y openssl
@@ -35,8 +43,9 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY extensions/moodclip-uploader/package.json ./extensions/moodclip-uploader/
 
-# Install ONLY production dependencies using `npm ci`
-RUN npm ci --workspaces --include-workspace-root --omit=dev
+# Refresh the lockfile for the Linux target before installing production dependencies.
+RUN npm install --package-lock-only --ignore-scripts \
+  && npm ci --workspaces --include-workspace-root --omit=dev
 
 # Copy the compiled application and public assets from the builder stage
 COPY --from=builder /app/build ./build

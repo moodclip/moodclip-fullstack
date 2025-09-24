@@ -53,16 +53,47 @@ const formatTimestamp = (seconds: number): string => {
   return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 };
 
-const normalizeTimeValue = (value: unknown, durationSec?: number): number => {
-  if (value === null || value === undefined) return 0;
-  const numeric = typeof value === 'number' ? value : Number(value);
-  if (!Number.isFinite(numeric)) return 0;
-  if (durationSec && numeric > durationSec * 1.5) {
-    return numeric / 100; // centiseconds fallback
+const pickFirstDefined = (...values: unknown[]): unknown | undefined => {
+  for (const value of values) {
+    if (value !== undefined && value !== null) return value;
   }
-  if (!durationSec && numeric > 10_000) {
+  return undefined;
+};
+
+const parseMaybeNumber = (value: unknown): number | null => {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    const parsed = Number(trimmed);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return null;
+};
+
+const normalizeTimeValue = (
+  value: unknown,
+  options?: { units?: string; durationSec?: number; allowLegacyHeuristic?: boolean },
+): number => {
+  const numeric = parseMaybeNumber(value);
+  if (numeric === null) return 0;
+
+  const unit = options?.units?.toLowerCase();
+  if (unit === 'cs' || unit === 'centiseconds') return numeric / 100;
+  if (unit === 'ms' || unit === 'milliseconds') return numeric / 1000;
+  if (unit === 's' || unit === 'seconds') return numeric;
+
+  if (options?.allowLegacyHeuristic && options.durationSec) {
+    const duration = options.durationSec;
+    if (duration > 0 && numeric > duration * 1.5) {
+      return numeric / 100;
+    }
+  }
+
+  if (options?.allowLegacyHeuristic && numeric > 10_000) {
     return numeric / 100;
   }
+
   return numeric;
 };
 
@@ -76,15 +107,50 @@ const normalizeWord = (
   const text = typeof rawText === 'string' ? rawText.trim() : '';
   if (!text) return null;
 
-  const start = normalizeTimeValue(
-    word.start ?? word.startTime ?? word.ts ?? word.offset ?? word.begin ?? 0,
-    durationSec,
+  const units =
+    typeof word.units === 'string'
+      ? word.units
+      : typeof word.timeUnit === 'string'
+        ? word.timeUnit
+        : undefined;
+
+  const startSource = pickFirstDefined(
+    word.startTime,
+    word.start_seconds,
+    word.startSeconds,
+    word.start,
+    word.ts,
+    word.offset,
+    word.begin,
   );
-  const end = normalizeTimeValue(
-    word.end ?? word.endTime ?? word.until ?? word.offsetEnd ?? word.finish ?? start,
-    durationSec,
+  const endSource = pickFirstDefined(
+    word.endTime,
+    word.end_seconds,
+    word.endSeconds,
+    word.end,
+    word.until,
+    word.offsetEnd,
+    word.finish,
   );
-  const safeEnd = Number.isFinite(end) && end > start ? end : start + Math.max(0.3, text.length * 0.05);
+
+  let start = parseMaybeNumber(startSource);
+  let end = parseMaybeNumber(endSource);
+
+  if (start === null || end === null) {
+    const fallbackStart = pickFirstDefined(word.start, word.ts, word.offset, word.begin, 0);
+    const fallbackEnd = pickFirstDefined(word.end, word.until, word.offsetEnd, word.finish, fallbackStart);
+    start = normalizeTimeValue(fallbackStart, { units, durationSec, allowLegacyHeuristic: true });
+    end = normalizeTimeValue(fallbackEnd, { units, durationSec, allowLegacyHeuristic: true });
+  } else {
+    const unitOptions = { units, durationSec };
+    start = normalizeTimeValue(start, unitOptions);
+    end = normalizeTimeValue(end, unitOptions);
+  }
+
+  if (!Number.isFinite(start)) start = 0;
+  if (!Number.isFinite(end) || end <= start) {
+    end = start + Math.max(0.3, text.length * 0.05);
+  }
 
   const speaker =
     typeof word.speaker === 'string'
@@ -97,36 +163,13 @@ const normalizeWord = (
     id: String(word.id ?? word.word_id ?? fallbackId),
     text,
     startTime: start,
-    endTime: safeEnd,
+    endTime: end,
     speaker,
     isHook: Boolean(word.isHook || word.hook),
   };
 };
 
-const normalizeParagraph = (
-  paragraph: any,
-  index: number,
-  durationSec?: number,
-): TranscriptParagraph => {
-  const rawWords = Array.isArray(paragraph?.words) ? paragraph.words : [];
-  const words = rawWords
-    .map((word: any, wordIndex: number) => normalizeWord(word, `${index}-${wordIndex}`, durationSec))
-    .filter(Boolean) as TranscriptWord[];
 
-  const speaker =
-    typeof paragraph?.speaker === 'string'
-      ? paragraph.speaker
-      : words[0]?.speaker ?? `Speaker ${index + 1}`;
-
-  const timestamp = formatTimestamp(words[0]?.startTime ?? 0);
-
-  return {
-    id: paragraph?.id?.toString() ?? `p-${index}`,
-    timestamp,
-    speaker,
-    words,
-  };
-};
 
 const buildParagraphsFromWords = (words: TranscriptWord[]): TranscriptParagraph[] => {
   if (words.length === 0) return [];
@@ -170,11 +213,38 @@ const normalizeTranscript = (
 ): TranscriptParagraph[] => {
   if (!raw) return [];
 
+  const mapParagraph = (paragraph: any, index: number): TranscriptParagraph | null => {
+    if (!paragraph) return null;
+    const words = Array.isArray(paragraph.words)
+      ? (paragraph.words as any[])
+          .map((word: any, wordIndex: number) => normalizeWord(word, `${index}-${wordIndex}`, durationSec))
+          .filter(Boolean) as TranscriptWord[]
+      : [];
+    if (!words.length) return null;
+    const speaker =
+      typeof paragraph.speaker === 'string'
+        ? paragraph.speaker
+        : words[0]?.speaker ?? `Speaker ${index + 1}`;
+    const timestamp =
+      typeof paragraph.timestamp === 'string'
+        ? paragraph.timestamp
+        : formatTimestamp(words[0]?.startTime ?? 0);
+    return {
+      id: paragraph.id?.toString() ?? `p-${index}`,
+      timestamp,
+      speaker,
+      words,
+    };
+  };
+
+  const buildFromParagraphs = (paragraphs: any[]): TranscriptParagraph[] =>
+    paragraphs
+      .map((paragraph, index) => mapParagraph(paragraph, index))
+      .filter((paragraph): paragraph is TranscriptParagraph => Boolean(paragraph));
+
   if (Array.isArray(raw)) {
-    if (raw.length && typeof raw[0] === 'object' && raw[0] && 'words' in (raw[0] as any)) {
-      return (raw as any[]).map((paragraph, index) =>
-        normalizeParagraph(paragraph, index, durationSec),
-      );
+    if (raw.length && Array.isArray((raw[0] as any)?.words)) {
+      return buildFromParagraphs(raw as any[]);
     }
 
     if (raw.length && typeof raw[0] === 'object') {
@@ -188,21 +258,15 @@ const normalizeTranscript = (
   if (raw && typeof raw === 'object') {
     const candidate = raw as Record<string, unknown>;
     if (Array.isArray(candidate.paragraphs)) {
-      return (candidate.paragraphs as any[]).map((paragraph, index) =>
-        normalizeParagraph(paragraph, index, durationSec),
-      );
+      return buildFromParagraphs(candidate.paragraphs as any[]);
     }
     if (Array.isArray(candidate.items)) {
-      const words = (candidate.items as any[])
-        .map((item, index) => {
-          if (Array.isArray(item?.words)) {
-            return (item.words as any[])
-              .map((word, wordIndex) => normalizeWord(word, `${index}-${wordIndex}`, durationSec))
-              .filter(Boolean);
-          }
-          return normalizeWord(item, `item-${index}`, durationSec);
-        })
-        .flat()
+      const items = candidate.items as any[];
+      if (items.length && Array.isArray(items[0]?.words)) {
+        return buildFromParagraphs(items);
+      }
+      const words = items
+        .map((item, index) => normalizeWord(item, `word-${index}`, durationSec))
         .filter(Boolean) as TranscriptWord[];
       return buildParagraphsFromWords(words);
     }
@@ -222,6 +286,8 @@ const normalizeTranscript = (
 
   return [];
 };
+
+
 
 const flattenWords = (transcript: TranscriptParagraph[]): TranscriptWord[] =>
   transcript.flatMap((paragraph) => paragraph.words);
@@ -262,9 +328,11 @@ const normalizeRange = (
   startValue: unknown,
   endValue: unknown,
   durationSec?: number,
+  units?: string,
 ): [number, number] => {
-  let start = normalizeTimeValue(startValue, durationSec);
-  let end = normalizeTimeValue(endValue, durationSec);
+  const options = { units, durationSec, allowLegacyHeuristic: true } as const;
+  let start = normalizeTimeValue(startValue, options);
+  let end = normalizeTimeValue(endValue, options);
   if (!Number.isFinite(start) || start < 0) start = 0;
   if (!Number.isFinite(end) || end <= start) {
     end = start + 5;
@@ -284,7 +352,25 @@ const buildAiBubbles = (
 
   const words = flattenWords(transcript);
   return suggestions.map((suggestion, index) => {
-    const [start, end] = normalizeRange(suggestion.start, suggestion.end, durationSec);
+    const suggestionExtras = suggestion as Record<string, unknown>;
+    const [start, end] = normalizeRange(
+      pickFirstDefined(
+        suggestion.start,
+        suggestionExtras.startTime,
+        suggestionExtras.begin,
+        suggestionExtras.start_seconds,
+        suggestionExtras.startMs,
+      ),
+      pickFirstDefined(
+        suggestion.end,
+        suggestionExtras.endTime,
+        suggestionExtras.finish,
+        suggestionExtras.end_seconds,
+        suggestionExtras.endMs,
+      ),
+      durationSec,
+      typeof suggestionExtras.units === 'string' ? (suggestionExtras.units as string) : undefined,
+    );
     const relevantWords = extractWordsInRange(words, start, end);
     const clipText = relevantWords.length
       ? relevantWords.map((word) => word.text).join(' ')
@@ -315,7 +401,25 @@ const buildGeneratedClipsBubble = (
   const words = flattenWords(transcript);
 
   const clips = clipStatuses.map((clip, index) => {
-    const [start, end] = normalizeRange(clip.start, clip.end, durationSec);
+    const clipExtras = clip as Record<string, unknown>;
+    const [start, end] = normalizeRange(
+      pickFirstDefined(
+        clip.start,
+        clipExtras.startTime,
+        clipExtras.begin,
+        clipExtras.start_seconds,
+        clipExtras.startMs,
+      ),
+      pickFirstDefined(
+        clip.end,
+        clipExtras.endTime,
+        clipExtras.finish,
+        clipExtras.end_seconds,
+        clipExtras.endMs,
+      ),
+      durationSec,
+      typeof clipExtras.units === 'string' ? (clipExtras.units as string) : undefined,
+    );
     let text = clip.title ?? '';
     if (!text) {
       const rangeWords = extractWordsInRange(words, start, end);

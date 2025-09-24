@@ -2,7 +2,7 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import type { DocumentData, DocumentReference } from "firebase-admin/firestore";
 import { Storage } from "@google-cloud/storage";
-import { db } from "../firebase.server";
+import { db, FieldValue } from "../firebase.server";
 
 /* CORS */
 const CORS = {
@@ -51,15 +51,72 @@ const ensureCanonicalSource = async (
             object: objectPath,
             bucket: bucketName,
           },
+          sourceValidatedAt: FieldValue.serverTimestamp(),
         },
         { merge: true },
       );
+      console.info('[proxy.stream]', JSON.stringify({ phase: 'normalize', videoId, object: objectPath, bucket: bucketName }));
     } catch (error) {
       console.warn('[proxy.stream] failed to normalize project.source', { videoId, error });
     }
   }
 
   return { objectPath, bucketName } as const;
+};
+
+const tryRecoverLegacySource = async (
+  videoId: string,
+  project: ProjectDoc,
+  source: any,
+  bucketName: string,
+  objectPath: string,
+) => {
+  const bucket = storage.bucket(bucketName);
+  const canonicalFile = bucket.file(objectPath);
+  const [exists] = await canonicalFile.exists();
+  if (exists) {
+    return { file: canonicalFile, recovered: false } as const;
+  }
+
+  const canonicalObject = `videos/${videoId}/source`;
+  const candidates = new Set<string>();
+  candidates.add(canonicalObject);
+  const legacyWithoutPrefix = canonicalObject.replace(/^videos\//, '');
+  if (legacyWithoutPrefix) candidates.add(legacyWithoutPrefix);
+  candidates.add(`${videoId}/source`);
+  if (objectPath && objectPath !== canonicalObject) {
+    candidates.add(objectPath);
+    const withoutPrefix = objectPath.replace(/^videos\//, '');
+    if (withoutPrefix) candidates.add(withoutPrefix);
+  }
+
+  for (const candidate of candidates) {
+    const legacyFile = bucket.file(candidate);
+    const [legacyExists] = await legacyFile.exists();
+    if (!legacyExists) continue;
+
+    try {
+      await legacyFile.copy(canonicalFile);
+      await legacyFile.delete({ ignoreNotFound: true });
+      await project.ref.set(
+        {
+          source: {
+            ...(typeof source === 'object' && source ? source : {}),
+            object: canonicalObject,
+            bucket: bucketName,
+          },
+          sourceValidatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true },
+      );
+      console.info('[proxy.stream]', JSON.stringify({ phase: 'recover', videoId, canonicalObject, recoveredFrom: candidate }));
+      return { file: canonicalFile, recovered: true } as const;
+    } catch (error) {
+      console.error('[proxy.stream] failed to recover legacy source', { videoId, candidate, error });
+    }
+  }
+
+  return { file: canonicalFile, recovered: false } as const;
 };
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
@@ -82,7 +139,13 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     );
 
     const bucket = storage.bucket(bucketName);
-    const file = bucket.file(objectPath);
+    const { file } = await tryRecoverLegacySource(
+      videoId,
+      project,
+      source,
+      bucketName,
+      objectPath,
+    );
     const [exists] = await file.exists();
     if (!exists) {
       return fail(404, "source_not_found");

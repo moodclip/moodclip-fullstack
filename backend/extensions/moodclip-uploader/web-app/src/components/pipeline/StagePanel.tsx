@@ -97,14 +97,15 @@ export const StagePanel = ({
   const gradientProgress = stage.displayProgress ?? stage.progress ?? 0;
   const disablePrimary = !onPrimaryAction || stage.ctaStatus === 'running';
 
-  const uploadPrimaryClasses = 'max-w-lg font-semibold text-2xl px-20 py-8 rounded-[3.75rem]';
-  const pipelinePrimaryClasses = 'max-w-sm font-semibold text-xl px-12 py-6 rounded-[2.75rem]';
-  const primaryButtonClasses = `w-full ${isUploadStage ? uploadPrimaryClasses : pipelinePrimaryClasses} text-white border-0 transition-all duration-500 ease-out hover:scale-105 disabled:opacity-60`;
+  const primarySizeClasses = isUploadStage ? 'max-w-2xl text-4xl' : 'max-w-sm text-xl';
+  const primaryToneClass = stage.ctaStatus === 'completed' ? 'mc-cta-success' : 'mc-cta-primary';
+  const primaryButtonClasses = `w-full ${primarySizeClasses} ${isUploadStage ? 'mc-cta-button-2x' : 'mc-cta-button'} ${primaryToneClass} rounded-[9999px] text-white hover:bg-transparent hover:text-white disabled:opacity-70`;
 
   const renderPrimaryButton = () => (
     <Button
       onClick={onPrimaryAction}
       disabled={disablePrimary}
+      variant="ghost"
       size="lg"
       className={primaryButtonClasses}
       style={{ background: getCtaBackground(stage.ctaStatus, gradientProgress) }}
@@ -115,14 +116,16 @@ export const StagePanel = ({
 
   const renderSecondaryButton = () => {
     if (!stage.secondaryButtonText || !onSecondaryAction) return null;
-    const uploadSecondaryClasses = 'max-w-lg font-semibold text-xl px-20 py-6 rounded-[3.75rem]';
-    const pipelineSecondaryClasses = 'max-w-sm font-semibold text-xl px-12 py-6 rounded-[2.75rem]';
+    const secondarySizeClasses = isUploadStage ? 'max-w-2xl text-2xl' : 'max-w-sm text-xl';
+    const isBuildClips = stage.secondaryButtonText?.toLowerCase() === 'build clips';
+    const secondaryToneClass = isBuildClips ? 'mc-cta-success' : 'mc-cta-primary';
     return (
       <Button
         onClick={onSecondaryAction}
-        variant="outline"
+        variant="ghost"
         size="lg"
-        className={`w-full ${isUploadStage ? uploadSecondaryClasses : pipelineSecondaryClasses} border-2 transition-all duration-500 ease-out hover:scale-105`}
+        className={`w-full ${secondarySizeClasses} ${isUploadStage ? 'mc-cta-button-2x' : 'mc-cta-button'} ${secondaryToneClass} rounded-[9999px] text-white hover:bg-transparent hover:text-white`}
+        style={{ background: getCtaBackground(isBuildClips ? 'completed' : 'ready') }}
       >
         {stage.secondaryButtonText}
       </Button>

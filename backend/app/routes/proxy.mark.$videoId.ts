@@ -55,16 +55,87 @@ const ensureCanonicalSource = async (
             object: objectPath,
             bucket: bucketName,
           },
+          sourceValidatedAt: FieldValue.serverTimestamp(),
         },
         { merge: true },
       );
-      logMark({ phase: 'mark', videoId, object: objectPath, bucket: bucketName, outcome: 'source_normalized' });
+      logMark({
+        phase: 'mark',
+        videoId,
+        object: objectPath,
+        bucket: bucketName,
+        previousObject: rawObject || null,
+        previousBucket: rawBucket || null,
+        outcome: 'source_normalized',
+      });
     } catch (error) {
       console.warn('[proxy.mark] failed to normalize project.source', { videoId, error });
     }
   }
 
   return { objectPath, bucketName } as const;
+};
+
+const tryRecoverLegacySource = async (
+  videoId: string,
+  project: ProjectDoc,
+  source: any,
+  bucketName: string,
+  objectPath: string,
+) => {
+  const bucket = storage.bucket(bucketName);
+  const canonicalFile = bucket.file(objectPath);
+  const [exists] = await canonicalFile.exists();
+  if (exists) {
+    return { file: canonicalFile, recovered: false } as const;
+  }
+
+  const canonicalObject = `videos/${videoId}/source`;
+  const candidates = new Set<string>();
+  candidates.add(canonicalObject);
+  const legacyWithoutPrefix = canonicalObject.replace(/^videos\//, '');
+  if (legacyWithoutPrefix) candidates.add(legacyWithoutPrefix);
+  candidates.add(`${videoId}/source`);
+  if (objectPath && objectPath !== canonicalObject) {
+    candidates.add(objectPath);
+    const withoutPrefix = objectPath.replace(/^videos\//, '');
+    if (withoutPrefix) candidates.add(withoutPrefix);
+  }
+
+  for (const candidate of candidates) {
+    const legacyFile = bucket.file(candidate);
+    const [legacyExists] = await legacyFile.exists();
+    if (!legacyExists) continue;
+
+    try {
+      await legacyFile.copy(canonicalFile);
+      await legacyFile.delete({ ignoreNotFound: true });
+      await project.ref.set(
+        {
+          source: {
+            ...(typeof source === 'object' && source ? source : {}),
+            object: canonicalObject,
+            bucket: bucketName,
+          },
+          sourceValidatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true },
+      );
+      logMark({
+        phase: 'mark',
+        videoId,
+        object: canonicalObject,
+        bucket: bucketName,
+        recoveredFrom: candidate,
+        outcome: 'source_recovered',
+      });
+      return { file: canonicalFile, recovered: true } as const;
+    } catch (error) {
+      console.error('[proxy.mark] failed to recover legacy source', { videoId, candidate, error });
+    }
+  }
+
+  return { file: canonicalFile, recovered: false } as const;
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -103,13 +174,28 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       bucketFallback,
     );
 
-    const file = storage.bucket(bucketName).file(objectPath);
+    const { file, recovered } = await tryRecoverLegacySource(
+      videoId,
+      project,
+      source,
+      bucketName,
+      objectPath,
+    );
     const [exists] = await file.exists();
-    logMark({ phase: 'mark', videoId, object: objectPath, bucket: bucketName, exists, attempt: 1, outcome: exists ? 'source_found' : 'source_missing' });
+    logMark({ phase: 'mark', videoId, object: objectPath, bucket: bucketName, exists, recovered, attempt: 1, outcome: exists ? 'source_found' : 'source_missing' });
 
     if (!exists) return fail(409, "source_missing");
 
-    await file.setMetadata({ customTime: new Date().toISOString() });
+    try {
+      await file.setMetadata({ customTime: new Date().toISOString() });
+    } catch (error: any) {
+      const message = error?.message ?? String(error);
+      if (typeof message === 'string' && message.includes('No such object')) {
+        logMark({ phase: 'mark', videoId, object: objectPath, bucket: bucketName, attempt: 1, recovered, outcome: 'source_missing_after_exists', error: message });
+        return fail(409, "source_missing");
+      }
+      throw error;
+    }
 
     await project.ref.set(
       {

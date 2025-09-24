@@ -2,6 +2,7 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
 import jwt from "jsonwebtoken";
 import { db } from "../firebase.server";
+import { extractTranscriptCandidate } from "~/lib/transcript-utils.server";
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -30,24 +31,6 @@ const toIso = (value: any): string | null => {
   } catch {
     return null;
   }
-};
-
-const extractTranscriptCandidate = (data: any): unknown => {
-  if (!data || typeof data !== "object") return null;
-  const candidates = [
-    data.transcriptNormalized,
-    data.transcript,
-    data.transcriptParagraphs,
-    data.transcriptParts,
-    data.transcriptData,
-    data.fullTranscript,
-  ];
-  for (const candidate of candidates) {
-    if (candidate !== undefined && candidate !== null) {
-      return candidate;
-    }
-  }
-  return null;
 };
 
 const getAuth = async (request: Request): Promise<{ shop: string; customerId: string } | null> => {

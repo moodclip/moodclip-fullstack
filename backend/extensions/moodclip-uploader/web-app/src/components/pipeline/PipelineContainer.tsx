@@ -684,7 +684,11 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
 
   useEffect(() => {
     return () => {
-      resetUploadState();
+      stopBootstrap();
+      uploadControllerRef.current?.abort();
+      uploadControllerRef.current = null;
+      setIsUploading(false);
+      hasRealProgressRef.current = false;
     };
   }, []);
 

@@ -1,80 +1,130 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {
   BlockStack,
   InlineStack,
   Heading,
   Text,
+  Button,
+  Spinner,
   useApi,
 } from '@shopify/ui-extensions-react/customer-account';
 
-// Talk straight to Cloud Run; no App Proxy here.
 const CLOUD_RUN_BASE = 'https://mf-backend-270455452709.us-central1.run.app';
+const PAGE_SIZE = 30;
 
-type Project = { id: string; title?: string | null; status?: string | null };
+type Project = { id: string; title?: string | null; status?: string | null; createdAt?: string | null };
+type ProjectsResponse = { projects?: Project[]; nextCursor?: string | null };
+
+const buildUrl = (cursor: string | null, token: string | null) => {
+  const params = new URLSearchParams({ limit: String(PAGE_SIZE) });
+  if (cursor) params.set('cursor', cursor);
+  if (token) params.set('token', token);
+  return `${CLOUD_RUN_BASE}/proxy/projects?${params.toString()}`;
+};
 
 export function ProjectsView() {
   const {sessionToken} = useApi();
 
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState<string | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [diag, setDiag]         = useState<string>('Booting…');
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [loadingInitial, setLoadingInitial] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [diag, setDiag] = useState<string>('Booting…');
 
-  useEffect(() => {
-    let cancelled = false;
+  const loadPage = useCallback(
+    async (cursor: string | null) => {
+      const isLoadMore = Boolean(cursor);
+      setError(null);
+      setDiag(isLoadMore ? 'Loading more projects…' : 'Fetching customer token…');
+      if (isLoadMore) {
+        setLoadingMore(true);
+      } else {
+        setLoadingInitial(true);
+      }
 
-    async function load() {
       try {
-        setLoading(true);
-        setError(null);
-        setDiag('Fetching customer token…');
-
-        // Safe probe: get the Customer Account session token
         const token = await sessionToken.get();
-        if (cancelled) return;
+        const primaryUrl = buildUrl(cursor, null);
 
-        setDiag('Calling Cloud Run /proxy/projects…');
+        const primaryHeaders: Record<string, string> = { Accept: 'application/json' };
+        if (token) {
+          primaryHeaders.Authorization = `Bearer ${token}`;
+        }
 
-        // Primary path: Authorization header
-        let res = await fetch(`${CLOUD_RUN_BASE}/proxy/projects?limit=30`, {
+        let res = await fetch(primaryUrl, {
           method: 'GET',
-          headers: {Accept: 'application/json', Authorization: `Bearer ${token}`},
+          headers: primaryHeaders,
           mode: 'cors',
           cache: 'no-store',
         });
 
-        // Fallback: if some edge strips Authorization, retry with ?token=
         if (!res.ok) {
-          setDiag(`Primary failed (${res.status}); retrying with ?token=…`);
-          res = await fetch(
-            `${CLOUD_RUN_BASE}/proxy/projects?limit=30&token=${encodeURIComponent(token)}`,
-            {method: 'GET', headers: {Accept: 'application/json'}, mode: 'cors', cache: 'no-store'}
-          );
+          const fallbackUrl = buildUrl(cursor, token);
+          res = await fetch(fallbackUrl, {
+            method: 'GET',
+            headers: { Accept: 'application/json' },
+            mode: 'cors',
+            cache: 'no-store',
+          });
         }
 
         const text = await res.text().catch(() => '');
-        if (!res.ok) throw new Error(`Projects request failed: ${res.status} ${text.slice(0,140)}`);
+        if (!res.ok) {
+          throw new Error(`Projects request failed: ${res.status} ${text.slice(0, 120)}`);
+        }
 
-        let json: any = {};
-        try { json = JSON.parse(text || '{}'); } catch { json = {}; }
+        let json: ProjectsResponse = {};
+        try {
+          json = JSON.parse(text || '{}') as ProjectsResponse;
+        } catch {
+          json = {};
+        }
 
-        const list: Project[] = Array.isArray(json?.projects) ? json.projects : [];
-        if (cancelled) return;
-
-        setProjects(list);
-        setDiag(`Loaded ${list.length} project(s).`);
-        setLoading(false);
-      } catch (e: any) {
-        if (cancelled) return;
-        setError(String(e?.message || e));
-        setProjects([]);
-        setLoading(false);
+        const list = Array.isArray(json.projects) ? json.projects : [];
+        setNextCursor(json.nextCursor ?? null);
+        setProjects((prev) => {
+          const merged = cursor ? [...prev, ...list] : list;
+          setDiag(`Loaded ${merged.length} project(s).`);
+          return merged;
+        });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        setError(message);
+        if (!cursor) {
+          setProjects([]);
+        }
+        setDiag('');
+      } finally {
+        if (cursor) {
+          setLoadingMore(false);
+        } else {
+          setLoadingInitial(false);
+        }
       }
-    }
+    },
+    [sessionToken],
+  );
 
-    load();
-    return () => { cancelled = true; };
-  }, [sessionToken]);
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      if (cancelled) return;
+      await loadPage(null);
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [loadPage]);
+
+  const hasMore = useMemo(() => Boolean(nextCursor), [nextCursor]);
+
+  const handleLoadMore = useCallback(() => {
+    if (!nextCursor || loadingMore) return;
+    void loadPage(nextCursor);
+  }, [nextCursor, loadingMore, loadPage]);
 
   return (
     <BlockStack spacing="base">
@@ -82,17 +132,22 @@ export function ProjectsView() {
 
       {!!diag && <Text>{diag}</Text>}
 
-      {loading && <Text>Loading…</Text>}
+      {loadingInitial && (
+        <InlineStack spacing="tight">
+          <Spinner size="small" />
+          <Text>Loading projects…</Text>
+        </InlineStack>
+      )}
 
-      {!loading && error && (
+      {!loadingInitial && error && (
         <Text appearance="critical">Error: {error}</Text>
       )}
 
-      {!loading && !error && projects.length === 0 && (
+      {!loadingInitial && !error && projects.length === 0 && (
         <Text>No projects yet.</Text>
       )}
 
-      {!loading && !error && projects.length > 0 && (
+      {!loadingInitial && !error && projects.length > 0 && (
         <BlockStack spacing="base">
           {projects.map((p) => (
             <BlockStack key={p.id} spacing="tight">
@@ -101,8 +156,28 @@ export function ProjectsView() {
                 {p.status ? <Text>• {p.status}</Text> : null}
               </InlineStack>
               <Text>Open in editor: moodclip.com/#pid={p.id}</Text>
+              {p.createdAt ? (
+                <Text appearance="subdued" size="small">Created {new Date(p.createdAt).toLocaleString()}</Text>
+              ) : null}
             </BlockStack>
           ))}
+
+          {hasMore && (
+            <InlineStack spacing="tight">
+              <Button
+                kind="secondary"
+                loading={loadingMore}
+                onPress={handleLoadMore}
+                disabled={loadingMore}
+              >
+                {loadingMore ? 'Loading…' : 'Load more'}
+              </Button>
+            </InlineStack>
+          )}
+
+          {!hasMore && projects.length > 0 && (
+            <Text appearance="subdued" size="small">You've reached the end of your project history.</Text>
+          )}
         </BlockStack>
       )}
     </BlockStack>

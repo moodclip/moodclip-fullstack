@@ -2,6 +2,8 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
 import jwt from "jsonwebtoken";
 import { db } from "../firebase.server";
+import { ensureFallbackAISuggestions } from "~/lib/ai-suggestions.server";
+import { extractTranscriptCandidate } from "~/lib/transcript-utils.server";
 
 const MAX_INLINE_TRANSCRIPT_BYTES = 250_000; // ~250 KB inline cap
 
@@ -32,27 +34,6 @@ const toIso = (value: any): string | null => {
   } catch {
     return null;
   }
-};
-
-const extractTranscriptCandidate = (data: any): unknown => {
-  if (!data || typeof data !== "object") return null;
-
-  const candidates = [
-    data.transcriptNormalized,
-    data.transcript,
-    data.transcriptParagraphs,
-    data.transcriptParts,
-    data.transcriptData,
-    data.fullTranscript,
-  ];
-
-  for (const candidate of candidates) {
-    if (candidate !== undefined && candidate !== null) {
-      return candidate;
-    }
-  }
-
-  return null;
 };
 
 type AuthContext = { shop?: string; customerId?: string; via: 'app-proxy' | 'jwt' };
@@ -126,11 +107,26 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
       ownerCustomerId === viewerCustomerId &&
       (!ownerShop || !viewerShop || ownerShop === viewerShop);
 
+    let aiReady = Boolean(p.aiReady);
+    let aiSuggestions: any[] = Array.isArray(p.aiSuggestions) ? p.aiSuggestions : [];
+
+    if (aiSuggestions.length === 0) {
+      try {
+        const fallback = await ensureFallbackAISuggestions(ref, p);
+        if (Array.isArray(fallback) && fallback.length) {
+          aiSuggestions = fallback;
+          aiReady = true;
+        }
+      } catch (error) {
+        console.warn('[proxy.status] fallback_ai_suggestions_failed', { videoId, error });
+      }
+    }
+
     const project = {
       status: p.status || null,
       stage: p.stage || null,
       progress: p.progress ?? null,
-      aiReady: !!p.aiReady,
+      aiReady,
       aiError: !!p.aiError,
       durationSec: p.durationSec ?? p.duration ?? null,
     };
@@ -151,8 +147,6 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
         });
       });
     } catch {}
-
-    const aiSuggestions = Array.isArray(p.aiSuggestions) ? p.aiSuggestions : [];
 
     const transcriptCandidate = extractTranscriptCandidate(p);
     let transcript: unknown = undefined;

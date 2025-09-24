@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build": "npm run build:ext && remix vite:build",
-    "build:ext": "vite build --config extensions/moodclip-uploader/vite.ext.config.ts",
+    "build:ext": "ROLLUP_SKIP_NODE_NATIVE=true vite build --config extensions/moodclip-uploader/vite.ext.config.ts",
     "dev": "remix vite:dev",
     "config:link": "shopify app config link",
     "generate": "shopify app generate",

@@ -1,7 +1,7 @@
 # Spec vs Implementation Gaps
 
 _Date first logged: 2025-09-19_
-_Last updated: 2025-09-26_
+_Last updated: 2025-09-27_
 
 ## Resolved gaps
 
@@ -13,11 +13,10 @@ _Last updated: 2025-09-26_
 | Status polling | All reads should stay within the Shopify App Proxy. | Pipeline status uses React Query + `fetchProjectStatus`, which only targets `/apps/moodclip-uploader-v4/proxy/status/:id`. | Resolved – no fallback to the public Cloud Run host remains. |
 | Styling system | Align extension styling with Tailwind/shadcn token strategy. | `web-app/src/index.css` defines the shared design tokens and gradients used across the new UI. | Resolved – Lovable components can share the token set without conflicts. |
 | Source transparency | Keep reusable React source (HeroUploader, TranscriptEditor, etc.) in-repo. | Both the extension shell (`src/`) and Lovable web app (`web-app/src/`) ship readable React components and hooks. | Resolved – no reliance on minified-only bundles. |
+| Project list pagination | App proxy supports cursor pagination via `cursor` parameter. | `extensions/moodclip-projects/src/ProjectsView.tsx` now consumes `nextCursor` and renders a load-more button; `app/routes/proxy.projects.ts` issues ordered batches with stable cursors. | Resolved – customer account history paginates without truncation. |
+| Clip creation gating | Server must validate clip requests against project ownership. | `app/routes/proxy.clip.$videoId.ts` derives the authenticated customer and enforces owner/shop checks before queuing Pub/Sub jobs. | Resolved – clip POSTs require ownership, eliminating blind `videoId` guesses. |
+| Transcript data normalization | Backend should be the canonical normalization pass. | `web-app/src/pages/ClipBuilder.tsx` now trusts backend timestamps, only heuristically normalizing legacy fallbacks. | Resolved – UI stays aligned with canonical transcript timing. |
 
 ## Outstanding gaps
 
-| Area | Spec expectation | Current implementation | Impact |
-| --- | --- | --- | --- |
-| Project list pagination | App proxy supports cursor pagination via `cursor` parameter. | `extensions/moodclip-projects/src/ProjectsView.tsx` always requests `?limit=30` with no pagination controls. | Large project histories are truncated; add cursor support or load-more UI. |
-| Clip creation gating | Server must validate clip requests against project ownership. | `app/routes/proxy.clip.$videoId.ts` enforces App Proxy HMAC and shop domain but does not confirm the requesting customer owns the project. | Risk of clip creation by guessing `videoId`; add owner/customer checks before queuing clips. |
-| Transcript data normalization | Backend should be the canonical normalization pass. | `web-app/src/pages/ClipBuilder.tsx` still normalizes transcript timing on the client (`normalizeTimeValue`, `normalizeTranscript`). | Potential drift once backend normalization changes; harmonize the rules or gate behind a flag. |
+_None – all known spec mismatches are currently addressed._
