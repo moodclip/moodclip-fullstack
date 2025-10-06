@@ -1,0 +1,188 @@
+<account-modal class="header__account header-modal" id="account-modal">
+	<div class="account__content header-modal_content color-background-1">
+		<div class="account__header">
+			{%- if customer -%}
+				<h4 class="account__header-title">{{ customer.name }}</h4>
+			{%- else -%}
+				<h4 class="account__header-title">
+					{{- 'general.account.title' | t -}}
+				</h4>
+			{%- endif -%}
+
+			<button
+				type="button"
+				class="account__close button focus-inset modal-close-button"
+				aria-label="{{ 'accessibility.close' | t }}"
+				id="account-modal-close"
+			>
+				{% comment %}{% render 'icon-close' %}{% endcomment %}
+				{{ 'general.close.title' | t }}
+			</button>
+		</div>
+		<div class="account__main">
+			{%- if customer -%}
+				<div class="header__account__account">
+					<ul class="header__account__body list-unstyled">
+						<li class="header__account__link">
+							<a
+								href="{{ routes.account_url }}"
+								class="link button button--simple"
+							>
+								{% if settings.button_animation %}
+									<span class="animation-wrapper" hoverstagger="link">
+										<span class="button-label animation" hoverstagger="text">
+											<span class="word" id="word1">
+												{{ 'customer.account.title' | t }}
+											</span>
+										</span>
+										<span
+											class="button-label is-2 animation"
+											hoverstagger="text"
+										>
+											<span class="word" id="word2">
+												{{ 'customer.account.title' | t }}
+											</span>
+										</span>
+									</span>
+								{% else %}
+									<span class="button-label">
+										{{- 'customer.account.title' | t -}}
+									</span>
+								{% endif %}
+							</a>
+						</li>
+						<li class="header__account__address">
+							<a
+								href="{{ routes.account_addresses_url }}"
+								class="link button button--simple"
+							>
+								{% if settings.button_animation %}
+									<span class="animation-wrapper" hoverstagger="link">
+										<span class="button-label animation" hoverstagger="text">
+											<span class="word" id="word1">
+												{{- 'customer.addresses.book' | t -}}
+											</span>
+										</span>
+										<span
+											class="button-label is-2 animation"
+											hoverstagger="text"
+										>
+											<span class="word" id="word2">
+												{{- 'customer.addresses.book' | t -}}
+											</span>
+										</span>
+									</span>
+								{% else %}
+									<span class="button-label">
+										{{- 'customer.addresses.book' | t -}}
+									</span>
+								{% endif %}
+							</a>
+						</li>
+					</ul>
+					<a
+						class="header__account__logout button button--primary focus-inset"
+						href="{{ routes.account_logout_url }}"
+					>
+						{% if settings.button_animation %}
+							<span class="animation-wrapper" hoverstagger="link">
+								<span class="button-label animation" hoverstagger="text">
+									<span class="word" id="word1">
+										{{- 'customer.log_out' | t -}}
+									</span>
+								</span>
+								<span class="button-label is-2 animation" hoverstagger="text">
+									<span class="word" id="word2">
+										{{- 'customer.log_out' | t -}}
+									</span>
+								</span>
+							</span>
+						{% else %}
+							<span class="button-label">{{ 'customer.log_out' | t }}</span>
+						{% endif %}
+					</a>
+				</div>
+			{%- else -%}
+				{% if settings.account_description != blank %}
+					<div class="account__info medium-font">
+						{{ settings.account_description }}
+					</div>
+				{% endif %}
+				<div class="account__buttons">
+					<a
+						href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
+						class="button button--primary header__account__login link focus-inset"
+					>
+						{% if settings.button_animation %}
+							<span class="animation-wrapper" hoverstagger="link">
+								<span class="button-label animation" hoverstagger="text">
+									<span class="word" id="word1">
+										{%- liquid
+											if customer
+												echo 'customer.account_fallback' | t
+											else
+												echo 'customer.log_in' | t
+											endif
+										-%}
+									</span>
+								</span>
+								<span class="button-label is-2 animation" hoverstagger="text">
+									<span class="word" id="word2">
+										{%- liquid
+											if customer
+												echo 'customer.account_fallback' | t
+											else
+												echo 'customer.log_in' | t
+											endif
+										-%}
+									</span>
+								</span>
+							</span>
+						{% else %}
+							<span class="button-label">
+								{%- liquid
+									if customer
+										echo 'customer.account_fallback' | t
+									else
+										echo 'customer.log_in' | t
+									endif
+								-%}
+							</span>
+						{% endif %}
+					</a>
+					<div class="header__account__register-wrapper">
+						<a
+							class="header__account__register link button button--simple"
+							href="{{ routes.account_register_url }}"
+						>
+							{% render 'icon-button-arrow' %}
+
+							{% if settings.button_animation %}
+								<span class="animation-wrapper" hoverstagger="link">
+									<span class="button-label animation" hoverstagger="text">
+										<span class="word" id="word1">
+											{{- 'customer.login_page.create_account' | t -}}
+										</span>
+									</span>
+									<span class="button-label is-2 animation" hoverstagger="text">
+										<span class="word" id="word2">
+											{{- 'customer.login_page.create_account' | t -}}
+										</span>
+									</span>
+								</span>
+							{% else %}
+								<span class="button-label">
+									{{- 'customer.login_page.create_account' | t -}}
+								</span>
+							{% endif %}
+						</a>
+					</div>
+				</div>
+			{%- endif -%}
+		</div>
+	</div>
+	<div
+		id="accountModal-Overlay"
+		class="modal__overlay account-modal__overlay"
+	></div>
+</account-modal>

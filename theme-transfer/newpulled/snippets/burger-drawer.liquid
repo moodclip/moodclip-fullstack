@@ -1,0 +1,457 @@
+{% comment %}
+	Renders cart drawer
+
+	Usage:
+	{% render 'burger-drawer' %}
+{% endcomment %}
+
+<style>
+	.drawer {
+		visibility: hidden;
+	}
+</style>
+
+{% liquid
+	assign first_promo_trigger = block.settings.first_promo_trigger | handle | strip
+	assign second_promo_trigger = block.settings.second_promo_trigger | handle | strip
+	assign third_promo_trigger = block.settings.third_promo_trigger | handle | strip
+	assign fourth_promo_trigger = block.settings.fourth_promo_trigger | handle | strip
+	assign fifth_promo_trigger = block.settings.fifth_promo_trigger | handle | strip
+%}
+
+<burger-drawer class="drawer burger-drawer">
+	<div
+		id="BurgerDrawer-Overlay"
+		class="cart-drawer__overlay"
+	></div>
+	<div
+		id="BurgerDrawer"
+		class="cart-drawer color-{{ section.settings.color_scheme }}"
+	>
+		
+		<div
+			class="drawer__inner"
+			role="dialog"
+			aria-modal="true"
+			aria-label="{{ 'general.cart.item_added' | t }}"
+			tabindex="-1"
+		>
+			<div class="drawer__inner-wrapper">
+				{% comment %}<button
+					type="button"
+					class="burger__close focus-inset modal-close-button"
+					id="burger-drawer-close"
+					aria-label="{{ 'accessibility.close' | t }}"
+				>
+					{% comment %}{% render 'icon-close' %}{% endcomment %}
+				</button>{% endcomment %}
+				<div class="drawer__top">
+					<div class="burger_menu">
+						{%- for link in block.settings.dropdown_button_menu.links -%}
+							<div class="h3">
+								{%- if link.links != blank -%}
+									<div
+										class="drawer__accordion-title burger_menu_link first_level button-animation"
+										tabindex="0"
+									>
+										{% if settings.header_links_animation %}
+											<span class="animation-wrapper" hoverstagger="link">
+												<span class="animation" hoverstagger="text">
+													<span class="word" id="word1">
+														{{- link.title | escape -}}
+													</span>
+												</span>
+												<span class="is-2 animation" hoverstagger="text">
+													<span class="word" id="word2">
+														{{- link.title | escape -}}
+													</span>
+												</span>
+											</span>
+										{% else %}
+											<span>
+												{{ link.title | escape }}
+											</span>
+										{% endif %}
+									</div>
+									{% if link.links != blank %}
+										<div class="drawer__accordion-content">
+											<div class="drawer__accordion-content-block">
+												{%- for childlink in link.links -%}
+													{% liquid
+														assign trigger = ""
+														if childlink.handle == first_promo_trigger
+															assign trigger = " opacity-1"
+														elsif childlink.handle == second_promo_trigger
+															assign trigger = " opacity-2"
+														elsif childlink.handle == third_promo_trigger
+															assign trigger = " opacity-3"
+														elsif childlink.handle == fourth_promo_trigger
+															assign trigger = " opacity-4"
+														elsif childlink.handle == fifth_promo_trigger
+															assign trigger = " opacity-5"
+														endif
+													%}
+													<div class="h3{{ trigger }}">
+														{%- if childlink.links != blank -%}
+															<div
+																class="drawer__accordion-title burger_menu_link second_level button-animation"
+																tabindex="0"
+															>
+																{% if settings.header_links_animation %}
+																	<span
+																		class="animation-wrapper"
+																		hoverstagger="link"
+																	>
+																		<span class="animation" hoverstagger="text">
+																			<span class="word" id="word1">
+																				{{- childlink.title | escape -}}
+																			</span>
+																		</span>
+																		<span
+																			class="is-2 animation"
+																			hoverstagger="text"
+																		>
+																			<span class="word" id="word2">
+																				{{- childlink.title | escape -}}
+																			</span>
+																		</span>
+																	</span>
+																{% else %}
+																	<span>
+																		{{ childlink.title | escape }}
+																	</span>
+																{% endif %}
+															</div>
+														{% else %}
+															<div class="second_level">
+																<a
+																	href="{{ childlink.url }}"
+																	class="menu-drawer__menu-item burger_menu_link list-menu__item focus-inset button-animation{% if childlink.current %} menu-drawer__menu-item--active{% endif %}"
+																	{% if childlink.current %}
+																		aria-current="page"
+																	{% endif %}
+																>
+																	{% if settings.header_links_animation %}
+																		<span
+																			class="animation-wrapper"
+																			hoverstagger="link"
+																		>
+																			<span
+																				class="animation"
+																				hoverstagger="text"
+																			>
+																				<span class="word" id="word1">
+																					{{- childlink.title | escape -}}
+																				</span>
+																			</span>
+																			<span
+																				class="is-2 animation"
+																				hoverstagger="text"
+																			>
+																				<span class="word" id="word2">
+																					{{- childlink.title | escape -}}
+																				</span>
+																			</span>
+																		</span>
+																	{% else %}
+																		<span>
+																			{{ childlink.title | escape }}
+																		</span>
+																	{% endif %}
+																</a>
+															</div>
+														{% endif %}
+														{% if childlink.links != blank %}
+															<div class="drawer__accordion-content">
+																<div class="drawer__accordion-content-block">
+																	{%- for grandchildlink in childlink.links -%}
+																		<div class="third_level h3">
+																			<a
+																				href="{{ grandchildlink.url }}"
+																				class="menu-drawer__menu-item-child burger_menu_link button-animation"
+																				{% if grandchildlink.current %}
+																					aria-current="page"
+																				{% endif %}
+																			>
+																				{% if settings.header_links_animation %}
+																					<span
+																						class="animation-wrapper"
+																						hoverstagger="link"
+																					>
+																						<span
+																							class="animation"
+																							hoverstagger="text"
+																						>
+																							<span class="word" id="word1">
+																								{{-
+																									grandchildlink.title
+																									| escape
+																								-}}
+																							</span>
+																						</span>
+																						<span
+																							class="is-2 animation"
+																							hoverstagger="text"
+																						>
+																							<span class="word" id="word2">
+																								{{-
+																									grandchildlink.title
+																									| escape
+																								-}}
+																							</span>
+																						</span>
+																					</span>
+																				{% else %}
+																					<span>
+																						{{ grandchildlink.title | escape }}
+																					</span>
+																				{% endif %}
+																			</a>
+																		</div>
+																	{%- endfor -%}
+																</div>
+															</div>
+														{% endif %}
+													</div>
+												{%- endfor -%}
+
+												<div class="burger-menu__items">
+													{%- for childlink in link.links -%}
+														{% if childlink.handle == first_promo_trigger %}
+															<div class="burger-menu__item opacity-1">
+																{% if block.settings.image_1 != blank %}
+																	{{
+																		block.settings.image_1
+																		| image_url:
+																			width: block.settings.image_1.width
+																		| image_tag:
+																			loading: 'lazy',
+																			sizes: '100vw',
+																			widths: '360, 550, 710',
+																			width: block.settings.image_1.width,
+																			class: 'burger-menu__item-image'
+																	}}
+																{%- endif -%}
+															</div>
+														{% endif %}
+														{% if childlink.handle == second_promo_trigger %}
+															<div class="burger-menu__item opacity-2">
+																{% if block.settings.image_2 != blank %}
+																	{{
+																		block.settings.image_2
+																		| image_url:
+																			width: block.settings.image_2.width
+																		| image_tag:
+																			loading: 'lazy',
+																			sizes: '100vw',
+																			widths: '360, 550, 710',
+																			width: block.settings.image_2.width,
+																			class: 'burger-menu__item-image'
+																	}}
+																{%- endif -%}
+															</div>
+														{% endif %}
+														{% if childlink.handle == third_promo_trigger %}
+															<div class="burger-menu__item opacity-3">
+																{% if block.settings.image_3 != blank %}
+																	{{
+																		block.settings.image_3
+																		| image_url:
+																			width: block.settings.image_3.width
+																		| image_tag:
+																			loading: 'lazy',
+																			sizes: '100vw',
+																			widths: '360, 550, 710',
+																			width: block.settings.image_3.width,
+																			class: 'burger-menu__item-image'
+																	}}
+																{%- endif -%}
+															</div>
+														{% endif %}
+														{% if childlink.handle == fourth_promo_trigger %}
+															<div class="burger-menu__item opacity-4">
+																{% if block.settings.image_4 != blank %}
+																	{{
+																		block.settings.image_4
+																		| image_url:
+																			width: block.settings.image_4.width
+																		| image_tag:
+																			loading: 'lazy',
+																			sizes: '100vw',
+																			widths: '360, 550, 710',
+																			width: block.settings.image_4.width,
+																			class: 'burger-menu__item-image'
+																	}}
+																{%- endif -%}
+															</div>
+														{% endif %}
+														{% if childlink.handle == fifth_promo_trigger %}
+															<div class="burger-menu__item opacity-5">
+																{% if block.settings.image_5 != blank %}
+																	{{
+																		block.settings.image_5
+																		| image_url:
+																			width: block.settings.image_5.width
+																		| image_tag:
+																			loading: 'lazy',
+																			sizes: '100vw',
+																			widths: '360, 550, 710',
+																			width: block.settings.image_5.width,
+																			class: 'burger-menu__item-image'
+																	}}
+																{%- endif -%}
+															</div>
+														{% endif %}
+													{%- endfor -%}
+												</div>
+											</div>
+										</div>
+									{% endif %}
+								{%- else -%}
+									<div class="first_level">
+										<a
+											href="{{ link.url }}"
+											class="menu-drawer__menu-item burger_menu_link list-menu__item focus-inset button-animation{% if link.current %} menu-drawer__menu-item--active{% endif %}"
+											{% if link.current %}
+												aria-current="page"
+											{% endif %}
+										>
+											{% if settings.header_links_animation %}
+												<span class="animation-wrapper" hoverstagger="link">
+													<span class="animation" hoverstagger="text">
+														<span class="word" id="word1">
+															{{- link.title | escape -}}
+														</span>
+													</span>
+													<span class="is-2 animation" hoverstagger="text">
+														<span class="word" id="word2">
+															{{- link.title | escape -}}
+														</span>
+													</span>
+												</span>
+											{% else %}
+												{{ link.title | escape }}
+											{% endif %}
+										</a>
+									</div>
+								{%- endif -%}
+							</div>
+						{%- endfor -%}
+					</div>
+				</div>
+				<div class="drawer__bottom">
+					{% if block.settings.description != blank %}
+						<div class="drawer__bottom-text medium-font">
+							{{ block.settings.description }}
+						</div>
+					{% endif %}
+					{% if block.settings.show_social %}
+						{% if settings.social_instagram_link != blank
+							or settings.social_facebook_link != blank
+							or settings.social_twitter_link != blank
+							or settings.social_pinterest_link != blank
+							or settings.social_tiktok_link != blank
+							or settings.social_tumblr_link != blank
+							or settings.social_snapchat_link != blank
+							or settings.social_youtube_link != blank
+							or settings.social_vimeo_link != blank
+						%}
+							<div class="drawer__bottom-socials">
+								{%- if settings.social_instagram_link != blank -%}
+									<a
+										href="{{ settings.social_instagram_link }}"
+										class="link link--text list-social__link small-font"
+										aria-describedby="a11y-external-message"
+										aria-label="instagram"
+									>
+										{{- 'general.social.links.instagram' | t -}}
+									</a>
+								{%- endif -%}
+								{%- if settings.social_facebook_link != blank -%}
+									<a
+										href="{{ settings.social_facebook_link }}"
+										class="link link--text list-social__link small-font"
+										aria-describedby="a11y-external-message"
+										aria-label="facebook"
+									>
+										{{- 'general.social.links.facebook' | t -}}
+									</a>
+								{%- endif -%}
+								{%- if settings.social_twitter_link != blank -%}
+									<a
+										href="{{ settings.social_twitter_link }}"
+										class="link link--text list-social__link small-font"
+										aria-describedby="a11y-external-message"
+										aria-label="twitter"
+									>
+										{{- 'general.social.links.twitter' | t -}}
+									</a>
+								{%- endif -%}
+								{%- if settings.social_pinterest_link != blank -%}
+									<a
+										href="{{ settings.social_pinterest_link }}"
+										class="link link--text list-social__link small-font"
+										aria-describedby="a11y-external-message"
+										aria-label="pinterest"
+									>
+										{{- 'general.social.links.pinterest' | t -}}
+									</a>
+								{%- endif -%}
+								{%- if settings.social_tiktok_link != blank -%}
+									<a
+										href="{{ settings.social_tiktok_link }}"
+										class="link link--text list-social__link small-font"
+										aria-describedby="a11y-external-message"
+										aria-label="tiktok"
+									>
+										{{- 'general.social.links.tiktok' | t -}}
+									</a>
+								{%- endif -%}
+								{%- if settings.social_tumblr_link != blank -%}
+									<a
+										href="{{ settings.social_tumblr_link }}"
+										class="link link--text list-social__link small-font"
+										aria-describedby="a11y-external-message"
+										aria-label="tumblr"
+									>
+										{{- 'general.social.links.tumblr' | t -}}
+									</a>
+								{%- endif -%}
+								{%- if settings.social_snapchat_link != blank -%}
+									<a
+										href="{{ settings.social_snapchat_link }}"
+										class="link link--text list-social__link small-font"
+										aria-describedby="a11y-external-message"
+										aria-label="snapchat"
+									>
+										{{- 'general.social.links.snapchat' | t -}}
+									</a>
+								{%- endif -%}
+								{%- if settings.social_youtube_link != blank -%}
+									<a
+										href="{{ settings.social_youtube_link }}"
+										class="link link--text list-social__link small-font"
+										aria-describedby="a11y-external-message"
+										aria-label="youtube"
+									>
+										{{- 'general.social.links.youtube' | t -}}
+									</a>
+								{%- endif -%}
+								{%- if settings.social_vimeo_link != blank -%}
+									<a
+										href="{{ settings.social_vimeo_link }}"
+										class="link link--text list-social__link small-font"
+										aria-describedby="a11y-external-message"
+										aria-label="vimeo"
+									>
+										{{- 'general.social.links.vimeo' | t -}}
+									</a>
+								{%- endif -%}
+							</div>
+						{% endif %}
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+</burger-drawer>

@@ -1,0 +1,1860 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "17576687739191a232": {
+      "type": "apps",
+      "blocks": {
+        "moodclip_v3_app_block_3MeEEa": {
+          "type": "shopify://apps/moodclip-v3/blocks/app-block/5e8701fb-c41c-4dcc-94c7-b5bfa4dc9223",
+          "settings": {
+            "title": "Upload Your Video"
+          }
+        }
+      },
+      "block_order": [
+        "moodclip_v3_app_block_3MeEEa"
+      ],
+      "settings": {
+        "include_margins": true
+      }
+    },
+    "videogrid_GakRF9": {
+      "type": "videogrid",
+      "blocks": {
+        "tab_wYU7BB": {
+          "type": "tab",
+          "settings": {
+            "title": "Testimonials"
+          }
+        },
+        "video_EUdmCc": {
+          "type": "video",
+          "settings": {
+            "video_url": ""
+          }
+        },
+        "video_f6dqMg": {
+          "type": "video",
+          "settings": {
+            "video_url": ""
+          }
+        },
+        "video_VhRgFQ": {
+          "type": "video",
+          "settings": {
+            "video_url": ""
+          }
+        },
+        "tab_6NCkWi": {
+          "type": "tab",
+          "settings": {
+            "title": "Featured Client Channels"
+          }
+        },
+        "video_qfNTfq": {
+          "type": "video",
+          "settings": {
+            "video_url": "https://www.youtube.com/watch?v=fvBhnXKGz_Q"
+          }
+        },
+        "video_UUEXRK": {
+          "type": "video",
+          "settings": {
+            "video_url": "https://www.youtube.com/watch?v=-zCZ8bQ6d60"
+          }
+        },
+        "video_yXY4eN": {
+          "type": "video",
+          "settings": {
+            "video_url": "https://www.youtube.com/watch?v=YjaurgnyY8o"
+          }
+        },
+        "video_pGBjkC": {
+          "type": "video",
+          "settings": {
+            "video_url": "https://www.youtube.com/watch?v=HIJy-uy0GRI"
+          }
+        },
+        "video_ghzcty": {
+          "type": "video",
+          "settings": {
+            "video_url": "https://www.youtube.com/watch?v=NywJxCLsEgg"
+          }
+        },
+        "video_8A36Cc": {
+          "type": "video",
+          "settings": {
+            "video_url": "https://www.youtube.com/watch?v=YZDi-HEr_EY"
+          }
+        }
+      },
+      "block_order": [
+        "tab_wYU7BB",
+        "video_EUdmCc",
+        "video_f6dqMg",
+        "video_VhRgFQ",
+        "tab_6NCkWi",
+        "video_qfNTfq",
+        "video_UUEXRK",
+        "video_yXY4eN",
+        "video_pGBjkC",
+        "video_ghzcty",
+        "video_8A36Cc"
+      ],
+      "disabled": true,
+      "settings": {
+        "icon_lottie_url": "",
+        "icon_size": 50,
+        "icon_size_mobile": 64,
+        "icon_align": "center",
+        "icon_align_mobile": "center",
+        "hide_icon": false,
+        "heading": "<p>BIG CHANNELS.</p><p>THEIR WORDS ABOUT US.</p>",
+        "heading_custom": true,
+        "heading_font": "archivo_n6",
+        "heading_size": 34,
+        "heading_size_mobile": 34,
+        "heading_height": 130,
+        "heading_align": "center",
+        "heading_align_mobile": "center",
+        "heading_mt": 16,
+        "text": "<p>Trusted by the voices behind your favorite plugins, breakdowns, and viral loops. Together, the creators we edit for have earned over <span style=\"text-decoration:underline\"><em>1 billion views</em></span> and counting.</p>",
+        "text_width": 60,
+        "text_width_mobile": 92,
+        "text_custom": true,
+        "text_font": "archivo_n4",
+        "text_size": 14,
+        "text_size_mobile": 12,
+        "text_height": 150,
+        "text_align": "center",
+        "text_align_mobile": "center",
+        "text_mt": 6,
+        "list_gap": 16,
+        "list_gap_mobile": 16,
+        "list_mt": 16,
+        "list_border_thickness": 1,
+        "list_item_width": 10,
+        "list_item_width_mobile": 10,
+        "list_item_custom": false,
+        "list_item_font": "josefin_sans_n4",
+        "list_item_size": 20,
+        "list_item_size_mobile": 18,
+        "list_item_height": 150,
+        "list_item_border_thickness": 6,
+        "mobile_layout_list": true,
+        "grid_width": 85,
+        "grid_width_mobile": 100,
+        "grid_row": 3,
+        "grid_row_mobile": 1,
+        "grid_gap": 32,
+        "grid_gap_mobile": 16,
+        "grid_mt": 16,
+        "autoplay_videos": false,
+        "video_ratio": "original",
+        "video_radius": 10,
+        "video_border_thickness": 0,
+        "video_shadow": false,
+        "arrow_size": 50,
+        "arrow_icon_size": 28,
+        "arrow_border_thickness": 0,
+        "bottom_text": "",
+        "bottom_text_width": 72,
+        "bottom_text_width_mobile": 100,
+        "bottom_text_custom": true,
+        "bottom_text_font": "archivo_n4",
+        "bottom_text_size": 16,
+        "bottom_text_size_mobile": 12,
+        "bottom_text_height": 150,
+        "bottom_text_align": "center",
+        "bottom_text_align_mobile": "center",
+        "bottom_text_mt": 36,
+        "button": "",
+        "button_url": "",
+        "button_custom": true,
+        "button_font": "archivo_n4",
+        "button_size": 16,
+        "button_size_mobile": 14,
+        "button_height": 100,
+        "button_align": "center",
+        "button_align_mobile": "center",
+        "button_mt": 32,
+        "button_padding_vertical": 16,
+        "button_padding_horizontal": 60,
+        "button_radius": 50,
+        "button_border_thickness": 0,
+        "list_border_color": "#404040",
+        "list_item_color": "#cccccc",
+        "list_item_hover_color": "#c7d1ff",
+        "list_item_active_color": "#c7d1ff",
+        "list_item_border_hover_color": "#325aff",
+        "list_item_border_color": "#325aff",
+        "list_item_border_active_color": "#325aff",
+        "video_border_color": "#0045e8",
+        "video_border_shadow_color": "#0045e8",
+        "button_color": "#ffffff",
+        "button_hover_color": "#ffffff",
+        "button_bg_color": "#006cff",
+        "button_bg_hover_color": "#006cff",
+        "button_border_color": "#000000",
+        "button_border_hover_color": "#000000",
+        "arrow_color": "#c7d1ff",
+        "arrow_bg_color": "#325aff",
+        "arrow_border_color": "#000000",
+        "heading_color": "#ffffff",
+        "text_color": "#a2aad3",
+        "bottom_text_color": "#c7d1ff",
+        "background_color": "#000000",
+        "background_gradient": "linear-gradient(180deg, rgba(30, 27, 120, 1) 4.315%, rgba(6, 16, 36, 1) 26%, rgba(12, 32, 72, 1) 74.819%, rgba(6, 5, 16, 1) 97%, rgba(0, 0, 0, 1) 100%)",
+        "border_color": "#000000",
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "padding_top": 28,
+        "padding_bottom": 28,
+        "padding_horizontal": 5,
+        "padding_horizontal_mobile": 1.5,
+        "full_width": true,
+        "content_width": 120,
+        "border_thickness": 0,
+        "lazy": true
+      }
+    },
+    "image_banner_rz6Lhe": {
+      "type": "image-banner",
+      "blocks": {
+        "review_nNMW8K": {
+          "type": "review",
+          "settings": {
+            "image_size": 38,
+            "image_size_mobile": 38,
+            "image_radius": 100,
+            "image_border_thickness": 0,
+            "stars_count": 5,
+            "stars_size": 18,
+            "stars_size_mobile": 18,
+            "review": "Trusted by the Best in Music",
+            "stars_text": "Excellent 5.0",
+            "review_custom": false,
+            "review_font": "josefin_sans_n4",
+            "review_size": 16,
+            "review_size_mobile": 13,
+            "review_height": 130,
+            "review_mt": 0,
+            "review_mt_mobile": 100,
+            "review_color": "#ffffff",
+            "count_color": "#ffffff",
+            "stars_color": "#ffffff",
+            "stars_bg_color": "#00b67a",
+            "stars_bg_half_color": "#dddddd",
+            "image_border_color": "#ffffff"
+          }
+        },
+        "button_8hiaFr": {
+          "type": "button",
+          "settings": {
+            "button": "View Pricing",
+            "url": "#shopify-section-template--19027717423332__sc_pricingtable_FrKcMh",
+            "button_custom": true,
+            "button_font": "archivo_n4",
+            "button_size": 16,
+            "button_size_mobile": 16,
+            "button_height": 100,
+            "button_padding_horizontal": 18,
+            "button_padding_horizontal_mobile": 18,
+            "button_padding_vertical": 12,
+            "button_padding_vertical_mobile": 12,
+            "button_radius": 30,
+            "button_border_thickness": 1,
+            "button_mt": 24,
+            "button_mt_mobile": 24,
+            "button_style": "outline",
+            "use_shadow": false,
+            "button_color": "#ffffff",
+            "button_hover_color": "#ffffff",
+            "button_bg_color": "#325aff",
+            "button_bg_hover_color": "#0045e8",
+            "button_border_color": "#325aff",
+            "button_border_hover_color": "#0045e8"
+          }
+        },
+        "button_MnAzyD": {
+          "type": "button",
+          "settings": {
+            "button": "Book A Call",
+            "url": "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0y3tDTVq7jxADawGwOtIlVgNmJdjfzwOIxjUgAgNWmdO9AWWcTyCf1Tt1bc0_AtjhzkFKH6Mvx?gv=true",
+            "button_custom": true,
+            "button_font": "archivo_n4",
+            "button_size": 16,
+            "button_size_mobile": 16,
+            "button_height": 100,
+            "button_padding_horizontal": 18,
+            "button_padding_horizontal_mobile": 18,
+            "button_padding_vertical": 12,
+            "button_padding_vertical_mobile": 12,
+            "button_radius": 30,
+            "button_border_thickness": 1,
+            "button_mt": 24,
+            "button_mt_mobile": 24,
+            "button_style": "outline_arrow",
+            "use_shadow": false,
+            "button_color": "#c7d1ff",
+            "button_hover_color": "#ffffff",
+            "button_bg_color": "rgba(0,0,0,0)",
+            "button_bg_hover_color": "#0045e8",
+            "button_border_color": "#c7d1ff",
+            "button_border_hover_color": "#0045e8"
+          }
+        }
+      },
+      "block_order": [
+        "review_nNMW8K",
+        "button_8hiaFr",
+        "button_MnAzyD"
+      ],
+      "disabled": true,
+      "custom_css": [],
+      "settings": {
+        "section_layout": "full",
+        "color_scheme": "",
+        "image_size": "medium",
+        "overlay_opacity": 0,
+        "enable_lazy_loading": true,
+        "media_fit": "cover",
+        "media_position": "center",
+        "heading_top_spacing_desktop": 10,
+        "heading_top_spacing_mobile": 15,
+        "content_align": "center",
+        "content_align_mobile": "center",
+        "subheading": "",
+        "heading": "<span style=\"text-decoration:underline\">THE ONLY VIDEO AGENCY</span>",
+        "heading_second": "That SPEAKS MUSIC",
+        "heading_font_size_desktop": 47,
+        "heading_font_size_mobile": 28,
+        "description": "<p>Video Editing for music audiences, tutorials, and everything inbetween.</p>",
+        "desc_size": "",
+        "button_label": "",
+        "button_link": "",
+        "button_style": "tertiary",
+        "button_arrow": false,
+        "margin_top": "no-indent",
+        "margin_bottom": "no-indent"
+      }
+    },
+    "team_showcase_e7NxiH": {
+      "type": "team-showcase",
+      "blocks": {
+        "team_member_ycQQJ8": {
+          "type": "team_member",
+          "settings": {
+            "name": "Video Editor",
+            "member_name_color": "#ffffff",
+            "member_card_color": "#333333",
+            "member_name_size_mobile": 16,
+            "member_name_size_desktop": 18
+          }
+        },
+        "team_member_9XDwRp": {
+          "type": "team_member",
+          "settings": {
+            "name": "Project Manager",
+            "member_name_color": "#ffffff",
+            "member_card_color": "#333333",
+            "member_name_size_mobile": 16,
+            "member_name_size_desktop": 18
+          }
+        },
+        "team_member_rNBQik": {
+          "type": "team_member",
+          "settings": {
+            "name": "Audio Engineer",
+            "member_name_color": "#ffffff",
+            "member_card_color": "#333333",
+            "member_name_size_mobile": 16,
+            "member_name_size_desktop": 18
+          }
+        }
+      },
+      "block_order": [
+        "team_member_ycQQJ8",
+        "team_member_9XDwRp",
+        "team_member_rNBQik"
+      ],
+      "disabled": true,
+      "name": "Team Showcase",
+      "settings": {
+        "padding_top": 20,
+        "padding_bottom": 45,
+        "entrance_animation": "slide-up",
+        "animation_duration": 0.9,
+        "stagger_delay": 130,
+        "heading": "",
+        "heading_highlighted": "",
+        "heading_color": "#ffffff",
+        "underline_gradient_start": "#151f46",
+        "underline_gradient_end": "#5a7aff",
+        "heading_size_mobile": 30,
+        "heading_size_desktop": 38,
+        "heading_margin_bottom": 50,
+        "box_background_color": "#1f1f1f",
+        "box_title_part1": "",
+        "box_title_highlighted": "you get a full team of professionals",
+        "box_title_part2": "",
+        "box_title_color": "#c7d1ff",
+        "box_underline_gradient_start": "#151f46",
+        "box_underline_gradient_end": "#5a7aff",
+        "box_border_color": "#5a7aff",
+        "box_title_size_mobile": 22,
+        "box_title_size_desktop": 34,
+        "button_primary_label": "",
+        "button_primary_link": "",
+        "button_secondary_label": "",
+        "button_secondary_link": ""
+      }
+    },
+    "sc_scrollinglogocloud_p3NJBY": {
+      "type": "sc-scrollinglogocloud",
+      "blocks": {
+        "slide_YUNirD": {
+          "type": "slide",
+          "settings": {
+            "link": ""
+          }
+        },
+        "slide_T9yt7L": {
+          "type": "slide",
+          "settings": {
+            "link": ""
+          }
+        },
+        "slide_pV63FV": {
+          "type": "slide",
+          "settings": {
+            "link": ""
+          }
+        },
+        "slide_aFMxCz": {
+          "type": "slide",
+          "settings": {
+            "link": ""
+          }
+        },
+        "slide_BCxJJj": {
+          "type": "slide",
+          "settings": {
+            "link": ""
+          }
+        },
+        "slide_tcGHAT": {
+          "type": "slide",
+          "settings": {
+            "link": ""
+          }
+        },
+        "slide_kkAdVk": {
+          "type": "slide",
+          "settings": {
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "slide_YUNirD",
+        "slide_T9yt7L",
+        "slide_pV63FV",
+        "slide_aFMxCz",
+        "slide_BCxJJj",
+        "slide_tcGHAT",
+        "slide_kkAdVk"
+      ],
+      "disabled": true,
+      "settings": {
+        "ss-title": "",
+        "heading_custom": false,
+        "heading_font": "assistant_n4",
+        "header_size": 30,
+        "header_align": "center",
+        "scrolling_velocity": 19,
+        "pause_hover": false,
+        "show_fade_effect": true,
+        "fade_color": "#000000",
+        "fade_width": 31,
+        "shadow": false,
+        "sliders_mt": 0,
+        "logo_padding_top": 0,
+        "logo_padding_bottom": 0,
+        "slider_gap": 68,
+        "slider_gap_mobile": 30,
+        "slider_direction": "left",
+        "icon_width": 120,
+        "header_color": "rgba(0,0,0,0)",
+        "border_color": "#ffffff",
+        "background-color": "rgba(0,0,0,0)",
+        "slider-background-color": "rgba(0,0,0,0)",
+        "margin_top": 20,
+        "margin_bottom": 40,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "full_width": true,
+        "content_width": 120,
+        "border_thickness": 0,
+        "lazy": true
+      }
+    },
+    "sc_feature39_66UPWt": {
+      "type": "sc-feature39",
+      "blocks": {
+        "sub_heading_iCHFt6": {
+          "type": "sub_heading",
+          "settings": {
+            "sub_heading": "<p>What We Offer</p>",
+            "sub_heading_custom": false,
+            "sub_heading_font": "josefin_sans_n4",
+            "sub_heading_size": 32,
+            "sub_heading_size_mobile": 24,
+            "sub_heading_height": 150,
+            "sub_heading_mt": 0,
+            "sub_heading_mt_mobile": 0,
+            "sub_heading_color": "#c7d1ff"
+          }
+        },
+        "heading_HRpEc7": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p><strong>Your Editing Team, Running on Autopilot</strong></p>",
+            "heading_custom": true,
+            "heading_font": "archivo_n4",
+            "heading_size": 40,
+            "heading_size_mobile": 32,
+            "heading_height": 130,
+            "heading_mt": 12,
+            "heading_mt_mobile": 12,
+            "heading_color": "#fdfdfd"
+          }
+        },
+        "feature_zU4fQp": {
+          "type": "feature",
+          "settings": {
+            "column": "first",
+            "icon": "atc",
+            "lottie_icon_url": "https://cdn.shopify.com/s/files/1/0732/9421/7444/files/wired-gradient-114-scissors-hover-pinch.json?v=1749647183",
+            "title": "Preclipping",
+            "text": "<p>We pull powerful moments from your long-form content and reshape them into story-driven short videos that resonate with music-loving audiences.</p>"
+          }
+        },
+        "feature_TpgDnb": {
+          "type": "feature",
+          "settings": {
+            "column": "first",
+            "icon": "none",
+            "lottie_icon_url": "https://cdn.shopify.com/s/files/1/0732/9421/7444/files/wired-gradient-62-film-hover-play_1.json?v=1749647455",
+            "title": "Video Editing",
+            "text": "<p>Pre-clipped from your long content—rhythm-aligned and tightly cut for attention.</p>"
+          }
+        },
+        "button_LQYRKT": {
+          "type": "button",
+          "settings": {
+            "button": "START TRIAL PACKAGE",
+            "url": "#open_discovery_modal",
+            "button_custom": true,
+            "button_font": "archivo_n6",
+            "button_size": 18,
+            "button_size_mobile": 16,
+            "button_height": 100,
+            "button_padding_horizontal": 26,
+            "button_padding_horizontal_mobile": 26,
+            "button_padding_vertical": 16,
+            "button_padding_vertical_mobile": 16,
+            "button_radius": 80,
+            "button_border_thickness": 1,
+            "button_mt": 32,
+            "button_mt_mobile": 0,
+            "button_style": "outline",
+            "button_color": "#060606",
+            "button_hover_color": "#060606",
+            "button_bg_color": "#5a7aff",
+            "button_bg_hover_color": "#325aff",
+            "button_border_color": "#060606",
+            "button_border_hover_color": "#121212"
+          }
+        },
+        "feature_qygFQV": {
+          "type": "feature",
+          "settings": {
+            "column": "second",
+            "icon": "none",
+            "lottie_icon_url": "https://cdn.shopify.com/s/files/1/0732/9421/7444/files/wired-gradient-1489-sonometer-hover-pinch.json?v=1749647509",
+            "title": "Audio Enhancement",
+            "text": "<p><em>Clean, loud, and leveled for any platform. Your audio, refined for earbuds or speakers.</em></p>"
+          }
+        },
+        "feature_YpWNHN": {
+          "type": "feature",
+          "settings": {
+            "column": "second",
+            "icon": "none",
+            "lottie_icon_url": "https://cdn.shopify.com/s/files/1/0732/9421/7444/files/wired-gradient-1437-photo-editor-hover-pinch_b52c5252-31c8-41be-a4ce-11fdde7edb05.json?v=1749648337",
+            "title": "Thumbnails & Captions",
+            "text": "<p><em>Text and visuals made to stop the scroll. Smart captions and scroll-worthy visuals built into every post.</em></p>"
+          }
+        },
+        "bottom_text_CnpxPU": {
+          "type": "bottom_text",
+          "settings": {
+            "text": "<p><em>No Contracts, Cancel Anytime</em></p>",
+            "text_custom": true,
+            "text_font": "archivo_n4",
+            "text_size": 9,
+            "text_size_mobile": 12,
+            "text_height": 80,
+            "text_mt": 16,
+            "text_mt_mobile": 16,
+            "text_color": "#fdfdfd"
+          }
+        }
+      },
+      "block_order": [
+        "sub_heading_iCHFt6",
+        "heading_HRpEc7",
+        "feature_zU4fQp",
+        "feature_TpgDnb",
+        "button_LQYRKT",
+        "feature_qygFQV",
+        "feature_YpWNHN",
+        "bottom_text_CnpxPU"
+      ],
+      "disabled": true,
+      "custom_css": [],
+      "settings": {
+        "feature_bg_type": "image",
+        "feature_bg_overlay": 0,
+        "content_align": "center",
+        "content_align_mobile": "center",
+        "features_gap": 40,
+        "features_gap_mobile": 24,
+        "features_mt": 40,
+        "features_mt_mobile": 24,
+        "feature_align": "center",
+        "feature_align_mobile": "center",
+        "feature_icon_size": 72,
+        "feature_icon_size_mobile": 62,
+        "title_custom": false,
+        "title_font": "josefin_sans_n4",
+        "title_size": 20,
+        "title_size_mobile": 20,
+        "title_height": 130,
+        "title_mt": 28,
+        "title_mt_mobile": 24,
+        "text_custom": false,
+        "text_font": "josefin_sans_n4",
+        "text_size": 15,
+        "text_size_mobile": 15,
+        "text_height": 150,
+        "text_mt": 16,
+        "text_mt_mobile": 16,
+        "image_radius": 0,
+        "image_border_thickness": 0,
+        "image_ratio": "original",
+        "image_ratio_mobile": "original",
+        "feature_icon_color": "#fdfdfd",
+        "title_color": "#e1e6f9",
+        "text_color": "#cccccc",
+        "image_border_color": "#fdfdfd",
+        "background_color": "rgba(0,0,0,0)",
+        "background_gradient": "",
+        "feature_bg_overlay_color": "#000000",
+        "border_color": "#fdfdfd",
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "margin_horizontal": 0,
+        "margin_horizontal_mobile": 0,
+        "padding_top": 36,
+        "padding_bottom": 36,
+        "padding_horizontal": 5,
+        "padding_horizontal_mobile": 1.5,
+        "full_width": false,
+        "content_width": 1200,
+        "border_thickness": 0,
+        "section_radius": 0,
+        "lazy": true
+      }
+    },
+    "sc_mediagrid4_fCrMAB": {
+      "type": "sc-mediagrid4",
+      "blocks": {
+        "text_bdXzt8": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Fill out a brief questionnaire about your project and brand.</p>",
+            "number_color": "#ffffff",
+            "text_color": "#ffffff",
+            "card_bg_color": "#030414"
+          }
+        },
+        "media_9NQWMp": {
+          "type": "media",
+          "settings": {
+            "media_type": "video",
+            "video_url": ""
+          }
+        },
+        "text_yxazGR": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Receive the first draft from our video editing team within 24-48 hours. Send revision notes like demo.</p>",
+            "number_color": "#ffffff",
+            "text_color": "#ffffff",
+            "card_bg_color": "#05061d"
+          }
+        },
+        "media_Jihemn": {
+          "type": "media",
+          "settings": {
+            "media_type": "video",
+            "video_url": ""
+          }
+        },
+        "text_aVTHfG": {
+          "type": "text",
+          "settings": {
+            "text": "<h6>Once approved, download your finished videos and assets.</h6>",
+            "number_color": "#ffffff",
+            "text_color": "#ffffff",
+            "card_bg_color": "#060829"
+          }
+        },
+        "media_ttBX8U": {
+          "type": "media",
+          "settings": {
+            "media_type": "video",
+            "video_url": ""
+          }
+        }
+      },
+      "block_order": [
+        "text_bdXzt8",
+        "media_9NQWMp",
+        "text_yxazGR",
+        "media_Jihemn",
+        "text_aVTHfG",
+        "media_ttBX8U"
+      ],
+      "disabled": true,
+      "custom_css": [],
+      "settings": {
+        "cards_per_view": 2,
+        "cards_per_view_mobile": "1",
+        "cards_gap": 4,
+        "cards_gap_mobile": 0,
+        "card_padding_horizontal": 56,
+        "card_padding_horizontal_mobile": 32,
+        "card_padding_vertical": 96,
+        "card_padding_vertical_mobile": 12,
+        "card_radius": 0,
+        "card_border_thickness": 0,
+        "card_align": "center",
+        "card_align_mobile": "center",
+        "number_custom": true,
+        "number_font": "archivo_n7",
+        "number_size": 62,
+        "number_size_mobile": 40,
+        "number_height": 150,
+        "text_custom": true,
+        "text_font": "archivo_n4",
+        "text_size": 25,
+        "text_size_mobile": 18,
+        "text_height": 200,
+        "media_ratio": "original",
+        "media_ratio_mobile": "original",
+        "card_border_color": "#091236",
+        "background_color": "rgba(0,0,0,0)",
+        "background_gradient": "",
+        "border_color": "rgba(0,0,0,0)",
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "margin_horizontal": 0,
+        "margin_horizontal_mobile": 0,
+        "padding_top": 4,
+        "padding_bottom": 4,
+        "padding_horizontal": 0,
+        "padding_horizontal_mobile": 0.5,
+        "full_width": false,
+        "content_width": 1400,
+        "border_thickness": 0,
+        "section_radius": 0,
+        "lazy": true
+      }
+    },
+    "sc_beforeandafter2_3DgaXU": {
+      "type": "sc-beforeandafter2",
+      "blocks": {
+        "slide_i9xkr3": {
+          "type": "slide",
+          "settings": {
+            "heading": "<h3>From 982 Views to 2.8m</h3>",
+            "stars_count": 0,
+            "text": "<p>Social media works - if your content hits. We've generated over <strong>1 billion views </strong>and helped brands go from <strong>30k to 100K a month</strong> with smart hooks, structured delivery, and conversion-focused edits.</p>"
+          }
+        },
+        "slide_dfXYAg": {
+          "type": "slide",
+          "settings": {
+            "heading": "<h3><strong>Thumbnails</strong></h3>",
+            "stars_count": 0,
+            "text": "<p>Branded. Clear. Clickable. We turn views into clicks and creators into brands. <strong>MrBeast spends $10K on a single thumbnail for a reason.</strong></p>"
+          }
+        },
+        "slide_RXJiqK": {
+          "type": "slide",
+          "settings": {
+            "heading": "<h3>Quality + Quantity</h3>",
+            "stars_count": 0,
+            "text": "<p>Inconsistent uploads are killing your channel and audience's interest. <strong>We plan it, streamline it, and we can even post it for you. </strong>(we do NOT use automation platforms like <em>Later</em> to post as it's bad for your algorithm)</p>"
+          }
+        },
+        "slide_FdtVr6": {
+          "type": "slide",
+          "settings": {
+            "heading": "<p><strong>What Would You Do With Extra 8 Hours A Week?</strong></p>",
+            "stars_count": 0,
+            "text": "<p>You’re not scaling when you're stuck on editing and management. Hand it off to pros and <strong>get your time back, your clarity back and your life back.</strong></p>"
+          }
+        }
+      },
+      "block_order": [
+        "slide_i9xkr3",
+        "slide_dfXYAg",
+        "slide_RXJiqK",
+        "slide_FdtVr6"
+      ],
+      "disabled": true,
+      "settings": {
+        "heading": "<p>See The Difference.</p>",
+        "heading_custom": true,
+        "heading_font": "archivo_n6",
+        "heading_size": 48,
+        "heading_size_mobile": 32,
+        "heading_height": 130,
+        "heading_align": "center",
+        "heading_align_mobile": "center",
+        "heading_padding_bottom_mobile": 41,
+        "body_gap": 100,
+        "body_gap_mobile": 40,
+        "body_mt": 0,
+        "body_mt_mobile": 0,
+        "image_padding": 0,
+        "image_padding_mobile": 0,
+        "image_ratio": "portrait",
+        "image_ratio_mobile": "portrait",
+        "image_radius": 20,
+        "image_border_thickness": 0,
+        "image_shadow": true,
+        "text_from": "from this",
+        "text_to": "to this",
+        "before_after_text_custom": false,
+        "before_after_text_font": "josefin_sans_n4",
+        "before_after_text_size": 25,
+        "before_after_text_size_mobile": 18,
+        "before_after_text_height": 130,
+        "slide_heading_custom": false,
+        "slide_heading_font": "josefin_sans_n4",
+        "slide_heading_size": 42,
+        "slide_heading_size_mobile": 28,
+        "slide_heading_height": 130,
+        "slide_heading_align": "left",
+        "slide_heading_align_mobile": "left",
+        "stars_size": 30,
+        "stars_mt": 20,
+        "stars_align": "start",
+        "stars_align_mobile": "start",
+        "slide_text_custom": false,
+        "slide_text_font": "josefin_sans_n4",
+        "slide_text_size": 18,
+        "slide_text_size_mobile": 16,
+        "slide_text_height": 150,
+        "slide_text_mt": 22,
+        "slide_text_align": "left",
+        "slide_text_align_mobile": "left",
+        "navigation_position_mobile": "top",
+        "navigation_mt": 30,
+        "navigation_mt_mobile": 20,
+        "navigation_gap": 10,
+        "navigation_align": "start",
+        "navigation_align_mobile": "center",
+        "arrow_size": 50,
+        "arrow_size_mobile": 50,
+        "arrow_show_desktop": true,
+        "arrow_show_mobile": true,
+        "pagination_custom": false,
+        "pagination_font": "josefin_sans_n4",
+        "pagination_size": 14,
+        "pagination_size_mobile": 14,
+        "pagination_height": 130,
+        "image_bg_color": "#ffffff",
+        "image_border_color": "rgba(0,0,0,0)",
+        "before_text_color": "#c7d1ff",
+        "after_text_color": "#ffffff",
+        "slide_heading_color": "#ffffff",
+        "stars_color": "#bd9a5b",
+        "slide_text_color": "#ffffff",
+        "arrow_color": "#ffffff",
+        "arrow_hover_color": "#ffffff",
+        "pagination_color": "#ffffff",
+        "heading_color": "#ffffff",
+        "background_color": "rgba(0,0,0,0)",
+        "background_image_fit": "cover",
+        "border_color": "rgba(0,0,0,0)",
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "padding_top": 76,
+        "padding_bottom": 76,
+        "padding_horizontal": 5,
+        "padding_horizontal_mobile": 1.5,
+        "full_width": false,
+        "content_width": 120,
+        "border_thickness": 0,
+        "lazy": true
+      }
+    },
+    "custom_liquid_KznAfj": {
+      "type": "custom-liquid",
+      "settings": {
+        "custom_liquid": "<div id=\"pricing\"></div>"
+      }
+    },
+    "sc_pricingtable5_JNwKtp": {
+      "type": "sc-pricingtable5",
+      "blocks": {
+        "heading_d9p7HF": {
+          "type": "heading",
+          "settings": {
+            "heading": "<h2>Pricing table #5</h2>",
+            "heading_custom": false,
+            "heading_font": "josefin_sans_n4",
+            "heading_size": 52,
+            "heading_size_mobile": 32,
+            "heading_height": 130,
+            "heading_mt": 0,
+            "heading_mt_mobile": 0,
+            "heading_align": "center",
+            "heading_align_mobile": "center",
+            "heading_color": "#121212"
+          }
+        },
+        "tab_8qh9Re": {
+          "type": "tab",
+          "settings": {
+            "tab": "Monthly",
+            "active_default": true
+          }
+        },
+        "card_wnxXCJ": {
+          "type": "card",
+          "settings": {
+            "title": "Title",
+            "text": "<p>Tell your story</p>",
+            "price_text": "$597",
+            "button_text": "Short Form Video",
+            "url": "",
+            "first_left_text": "Thumbnail",
+            "first_right_text": "x 7",
+            "second_left_text": "Feature 2",
+            "second_right_text": "x 7",
+            "third_left_text": "MoodIQ",
+            "third_right_text": "x 7",
+            "fourth_left_text": "Feature 4",
+            "fourth_right_text": "Value 4",
+            "fifth_left_text": "Feature 5",
+            "fifth_right_text": "Value 5",
+            "title_color": "#121212",
+            "text_color": "#121212",
+            "price_color": "#121212",
+            "table_left_color": "#121212",
+            "table_right_color": "#121212",
+            "card_bg_color": "#f3f3f3",
+            "table_border_color": "#dedede",
+            "card_border_color": "#121212",
+            "button_color": "#ffffff",
+            "button_hover_color": "#121212",
+            "button_bg_color": "#121212",
+            "button_bg_hover_color": "#ffffff",
+            "button_bg_gradient": "",
+            "button_bg_hover_gradient": "",
+            "button_border_color": "#121212",
+            "button_border_hover_color": "#121212"
+          }
+        },
+        "card_wbQXXx": {
+          "type": "card",
+          "settings": {
+            "title": "Title",
+            "text": "<p>Tell your story</p>",
+            "price_text": "$997",
+            "button_text": "Get started",
+            "url": "",
+            "first_left_text": "Feature 1",
+            "first_right_text": "x 14",
+            "second_left_text": "Feature 2",
+            "second_right_text": "x 14",
+            "third_left_text": "MoodFlow",
+            "third_right_text": "x 7",
+            "fourth_left_text": "Feature 4",
+            "fourth_right_text": "Value 4",
+            "fifth_left_text": "Feature 5",
+            "fifth_right_text": "Value 5",
+            "title_color": "#121212",
+            "text_color": "#121212",
+            "price_color": "#121212",
+            "table_left_color": "#121212",
+            "table_right_color": "#121212",
+            "card_bg_color": "#f3f3f3",
+            "table_border_color": "#dedede",
+            "card_border_color": "#121212",
+            "button_color": "#ffffff",
+            "button_hover_color": "#121212",
+            "button_bg_color": "#121212",
+            "button_bg_hover_color": "#ffffff",
+            "button_bg_gradient": "",
+            "button_bg_hover_gradient": "",
+            "button_border_color": "#121212",
+            "button_border_hover_color": "#121212"
+          }
+        },
+        "tab_pyghLi": {
+          "type": "tab",
+          "settings": {
+            "tab": "Yearly",
+            "active_default": false
+          }
+        },
+        "card_63Dn3g": {
+          "type": "card",
+          "settings": {
+            "title": "Title",
+            "text": "<p>Tell your story</p>",
+            "price_text": "$10",
+            "button_text": "Get started",
+            "url": "",
+            "first_left_text": "Feature 1",
+            "first_right_text": "x 14",
+            "second_left_text": "Feature 2",
+            "second_right_text": "✗",
+            "third_left_text": "Feature 3",
+            "third_right_text": "Value 3",
+            "fourth_left_text": "Feature 4",
+            "fourth_right_text": "Value 4",
+            "fifth_left_text": "Feature 5",
+            "fifth_right_text": "Value 5",
+            "title_color": "#121212",
+            "text_color": "#121212",
+            "price_color": "#121212",
+            "table_left_color": "#121212",
+            "table_right_color": "#121212",
+            "card_bg_color": "#f3f3f3",
+            "table_border_color": "#dedede",
+            "card_border_color": "#121212",
+            "button_color": "#ffffff",
+            "button_hover_color": "#121212",
+            "button_bg_color": "#121212",
+            "button_bg_hover_color": "#ffffff",
+            "button_bg_gradient": "",
+            "button_bg_hover_gradient": "",
+            "button_border_color": "#121212",
+            "button_border_hover_color": "#121212"
+          }
+        },
+        "card_WPPdGL": {
+          "type": "card",
+          "settings": {
+            "title": "Title",
+            "text": "<p>Tell your story</p>",
+            "price_text": "$10",
+            "button_text": "Get started",
+            "url": "",
+            "first_left_text": "Feature 1",
+            "first_right_text": "&#10003",
+            "second_left_text": "Feature 2",
+            "second_right_text": "&#10007;",
+            "third_left_text": "Feature 3",
+            "third_right_text": "Value 3",
+            "fourth_left_text": "Feature 4",
+            "fourth_right_text": "Value 4",
+            "fifth_left_text": "Feature 5",
+            "fifth_right_text": "Value 5",
+            "title_color": "#121212",
+            "text_color": "#121212",
+            "price_color": "#121212",
+            "table_left_color": "#121212",
+            "table_right_color": "#121212",
+            "card_bg_color": "#f3f3f3",
+            "table_border_color": "#dedede",
+            "card_border_color": "#121212",
+            "button_color": "#ffffff",
+            "button_hover_color": "#121212",
+            "button_bg_color": "#121212",
+            "button_bg_hover_color": "#ffffff",
+            "button_bg_gradient": "",
+            "button_bg_hover_gradient": "",
+            "button_border_color": "#121212",
+            "button_border_hover_color": "#121212"
+          }
+        },
+        "caption_7jYD6q": {
+          "type": "caption",
+          "settings": {
+            "text": "<p>Caption</p>",
+            "text_custom": false,
+            "text_font": "josefin_sans_n4",
+            "text_size": 12,
+            "text_size_mobile": 12,
+            "text_height": 150,
+            "text_mt": 24,
+            "text_mt_mobile": 16,
+            "text_align": "left",
+            "text_align_mobile": "left",
+            "text_max_width": 80,
+            "text_color": "#121212"
+          }
+        },
+        "button_9PGi3Y": {
+          "type": "button",
+          "settings": {
+            "button": "Learn more",
+            "url": "",
+            "button_custom": false,
+            "button_font": "josefin_sans_n4",
+            "button_size": 18,
+            "button_size_mobile": 18,
+            "button_height": 100,
+            "button_padding_horizontal": 36,
+            "button_padding_horizontal_mobile": 36,
+            "button_padding_vertical": 20,
+            "button_padding_vertical_mobile": 18,
+            "button_radius": 100,
+            "button_border_thickness": 1,
+            "button_mt": 52,
+            "button_mt_mobile": 32,
+            "button_style": "link",
+            "button_color": "#121212",
+            "button_hover_color": "#121212",
+            "button_bg_color": "#f3f3f3",
+            "button_bg_hover_color": "#ededed",
+            "button_bg_gradient": "",
+            "button_bg_hover_gradient": "",
+            "button_border_color": "#121212",
+            "button_border_hover_color": "#121212"
+          }
+        }
+      },
+      "block_order": [
+        "heading_d9p7HF",
+        "tab_8qh9Re",
+        "card_wnxXCJ",
+        "card_wbQXXx",
+        "tab_pyghLi",
+        "card_63Dn3g",
+        "card_WPPdGL",
+        "caption_7jYD6q",
+        "button_9PGi3Y"
+      ],
+      "disabled": true,
+      "name": "SS - Pricing table #5",
+      "settings": {
+        "tabs_radius": 100,
+        "tabs_border_thickness": 2,
+        "tabs_mt": 24,
+        "tabs_mt_mobile": 16,
+        "tab_custom": false,
+        "tab_font": "josefin_sans_n4",
+        "tab_size": 18,
+        "tab_size_mobile": 16,
+        "tab_height": 100,
+        "tab_padding_horizontal": 24,
+        "tab_padding_horizontal_mobile": 24,
+        "tab_padding_vertical": 14,
+        "tab_padding_vertical_mobile": 14,
+        "tab_radius": 100,
+        "tab_border_thickness": 0,
+        "tab_shadow": true,
+        "cards_per_row": 2,
+        "cards_gap": 16,
+        "cards_gap_mobile": 16,
+        "cards_mt": 48,
+        "cards_mt_mobile": 32,
+        "card_padding_horizontal": 32,
+        "card_padding_horizontal_mobile": 24,
+        "card_padding_vertical": 32,
+        "card_padding_vertical_mobile": 24,
+        "card_radius": 20,
+        "card_border_thickness": 0,
+        "card_align": "left",
+        "card_align_mobile": "left",
+        "title_custom": false,
+        "title_font": "josefin_sans_n4",
+        "title_size": 40,
+        "title_size_mobile": 32,
+        "title_height": 130,
+        "text_custom": false,
+        "text_font": "josefin_sans_n4",
+        "text_size": 16,
+        "text_size_mobile": 14,
+        "text_height": 150,
+        "text_mt": 16,
+        "text_mt_mobile": 16,
+        "price_second_text": "/mo",
+        "price_custom": false,
+        "price_font": "josefin_sans_n4",
+        "price_size": 56,
+        "price_size_mobile": 40,
+        "price_height": 130,
+        "price_mt": 32,
+        "price_mt_mobile": 32,
+        "button_custom": false,
+        "button_font": "josefin_sans_n4",
+        "button_size": 18,
+        "button_size_mobile": 16,
+        "button_height": 100,
+        "button_padding_horizontal": 32,
+        "button_padding_horizontal_mobile": 28,
+        "button_padding_vertical": 20,
+        "button_padding_vertical_mobile": 18,
+        "button_radius": 100,
+        "button_border_thickness": 1,
+        "button_mt": 32,
+        "button_mt_mobile": 20,
+        "button_style": "non_outline",
+        "table_padding_vertical": 16,
+        "table_padding_vertical_mobile": 14,
+        "table_border_thickness": 1,
+        "table_mt": 32,
+        "table_mt_mobile": 20,
+        "table_left_custom": false,
+        "table_left_font": "josefin_sans_n4",
+        "table_left_size": 16,
+        "table_left_size_mobile": 14,
+        "table_left_height": 130,
+        "table_right_custom": false,
+        "table_right_font": "josefin_sans_n4",
+        "table_right_size": 24,
+        "table_right_size_mobile": 20,
+        "table_right_height": 130,
+        "tabs_bg_color": "#f5f5f5",
+        "tabs_border_color": "#dedede",
+        "tab_color": "#767676",
+        "tab_bg_color": "rgba(0,0,0,0)",
+        "tab_border_color": "rgba(0,0,0,0)",
+        "tab_active_color": "#121212",
+        "tab_bg_active_color": "#ffffff",
+        "tab_bg_active_gradient": "",
+        "tab_border_active_color": "#dedede",
+        "background_color": "#ffffff",
+        "background_gradient": "",
+        "border_color": "#121212",
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "margin_horizontal": 0,
+        "margin_horizontal_mobile": 0,
+        "padding_top": 36,
+        "padding_bottom": 36,
+        "padding_horizontal": 5,
+        "padding_horizontal_mobile": 1.5,
+        "full_width": false,
+        "content_width": 1000,
+        "border_thickness": 0,
+        "section_radius": 0
+      }
+    },
+    "sc_pricingtable_FrKcMh": {
+      "type": "sc-pricingtable",
+      "blocks": {
+        "item_wtinKp": {
+          "type": "item",
+          "disabled": true,
+          "settings": {
+            "budges": "",
+            "heading": "SPARK",
+            "price_sale": "",
+            "price": "",
+            "currency": "$597",
+            "time": "per month",
+            "elements": "<p><strong>✓ </strong>Short Form Video x 7<br/><br/><strong>✓ </strong>Thumbnail x 7<br/><br/><strong>✓</strong> Story Clipping x 7<br/><br/><strong>✓ </strong>Optimized Caption x 7<br/><br/><strong>✓ </strong>Audio Cleanup<br/><br/><strong>✓ </strong>Unlimited Revision<br/><br/><strong>✓ </strong>Licnesed Music and Footage<br/><br/><strong>✓ </strong>Account Audit</p>",
+            "button_text": "Buy SPARK",
+            "button_url": "",
+            "subscription_product_id": "46398336368868",
+            "subscription_plan_id": "5236261092",
+            "guarantee_text": "",
+            "guarantee_tooltip": "1sdfa",
+            "Text": "",
+            "active": false
+          }
+        },
+        "item_iWeNbQ": {
+          "type": "item",
+          "settings": {
+            "budges": "Most Popular",
+            "heading": "AMPLIFY",
+            "price_sale": "",
+            "price": "1997",
+            "currency": "$",
+            "time": "per month",
+            "elements": "<p><strong>Dedicated Video Editing Team.</strong><br/><br/><strong>✓</strong> 30 Short-Form Videos<br/><br/><strong>✓ </strong>Professionally Designed Thumbnails<br/><br/><strong>✓ </strong>Crystal Clear Audio Enhancement<br/><br/><strong>✓</strong> Optimized Captions for Engagement<br/> </p>",
+            "button_text": "Book A Call",
+            "button_url": "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0y3tDTVq7jxADawGwOtIlVgNmJdjfzwOIxjUgAgNWmdO9AWWcTyCf1Tt1bc0_AtjhzkFKH6Mvx?gv=true",
+            "subscription_product_id": "",
+            "subscription_plan_id": "",
+            "guarantee_text": "14 Day Moneyback Guarantee",
+            "guarantee_tooltip": "Your purchase is covered by our 14-day satisfaction guarantee. If our service doesn't meet your expectations for any reason within the first two weeks, simply contact support for a prompt and full refund.",
+            "Text": "",
+            "active": true
+          }
+        },
+        "item_Nd3qan": {
+          "type": "item",
+          "settings": {
+            "budges": "Best Value",
+            "heading": "PARTNER",
+            "price_sale": "",
+            "price": "2997",
+            "currency": "$",
+            "time": "per month",
+            "elements": "<p><strong>Scale your business using a content machine we build and run.<br/><br/>✓</strong> <strong>Daily Content Edited & Posted</strong> (30 per month)<br/><br/><strong>✓ A Complete Content Strategy</strong> developed for your brand</p><p><strong>✓ Full Slack/Team Integration</strong> for seamless workflow<br/><br/><strong>✓ Monthly 1-on-1 Strategy Call<br/><br/>✓ Monthly Performance Reports</strong> with actionable insights<br/><br/><strong>✓ </strong>Professionally Designed <strong>Thumbnails & Captions</strong></p>",
+            "button_text": "Book A Call",
+            "button_url": "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0y3tDTVq7jxADawGwOtIlVgNmJdjfzwOIxjUgAgNWmdO9AWWcTyCf1Tt1bc0_AtjhzkFKH6Mvx?gv=true",
+            "subscription_product_id": "",
+            "subscription_plan_id": "",
+            "guarantee_text": "14 Day Moneyback Guarantee",
+            "guarantee_tooltip": "Your purchase is covered by our 14-day satisfaction guarantee. If our service doesn't meet your expectations for any reason within the first two weeks, simply contact support for a prompt and full refund.",
+            "Text": "",
+            "active": false
+          }
+        }
+      },
+      "block_order": [
+        "item_wtinKp",
+        "item_iWeNbQ",
+        "item_Nd3qan"
+      ],
+      "disabled": true,
+      "settings": {
+        "tooltip_bg_color": "#ffffff",
+        "tooltip_font_size": 14,
+        "heading": "<p>PRICING</p>",
+        "heading_custom": true,
+        "heading_font": "archivo_n7",
+        "heading_size": 48,
+        "heading_size_mobile": 40,
+        "heading_height": 180,
+        "heading_align": "center",
+        "sub_heading": "",
+        "sub_heading_custom": true,
+        "sub_heading_font": "archivo_n4",
+        "sub_heading_size": 16,
+        "sub_heading_size_mobile": 18,
+        "sub_heading_height": 130,
+        "sub_heading_align": "center",
+        "sub_heading_mt": 10,
+        "sub_heading_border": false,
+        "table_mt": 44,
+        "table_width": 90,
+        "table_width_mobile": 100,
+        "table_gap": 20,
+        "table_gap_mobile": 20,
+        "card_padding_vertical": 32,
+        "card_padding_horizontal": 32,
+        "card_radius": 26,
+        "card_border_thickness": 1,
+        "card_shadow": false,
+        "budges_custom": true,
+        "budges_font": "archivo_n4",
+        "budges_size": 12,
+        "budges_size_mobile": 12,
+        "budges_height": 100,
+        "budges_padding_vertical": 12,
+        "budges_padding_horizontal": 20,
+        "budges_radius": 20,
+        "budges_border_thickness": 1,
+        "budges_weight": "bold",
+        "budges_top": true,
+        "image_width": 35,
+        "image_width_mobile": 60,
+        "image_mt": 10,
+        "image_radius": 8,
+        "image_border_thickness": 0,
+        "title_custom": true,
+        "title_font": "archivo_n4",
+        "title_size": 20,
+        "title_size_mobile": 18,
+        "title_height": 130,
+        "title_align": "center",
+        "title_mt": 10,
+        "price_custom": true,
+        "price_font": "archivo_n4",
+        "price_size": 72,
+        "price_size_mobile": 58,
+        "price_sale_size": 24,
+        "price_sale_size_mobile": 24,
+        "price_height": 130,
+        "price_align": "center",
+        "price_mt": 10,
+        "price_time_under": true,
+        "elements_custom": true,
+        "elements_font": "archivo_n4",
+        "elements_size": 20,
+        "elements_size_mobile": 18,
+        "elements_height": 130,
+        "elements_align": "center",
+        "elements_position": "before",
+        "elements_mt": 38,
+        "elements_gap": 16,
+        "icon_size": 20,
+        "button_custom": true,
+        "button_font": "archivo_n4",
+        "button_size": 16,
+        "button_size_mobile": 14,
+        "button_height": 130,
+        "button_align": "center",
+        "button_mt": 44,
+        "button_padding_vertical": 12,
+        "button_padding_horizontal": 20,
+        "button_radius": 20,
+        "button_border_thickness": 0,
+        "button_width": 100,
+        "text_custom": false,
+        "text_font": "josefin_sans_n4",
+        "text_size": 14,
+        "text_size_mobile": 14,
+        "text_height": 130,
+        "text_align": "center",
+        "text_mt": 16,
+        "heading_color": "#ffffff",
+        "heading_other_color": "#ffffff",
+        "sub_heading_color": "#ffffff",
+        "sub_heading_border_color": "#ffffff",
+        "card_bg_color": "rgba(0,0,0,0)",
+        "card_bg_active_color": "rgba(0,0,0,0)",
+        "card_bg_active_gradient": "linear-gradient(133deg, rgba(90, 122, 255, 1) 11%, rgba(50, 90, 255, 1) 49%, rgba(6, 6, 6, 1) 87%)",
+        "card_border_color": "#3e53aa",
+        "card_border_active_color": "#3e53aa",
+        "budges_color": "#545a69",
+        "budges_active_color": "#545a69",
+        "budges_second_color": "#5a7aff",
+        "budges_second_active_color": "#7c5aff",
+        "budges_bg_color": "#ffffff",
+        "budges_bg_active_color": "#ffffff",
+        "budges_bg_second_color": "#ffffff",
+        "budges_bg_second_active_color": "#ffffff",
+        "budges_border_color": "#f3f3f3",
+        "budges_border_active_color": "#dddddd",
+        "budges_border_second_color": "#f3f3f3",
+        "budges_border_second_active_color": "#dddddd",
+        "image_bg_color": "#ffffff",
+        "image_bg_active_color": "#dddddd",
+        "image_border_color": "#ffffff",
+        "image_border_active_color": "#ffffff",
+        "title_color": "#ffffff",
+        "title_active_color": "#ffffff",
+        "price_color": "#fdfdfd",
+        "price_color_gradient": "",
+        "price_active_color": "#1d6bff",
+        "price_active_color_gradient": "linear-gradient(320deg, rgba(237, 223, 255, 1) 23%, rgba(250, 250, 250, 1) 59%, rgba(254, 254, 255, 1) 87%)",
+        "elements_color": "#ffffff",
+        "elements_active_color": "#ffffff",
+        "button_color": "#ffffff",
+        "button_hover_color": "#ffffff",
+        "button_active_color": "#ffffff",
+        "button_active_hover_color": "#ffffff",
+        "button_bg_color": "#5a7aff",
+        "button_bg_color_gradient": "",
+        "button_bg_hover_color": "#325aff",
+        "button_bg_hover_color_gradient": "",
+        "button_bg_active_color": "#587bf3",
+        "button_bg_active_color_gradient": "",
+        "button_bg_active_hover_color": "#1d6bff",
+        "button_bg_active_hover_color_gradient": "",
+        "button_border_color": "#425466",
+        "button_border_hover_color": "#425466",
+        "button_border_active_color": "#38a9f3",
+        "button_border_active_hover_color": "#425466",
+        "text_color": "#1a1a1a",
+        "background_color": "rgba(0,0,0,0)",
+        "background_gradient": "",
+        "border_color": "#000000",
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "padding_top": 36,
+        "padding_bottom": 36,
+        "padding_horizontal": 5,
+        "padding_horizontal_mobile": 1.5,
+        "video_fit_mobile": "fill",
+        "video_align_mobile": "right",
+        "show_overlay": false,
+        "overlay_color": "#000000",
+        "overlay_opacity": 30,
+        "full_width": true,
+        "content_width": 120,
+        "border_thickness": 0,
+        "lazy": true
+      }
+    },
+    "sc_trustbadges2_RKfywK": {
+      "type": "sc-trustbadges2",
+      "blocks": {
+        "image_XJfGCU": {
+          "type": "image",
+          "settings": {
+            "feature_title": "Unlimited Revisions",
+            "feature_text": "<p>Order today, receive tomorrow</p>",
+            "feature_url": "",
+            "hide_image": false
+          }
+        },
+        "image_EFGb9j": {
+          "type": "image",
+          "settings": {
+            "feature_title": "First Draft in 24-48 Hours",
+            "feature_text": "<p>Safe money when ordering with us</p>",
+            "feature_url": "",
+            "hide_image": false
+          }
+        },
+        "image_x3NaWj": {
+          "type": "image",
+          "settings": {
+            "feature_title": "Hassle-free exchange",
+            "feature_text": "<p>Receive a slip for exchanges</p>",
+            "feature_url": "",
+            "hide_image": false
+          }
+        },
+        "image_nyPFea": {
+          "type": "image",
+          "settings": {
+            "feature_title": "Project Dashboard",
+            "feature_text": "<p>Customer satisfaction #1 priority</p>",
+            "feature_url": "",
+            "hide_image": false
+          }
+        },
+        "image_EJtm4p": {
+          "type": "image",
+          "settings": {
+            "feature_title": "Licensed Music & Footages",
+            "feature_text": "<p>All content backed by proper usage rights</p>",
+            "feature_url": "",
+            "hide_image": false
+          }
+        },
+        "image_nYLRKx": {
+          "type": "image",
+          "settings": {
+            "feature_title": "Branding Customization",
+            "feature_text": "<p>Tailored to match your unique brand style</p>",
+            "feature_url": "",
+            "hide_image": false
+          }
+        }
+      },
+      "block_order": [
+        "image_XJfGCU",
+        "image_EFGb9j",
+        "image_x3NaWj",
+        "image_nyPFea",
+        "image_EJtm4p",
+        "image_nYLRKx"
+      ],
+      "disabled": true,
+      "settings": {
+        "feature_row": 3,
+        "feature_row_mobile": 2,
+        "feature_gap": 20,
+        "feature_gap_mobile": 20,
+        "feature_padding_horizontal": 0,
+        "feature_padding_vertical": 0,
+        "feature_radius": 16,
+        "feature_border_thickness": 0,
+        "feature_shadow": false,
+        "feature_heading_custom": false,
+        "feature_heading_font": "josefin_sans_n4",
+        "feature_heading_size": 18,
+        "feature_heading_size_mobile": 14,
+        "feature_heading_height": 130,
+        "feature_heading_mt": 8,
+        "feature_text_custom": false,
+        "feature_text_font": "josefin_sans_n4",
+        "feature_text_size": 12,
+        "feature_text_size_mobile": 12,
+        "feature_text_height": 130,
+        "feature_text_mt": 4,
+        "feature_icon_size": 42,
+        "feature_icon_size_mobile": 42,
+        "feature_bg": "rgba(0,0,0,0)",
+        "feature_border_color": "#000000",
+        "feature_shadow_color": "#000000",
+        "feature_heading_color": "#fdfdfd",
+        "feature_text_color": "#c7d1ff",
+        "feature_icon_color": "#000000",
+        "background_color": "rgba(0,0,0,0)",
+        "background_gradient": "",
+        "border_color": "#000000",
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "padding_top": 48,
+        "padding_bottom": 48,
+        "padding_horizontal": 5,
+        "padding_horizontal_mobile": 1.5,
+        "full_width": true,
+        "content_width": 120,
+        "border_thickness": 0,
+        "lazy": true
+      }
+    },
+    "custom_liquid_gHX7nN": {
+      "type": "custom-liquid",
+      "settings": {
+        "custom_liquid": "<div id=\"faq\"></div>"
+      }
+    },
+    "custom_liquid_QqM84p": {
+      "type": "custom-liquid",
+      "name": "t:sections.custom-liquid.presets.name",
+      "settings": {
+        "custom_liquid": "<div id=\"ourwork\"></div>"
+      }
+    },
+    "frame_io_embed_78DqEc": {
+      "type": "frame-io-embed",
+      "disabled": true,
+      "name": "Our Work",
+      "settings": {
+        "frameio_url": "https://f.io/egx80nMp",
+        "hide_info_panel": true,
+        "lazy_load": false,
+        "heading": "Our Work",
+        "description": "",
+        "heading_size_desktop": 40,
+        "heading_size_mobile": 32,
+        "description_size_desktop": 18,
+        "description_size_mobile": 16,
+        "bg_fit": "cover",
+        "bg_overlay_color": "#000000",
+        "bg_overlay_opacity": 0,
+        "music_url": "",
+        "enable_music_toggle": false,
+        "section_bg": "#ffffff",
+        "text_color": "#ffffff",
+        "desktop_width": 90,
+        "desktop_aspect_ratio": 84,
+        "mobile_aspect_ratio": 185
+      }
+    },
+    "testimonials_ydQeDP": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonials_slide_ekeLKL": {
+          "type": "testimonials_slide",
+          "settings": {
+            "object_fit": "contain",
+            "subheading": "Producer | YouTube Content Creator",
+            "heading_name": "Busy Works Beats",
+            "heading_size": "h3",
+            "text": "<p>\"Editing used to drain half my week. I handed off editing to Mood's team and I just create content now! They have a super smooth workflow with revisions, it wouldn't have been possible to hit <a href=\"https://www.youtube.com/@busyworksbeats\" target=\"_blank\" title=\"Busy Works Beats\">1.4 Million Subscribers</a> without their help!\"</p>"
+          }
+        },
+        "testimonials_slide_TxKUcg": {
+          "type": "testimonials_slide",
+          "settings": {
+            "object_fit": "cover",
+            "subheading": "PLUGIN DEVELOPER",
+            "heading_name": "SAM FISCHMANN",
+            "heading_size": "h3",
+            "text": "<p>\"As an independent plugin company, we have limited budget on marketing and we pick who we work with very carefully. Their first draft for <a href=\"https://www.youtube.com/watch?v=vkGQyJ4bEe8\" target=\"_blank\" title=\"Musik Hack Master Plan Plugin Video Edited by Mood Creative Studios\">our introduction video</a> of Master Plan plugin was already bang on! Super happy with the result\"</p>"
+          }
+        },
+        "testimonials_slide_MQLxFy": {
+          "type": "testimonials_slide",
+          "settings": {
+            "object_fit": "cover",
+            "subheading": "Sennheiser Rep",
+            "heading_name": "Anna Miller",
+            "heading_size": "h3",
+            "text": "<p>\"We’ve worked with a lot of creative teams, Mood Creative Studios has been one of the standouts. The ads they did for us were perfect.\"</p>"
+          }
+        },
+        "testimonials_slide_L6xAz8": {
+          "type": "testimonials_slide",
+          "settings": {
+            "object_fit": "cover",
+            "subheading": "Producer | YouTube Content Creator",
+            "heading_name": "Servida Music",
+            "heading_size": "h3",
+            "text": "<p>\"Their team is a goldmine of viral ideas. Viral is really the name of the game and I can say, they really know what they're doing. We go <a href=\"https://www.instagram.com/reel/CwqLarlxcpE/?hl=en\" target=\"_blank\" title=\"Servida Music Reels Edited by Mood Creative Studios\">viral 1 in every 5 videos</a> on average.\"</p>"
+          }
+        },
+        "testimonials_slide_KYVpKK": {
+          "type": "testimonials_slide",
+          "settings": {
+            "object_fit": "cover",
+            "subheading": "Musician | Content Creator",
+            "heading_name": "Claudio Passavanti",
+            "heading_size": "h3",
+            "text": "<p>\"I'm the type of guy that goes hands off if something works. I didn't even touch my short form videos and all of my socials have doubled in just a  few months... It went especially <a href=\"https://www.facebook.com/DoctorMixDotCom/\" target=\"_blank\" title=\"Doctor Mix Videos are edited by Mood Creative Studios\">crazy on facebook with 180k follwers now!</a> I couldn't recommend them enough.\"</p>"
+          }
+        },
+        "testimonials_slide_MznTEP": {
+          "type": "testimonials_slide",
+          "settings": {
+            "object_fit": "cover",
+            "subheading": "Production Mix Master YouTube Channel",
+            "heading_name": "HMD",
+            "heading_size": "h3",
+            "text": "<p>\"They have Incredibly fast turnarounds... It's usually 24 hours and I don't know how they do <a href=\"https://www.youtube.com/watch?v=LMQqf6vmy84\" target=\"_blank\" title=\"HMD | Help Me Devvon Videos are edited by Mood Creative Studios\">such incredible quality</a> at such short notice periods.\"</p>"
+          }
+        },
+        "testimonials_slide_MqBCA6": {
+          "type": "testimonials_slide",
+          "settings": {
+            "object_fit": "cover",
+            "subheading": "Production Mix Master YouTube Channel",
+            "heading_name": "REID STEFAN",
+            "heading_size": "h3",
+            "text": "<p>\"I only work with the best and <a href=\"https://www.youtube.com/watch?v=OwZjHm59gGA\" target=\"_blank\" title=\"https://www.youtube.com/watch?v=OwZjHm59gGA\">THEY'RE THE BEST IN THE GAME.</a>\" </p>"
+          }
+        }
+      },
+      "block_order": [
+        "testimonials_slide_ekeLKL",
+        "testimonials_slide_TxKUcg",
+        "testimonials_slide_MQLxFy",
+        "testimonials_slide_L6xAz8",
+        "testimonials_slide_KYVpKK",
+        "testimonials_slide_MznTEP",
+        "testimonials_slide_MqBCA6"
+      ],
+      "disabled": true,
+      "settings": {
+        "section_header_type": "type2",
+        "enable_border_top": true,
+        "subheading": "testimonials",
+        "heading": "<strong>What Our Clients Say</strong>",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_style": "primary",
+        "button_arrow": true,
+        "pagination_vertical_offset": 6,
+        "pagination_dot_color_inactive": "#c7d1ff",
+        "pagination_dot_color_active": "#5a7aff",
+        "arrow_width_desktop": 68,
+        "arrow_height_desktop": 56,
+        "is_autoplay": false,
+        "show_arrows": true,
+        "slideshow_speed": 1.1,
+        "slideshow_delay": 1.8,
+        "margin_top": "s",
+        "margin_bottom": "s"
+      }
+    },
+    "collapsible_content_XQfH7c": {
+      "type": "collapsible-content",
+      "blocks": {
+        "text_block_xVKKJw": {
+          "type": "text-block",
+          "settings": {
+            "heading": "<strong>How do I send my footage?</strong>",
+            "description": "<p>We’ll send you a simple folder structure and upload link. You don’t need fancy tools—just your files, and we’ll take it from there.</p>"
+          }
+        },
+        "text_block_jwA4A7": {
+          "type": "text-block",
+          "settings": {
+            "heading": "<strong>What if I don’t like the edit?</strong>",
+            "description": "<p>No problem. Every package includes unlimited revisions. We’ll keep working until it’s right.</p>"
+          }
+        },
+        "text_block_r6AyfR": {
+          "type": "text-block",
+          "settings": {
+            "heading": "<strong>Can I swap deliverables?</strong>",
+            "description": "<p>Yes, we have a swap system that gives you flexibility. For example, you can trade 1 short-form video for 5 thumbnails. Just let us know before the month starts.</p>"
+          }
+        },
+        "text_block_Y9fK4L": {
+          "type": "text-block",
+          "settings": {
+            "heading": "<strong>Do I need to commit long-term?</strong>",
+            "description": "<p>No contracts. You’re billed monthly and can cancel anytime. Most clients stick around because they love the results.</p>"
+          }
+        },
+        "text_block_wXFMEW": {
+          "type": "text-block",
+          "settings": {
+            "heading": "<strong>What platforms are the videos formatted for?</strong>",
+            "description": "<p>Description</p>"
+          }
+        },
+        "text_block_atETzd": {
+          "type": "text-block",
+          "settings": {
+            "heading": "<strong>Do you post the videos for me?</strong>",
+            "description": "<p>Posting is included in our Partner plan. For other tiers, we provide everything you need ready to upload with thumbnails and hashtags. If you'd like to organise it with us, just message us and our team will take care of that for you!</p>"
+          }
+        }
+      },
+      "block_order": [
+        "text_block_xVKKJw",
+        "text_block_jwA4A7",
+        "text_block_r6AyfR",
+        "text_block_Y9fK4L",
+        "text_block_wXFMEW",
+        "text_block_atETzd"
+      ],
+      "disabled": true,
+      "name": "FAQ",
+      "settings": {
+        "faqs_heading": "FAQ",
+        "faqs_heading_alignment": "center",
+        "faqs_desc": "",
+        "color_scheme": "scheme-3",
+        "show_image_content": false,
+        "subheading": "",
+        "heading": "Frequently Asked Questions",
+        "image_content_alignment": "left",
+        "text_animation": true,
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_style": "primary",
+        "button_arrow": true,
+        "button_alignment": "center",
+        "margin_top": "s",
+        "margin_bottom": "m"
+      }
+    }
+  },
+  "order": [
+    "17576687739191a232",
+    "videogrid_GakRF9",
+    "image_banner_rz6Lhe",
+    "team_showcase_e7NxiH",
+    "sc_scrollinglogocloud_p3NJBY",
+    "sc_feature39_66UPWt",
+    "sc_mediagrid4_fCrMAB",
+    "sc_beforeandafter2_3DgaXU",
+    "custom_liquid_KznAfj",
+    "sc_pricingtable5_JNwKtp",
+    "sc_pricingtable_FrKcMh",
+    "sc_trustbadges2_RKfywK",
+    "custom_liquid_gHX7nN",
+    "custom_liquid_QqM84p",
+    "frame_io_embed_78DqEc",
+    "testimonials_ydQeDP",
+    "collapsible_content_XQfH7c"
+  ]
+}

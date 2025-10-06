@@ -1,0 +1,88 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "footer",
+  "name": "t:sections.footer.settings.footer-group.label",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "footer-1": {
+          "type": "link_list",
+          "settings": {
+            "heading": "SHOP",
+            "menu": "main-menu"
+          }
+        },
+        "footer-2": {
+          "type": "link_list",
+          "settings": {
+            "heading": "INFORMATION",
+            "menu": "footer"
+          }
+        },
+        "footer-3": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Having a problem?",
+            "menu": ""
+          }
+        },
+        "store_info_MU9Hk4": {
+          "type": "store_info",
+          "settings": {
+            "text": "<p>Your Creative Partner In Video</p>",
+            "alignment": "center"
+          }
+        },
+        "footer-5": {
+          "type": "subscribe",
+          "settings": {
+            "heading": "Get the latest updates",
+            "button_label": "Subscribe",
+            "button_link": "",
+            "button_style": "primary",
+            "button_arrow": false,
+            "privacy_consent": true,
+            "newsletter_sub": "<p>By subscribing you agree to the Terms of Use and Privacy Policy.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "footer-1",
+        "footer-2",
+        "footer-3",
+        "store_info_MU9Hk4",
+        "footer-5"
+      ],
+      "disabled": true,
+      "settings": {
+        "color_scheme": "",
+        "show_logo": false,
+        "logo_width": 230,
+        "enable_language_selector": false,
+        "enable_country_selector": false,
+        "enable_follow_on_shop": false,
+        "payment_enable": true,
+        "show_policy": false,
+        "show_social": true,
+        "copyright_show": true,
+        "margin_top": "no-indent",
+        "padding_top": "s",
+        "padding_bottom": "s",
+        "enable_border_top": true,
+        "enable_border_bottom": true
+      }
+    }
+  },
+  "order": [
+    "footer"
+  ]
+}

@@ -1,0 +1,45 @@
+<nav class="header__menu">
+	{%- if section.settings.menu != blank -%}
+		<ul class="list-menu list-menu--inline list-unstyled" role="list">
+			{%- for link in section.settings.menu.links -%}
+				<li
+					class="{%liquid
+							if link.active
+							echo 'current-link '
+							endif
+							if link.links != blank
+								echo 'list-menu-has-child '
+							else
+							for block in section.blocks
+								assign menu_trigger = block.settings.menu_trigger | handle | strip
+								if link.handle == menu_trigger
+									echo 'list-menu-has-child '
+									break
+								endif
+							endfor
+						endif %}"
+				>
+					{% liquid
+						for block in section.blocks
+							assign menu_trigger = block.settings.menu_trigger | handle | strip
+							if link.handle == menu_trigger
+								render 'header-mega-menu', links: link.links, block: block, link: link
+								break
+							elsif forloop.last
+								render 'header-link', link: link
+								render 'submenu', link: link
+							endif
+						else
+							if link.links != blank
+								render 'header-link', link: link
+								render 'submenu', link: link
+							else
+								render 'header-link', link: link
+							endif
+						endfor
+					%}
+				</li>
+			{%- endfor -%}
+		</ul>
+	{%- endif -%}
+</nav>

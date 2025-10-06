@@ -1,0 +1,148 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "tags": {
+          "type": "tags",
+          "settings": {}
+        },
+        "title": {
+          "type": "title",
+          "settings": {}
+        },
+        "price": {
+          "type": "price",
+          "settings": {}
+        },
+        "description": {
+          "type": "description",
+          "disabled": true,
+          "settings": {
+            "description_heading": "Description"
+          }
+        },
+        "about-1": {
+          "type": "about",
+          "disabled": true,
+          "settings": {
+            "about_heading": "Some title",
+            "about_heading_content": "<p>Some description<\/p>"
+          }
+        },
+        "about-2": {
+          "type": "about",
+          "disabled": true,
+          "settings": {
+            "about_heading": "Some title",
+            "about_heading_content": "<p>Some description<\/p>"
+          }
+        },
+        "about-3": {
+          "type": "about",
+          "disabled": true,
+          "settings": {
+            "about_heading": "Some title",
+            "about_heading_content": "<p>Some description<\/p>"
+          }
+        },
+        "subscriptions_app_block_UTqUXb": {
+          "type": "shopify:\/\/apps\/subscriptions\/blocks\/app-block\/a3bfe9ec-96f8-4508-a003-df608a36d2ad",
+          "settings": {
+            "color_text_body": "#6d7175",
+            "dividers_color": "#8f8d8d",
+            "bacgkround_color": "#ffffff",
+            "border_thickness": 1,
+            "border_radius": 0,
+            "subscription_policy_url": "",
+            "product": "amplify"
+          }
+        },
+        "buy_buttons_eyJi3X": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": true,
+            "show_quantity": false,
+            "show_gift_card_recipient": false,
+            "notification_modal": true,
+            "modal_button_label": "Notify Me",
+            "heading": "Some heading",
+            "text": "<p>Some text<\/p>",
+            "button_label": "Customer Care",
+            "button_link": "",
+            "text_bottom": "<p>Some text<\/p>",
+            "button_label_2": "View Similar Products",
+            "button_link_2": ""
+          }
+        }
+      },
+      "block_order": [
+        "tags",
+        "title",
+        "price",
+        "description",
+        "about-1",
+        "about-2",
+        "about-3",
+        "subscriptions_app_block_UTqUXb",
+        "buy_buttons_eyJi3X"
+      ],
+      "settings": {
+        "image_gallery_collage": "grid",
+        "desktop_alignment": "left",
+        "mobile_alignment": "after",
+        "image_fit": "cover",
+        "enable_autoheight": true,
+        "content_centered": false,
+        "padding_top": "m",
+        "padding_bottom": "s"
+      }
+    },
+    "product-recommendations": {
+      "type": "product-recommendations",
+      "disabled": true,
+      "settings": {
+        "products_to_show": 4,
+        "per_row": 4,
+        "section_header_type": "type1",
+        "subheading": "Subheading",
+        "heading": "You May Be Interested",
+        "description": "",
+        "enable_border_top": true,
+        "button_label": "Button label",
+        "button_link": "",
+        "button_style": "primary",
+        "button_arrow": false,
+        "show_two_cards": true,
+        "autoplay": false,
+        "stop_autoplay": true,
+        "show_arrows": false,
+        "slideshow_speed": 1.1,
+        "slideshow_delay": 3,
+        "image_ratio": "portrait",
+        "image_fit": "cover",
+        "show_sku": false,
+        "show_vendor": false,
+        "show_collection_name": true,
+        "show_color_swatch": false,
+        "product_variant_type": "color",
+        "show_desc": false,
+        "margin_top": "no-indent",
+        "margin_bottom": "m"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "product-recommendations"
+  ]
+}

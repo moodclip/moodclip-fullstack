@@ -1,0 +1,615 @@
+{% style %}
+	{% render 'section-padding' %}
+	{% render 'section-margin' %}
+
+	#shopify-section-{{ section.id }} .countdown .have-overlay {
+		--overlay-alpha : {{ section.settings.overlay_opacity }}%;
+	}
+{% endstyle %}
+
+{{ 'section-countdown.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'countdown.js' | asset_url }}" defer="defer"></script>
+{% liquid
+
+
+	assign image_size = section.settings.image_size
+	assign alignment = section.settings.section_alignment
+
+	case image_size
+		when 'adapt'
+			assign section_size = 0
+		when 'small'
+			assign section_size = '30%'
+		when 'medium'
+			assign section_size = '42%'
+		when 'large'
+			assign section_size = '50%'
+		else
+			assign section_size = '100vh'
+	endcase
+
+
+%}
+{%- style -%}
+	#shopify-section-{{ section.id }} {
+		--image-height : {{ section_size }};
+		--ticker-speed : {{ section.settings.ticker_speed }}s;
+	}
+{%- endstyle -%}
+<div
+	class="countdown js-countdown js-countdown-{{ section.id }} "
+
+	data-date="{{ section.settings.date_picker }}"
+	data-time="{{ section.settings.time_picker }}"
+	data-timezone="{{ section.settings.time_zone }}"
+	data-completed="{{ section.settings.completed_countdown }}"
+>
+	{% if section.settings.section_layout == "container" %}
+		<div class="container ">
+	{% endif %}
+	{% case section.settings.section_flex_type %}
+		{% when 'type1' %}
+			<div class="countdown__wrapper countdown__wrapper_type1 {% if section.settings.button_bottom == true %} countdown__column{% endif %}">
+				<div class="countdown__img have-overlay">
+					{% if section.settings.image != blank %}
+						{% assign image_height = section.settings.image.width
+							| divided_by: section.settings.image.aspect_ratio
+						%}
+						{{
+							section.settings.image
+							| image_url: width: 3840
+							| image_tag:
+								loading: 'lazy',
+								width: section.settings.image.width,
+								height: image_height,
+								sizes: '100vw',
+								widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+						}}
+					{%- elsif section.settings.video != blank -%}
+						{% assign image_height = section.settings.image.width
+							| divided_by: section.settings.image.aspect_ratio
+						%}
+						{{
+							section.settings.video
+							| video_tag:
+								image_size: '1100x',
+								autoplay: true,
+								height: image_height,
+								loop: true,
+								controls: false,
+								muted: true,
+								class: 'cards-grid__image'
+						}}
+						{% else %}
+									{{ 'image' | placeholder_svg_tag: 'placeholder' }}
+					{% endif %}
+					{% if section.settings.ticker_text != blank %}
+						<div class="countdown__ticker-wrapper ticker-right">
+							<div
+								class="countdown__ticker color-{{ section.settings.color_scheme_ticker }} background "
+								data-ticker-id="{{ section.id }}"
+								data-ticker-speed="{{ section.settings.ticker_speed }}"
+							>
+								<div class="marquee container ticker-js-{{ section.id }}">
+									<div class="marquee-content">
+										{%- if section.settings.ticker_text != blank -%}
+											{% for i in (1..20) %}
+												<div class="marquee-tag">
+													<div class="ticker__title h3">
+														
+															{{ section.settings.ticker_text }}
+														
+													</div>
+												</div>
+											{% endfor %}
+										{%- endif -%}
+									</div>
+								</div>
+							</div>
+						</div>
+					{% endif %}
+				</div>
+				<div class="countdown_content  color-{{ section.settings.color_scheme }} background">
+					<div class="countdown_content_text">
+						<div class="countdown__header">
+							{%- if section.settings.subheading != blank -%}
+								<div class="subtitle countdown_subheading">
+									{{ section.settings.subheading }}
+								</div>
+							{%- endif -%}
+							{% if section.settings.heading != blank %}
+								<h2 class="countdown__header-title"
+									{% if section.settings.text_animation %}
+										data-animation-text="true"
+									{% endif %}
+								>
+									{{ section.settings.heading }}
+								</h2>
+							{%- endif -%}
+							{%- if section.settings.description != blank -%}
+								<div class="richtext__content countdown__header-text medium-font">
+									{{ section.settings.description }}
+								</div>
+							{%- endif -%}
+						</div>
+
+						{% if section.settings.countdown_heading %}
+							<div class="countdown__heading">
+								<h3 class="h3 richtext__content">
+									{{ section.settings.countdown_heading }}
+								</h3>
+							</div>
+						{% endif %}
+						{%- if section.settings.date_picker != blank -%}
+							<div class="countdown__body">
+								<div class="countdown__main">
+									<div class="countdown__block__num richtext__content">
+										<div class="countdown__block__days h3"></div>
+										<p class="small-font">{{ 'general.countdown.days' | t }}</p>
+									</div>
+									<div class="countdown__colon">
+										<span class="countdown__delimiter"></span>
+										<span class="countdown__delimiter"></span>
+									</div>
+									<div class="countdown__block__num richtext__content">
+										<div class="countdown__block__hours h3"></div>
+										<p class="small-font">{{ 'general.countdown.hours' | t }}</p>
+									</div>
+									<div class="countdown__colon">
+										<span class="countdown__delimiter"></span>
+										<span class="countdown__delimiter"></span>
+									</div>
+									<div class="countdown__block__num richtext__content">
+										<div class="countdown__block__minutes h3"></div>
+										<p class="small-font">{{ 'general.countdown.minutes' | t }}</p>
+									</div>
+									<div class="countdown__colon">
+										<span class="countdown__delimiter"></span>
+										<span class="countdown__delimiter"></span>
+									</div>
+									<div class="countdown__block__num richtext__content">
+										<div class="countdown__block__seconds h3"></div>
+										<p class="small-font">{{ 'general.countdown.seconds' | t }}</p>
+									</div>
+								</div>
+							</div>
+						{%- endif -%}
+						{% render 'button', layout: section %}
+					</div>
+				</div>
+		</div>
+		{% when 'type2' %}
+			<div class="countdown__wrapper countdown__wrapper_type2 	{% if section.settings.button_bottom == true %} countdown__column{% endif %}">
+				<div class="countdown__img have-overlay">
+					{% if section.settings.image != blank %}
+						{% assign image_height = section.settings.image.width
+							| divided_by: section.settings.image.aspect_ratio
+						%}
+						{{
+							section.settings.image
+							| image_url: width: 3840
+							| image_tag:
+								loading: 'lazy',
+								width: section.settings.image.width,
+								height: image_height,
+								sizes: '100vw',
+								widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+						}}
+					{%- elsif section.settings.video != blank -%}
+						{% assign image_height = section.settings.image.width
+							| divided_by: section.settings.image.aspect_ratio
+						%}
+						{{
+							section.settings.video
+							| video_tag:
+								image_size: '1100x',
+								autoplay: true,
+								height: image_height,
+								loop: true,
+								controls: false,
+								muted: true,
+								class: 'cards-grid__image'
+						}}
+						{% else %}
+						{{ 'image' | placeholder_svg_tag: 'placeholder' }}
+					{% endif %}
+				</div>
+				<div class="countdown_content  color-{{ section.settings.color_scheme }} background">
+					
+					{% if section.settings.ticker_text != blank %}
+						<div class="countdown__ticker-wrapper ticker-right">
+							<div
+								class="countdown__ticker color-{{ section.settings.color_scheme_ticker }} background "
+								data-ticker-id="{{ section.id }}"
+								data-ticker-speed="{{ section.settings.ticker_speed }}"
+							>
+								<div class="swiper container ticker-js-{{ section.id }}">
+									<div class="swiper-wrapper">
+										{%- if section.settings.ticker_text != blank -%}
+											{% for i in (1..20) %}
+												<div class="swiper-slide">
+													<div class="ticker__title h3">
+														
+															{{ section.settings.ticker_text }}
+														
+													</div>
+												</div>
+											{% endfor %}
+										{%- endif -%}
+									</div>
+								</div>
+							</div>
+						</div>
+					{% endif %}
+					<div class="countdown_content_text">
+						<div class="subtitle countdown_subheading">
+						{%- if section.settings.subheading != blank -%}
+								{{ section.settings.subheading }}
+						{%- endif -%}
+					</div>
+						<div class="countdown__header">
+							{% if section.settings.heading != blank %}
+								<h2 class="countdown__header-title h1" 
+									{% if section.settings.text_animation %}
+										data-animation-text="true"
+									{% endif %}
+								>
+									{{ section.settings.heading }}
+								</h2>
+							{%- endif -%}
+							{%- if section.settings.description != blank -%}
+								<div class="richtext__content countdown__header-text">
+									{{ section.settings.description }}
+								</div>
+							{%- endif -%}
+							{% render 'button', layout: section %}
+						</div>
+
+						{% if section.settings.countdown_heading %}
+							<div class="countdown__heading">
+								<h3 class="h3 richtext__content">
+									{{ section.settings.countdown_heading }}
+								</h3>
+							</div>
+						{% endif %}
+						{%- if section.settings.date_picker != blank -%}
+							<div class="countdown__body">
+								<div class="countdown__main">
+									<div class="countdown__block__num richtext__content">
+										<div class="countdown__block__days h2"></div>
+										<p class="small-font">{{ 'general.countdown.days' | t }}</p>
+									</div>
+									<div class="countdown__colon">
+										<span class="countdown__delimiter"></span>
+										<span class="countdown__delimiter"></span>
+									</div>
+									<div class="countdown__block__num richtext__content">
+										<div class="countdown__block__hours h2"></div>
+										<p class="small-font">{{ 'general.countdown.hours' | t }}</p>
+									</div>
+									<div class="countdown__colon">
+										<span class="countdown__delimiter"></span>
+										<span class="countdown__delimiter"></span>
+									</div>
+									<div class="countdown__block__num richtext__content">
+										<div class="countdown__block__minutes h2"></div>
+										<p class="small-font">{{ 'general.countdown.minutes' | t }}</p>
+									</div>
+									<div class="countdown__colon">
+										<span class="countdown__delimiter"></span>
+										<span class="countdown__delimiter"></span>
+									</div>
+									<div class="countdown__block__num richtext__content">
+										<div class="countdown__block__seconds h2"></div>
+										<p class="small-font">{{ 'general.countdown.seconds' | t }}</p>
+									</div>
+								</div>
+							</div>
+						{%- endif -%}
+					</div>
+
+				</div>
+			</div>
+		{% endcase %}
+	{% if section.settings.section_layout == "container" %}
+	</div>
+	{% endif %}
+</div>
+
+{% schema %}
+{
+	"name": "t:sections.countdown.name",
+	"tag": "section",
+	"class": "countdown-section",
+	"enabled_on": {
+		"templates": ["*"]
+	},
+	"settings": [
+		{
+			"type": "select",
+			"id": "section_layout",
+			"default": "full",
+			"label": "t:sections.all.section_size.full_label",
+			"options": [
+				{
+					"value": "full",
+					"label": "t:sections.all.section_size.options.options__1.label"
+				},
+				{
+					"value": "container",
+					"label": "t:sections.all.section_size.options.options__2.label"
+				}
+			]
+		},
+		{
+			"type": "select",
+			"id": "section_flex_type",
+			"label": "t:sections.all.section_header.header.content",
+			"default": "type1",
+			"options": [
+				{
+					"value": "type1",
+					"label": "t:sections.all.section_header.options.options__1.label"
+				},
+				{
+					"value": "type2",
+					"label": "t:sections.all.section_header.options.options__2.label"
+				}
+			]
+		},
+		{
+			"type": "select",
+			"id": "image_size",
+			"options": [
+		
+				{
+					"value": "small",
+					"label": "t:sections.all.image.size.options__2.label"
+				},
+				{
+					"value": "medium",
+					"label": "t:sections.all.image.size.options__3.label"
+				},
+				{
+					"value": "large",
+					"label": "t:sections.all.image.size.options__6.label"
+				}
+			],
+			"default": "medium",
+			"label": "t:sections.all.image.size.label"
+		},
+		{
+			"type": "color_scheme",
+			"id": "color_scheme",
+			"default": "background-6",
+			"label": "t:sections.all.color_scheme.label"
+		},
+
+		{
+			"type": "image_picker",
+			"id": "image",
+			"label": "t:sections.all.image.label"
+		},
+		{
+			"type": "video",
+			"id": "video",
+			"label": "t:sections.all.video.label"
+		},
+		{
+			"type": "text",
+			"id": "subheading",
+			"default": "Subheading",
+			"label": "t:sections.all.subheading.label"
+		},
+		{
+			"type": "inline_richtext",
+			"id": "heading",
+			"label": "t:sections.all.heading.label",
+			"default": "Heading"
+		},
+		{
+			"type": "checkbox",
+			"id": "text_animation",
+			"default": true,
+			"label": "t:sections.all.animations.label"
+		},
+		{
+			"type": "richtext",
+			"id": "description",
+			"default": "<p>Description</p>",
+			"label": "t:sections.all.description.label"
+		},
+		{
+			"type": "range",
+			"id": "overlay_opacity",
+			"min": 0,
+			"max": 100,
+			"default": 20,
+			"unit": "%",
+			"label": "t:sections.all.overlay_opacity.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.countdown.name"
+		},
+
+		{
+			"type": "number",
+			"id": "time_zone",
+			"default": 0,
+			"label": "t:sections.countdown.settings.timezone.label"
+		},
+		{
+			"type": "text",
+			"id": "date_picker",
+			"default": "2024-10-22",
+			"info": "YYYY-MM-DD",
+			"label": "t:sections.countdown.settings.date_picker.label"
+		},
+		{
+			"type": "text",
+			"id": "time_picker",
+			"default": "00:00",
+			"info": "hh:mm",
+			"label": "t:sections.countdown.settings.time_picker.label"
+		},
+		{
+			"type": "select",
+			"id": "completed_countdown",
+			"options": [
+				{
+					"value": "hide_section",
+					"label": "t:sections.countdown.settings.completed_countdown.options_1.label"
+				},
+				{
+					"value": "show_text",
+					"label": "t:sections.countdown.settings.completed_countdown.options_2.label"
+				}
+			],
+			"default": "show_text",
+			"label": "t:sections.countdown.settings.completed_countdown.label"
+		},
+		{
+			"type": "inline_richtext",
+			"id": "countdown_heading",
+			"default": "Header after countdown",
+			"info": "t:sections.countdown.settings.countdown_heading.info",
+			"label": "t:sections.countdown.settings.countdown_heading.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.button.header.content"
+		},
+		{
+			"type": "text",
+			"id": "button_label",
+			"default": "Button label",
+			"label": "t:sections.all.button.label.label",
+			"info": "t:sections.all.button.label.info"
+		},
+		{
+			"type": "url",
+			"id": "button_link",
+			"label": "t:sections.all.button.link.label"
+		},
+		{
+			"type": "select",
+			"id": "button_style",
+			"options": [
+				{
+					"value": "primary",
+					"label": "t:sections.all.button.style.options__1.label"
+				},
+				{
+					"value": "secondary",
+					"label": "t:sections.all.button.style.options__2.label"
+				},
+				{
+					"value": "tertiary",
+					"label": "t:sections.all.button.style.options__3.label"
+				}
+			],
+			"default": "primary",
+			"label": "t:sections.all.button.style.label"
+		},
+		{
+			"type": "checkbox",
+			"id": "button_arrow",
+			"default": false,
+			"label": "t:sections.all.button.arrow.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.ticker.header.content"
+		},
+		{
+			"type": "text",
+			"id": "ticker_text",
+			"default": "Some text",
+			"label": "t:sections.all.ticker.settings.ticker_text.label",
+			"info": "t:sections.all.ticker.info"
+		},
+		{
+			"type": "color_scheme",
+			"id": "color_scheme_ticker",
+			"default": "background-3",
+			"label": "t:sections.all.color_scheme.label"
+		},
+		{
+			"type": "range",
+			"id": "ticker_speed",
+			"min": 0,
+			"max": 50,
+			"step": 1,
+			"default": 25,
+			"unit": "s",
+			"label": "t:sections.all.ticker.settings.ticker_speed.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.section-margin.header.content"
+		},
+		{
+			"type": "select",
+			"id": "margin_top",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "s",
+			"label": "t:sections.all.section-margin.margin_top.label"
+		},
+		{
+			"type": "select",
+			"id": "margin_bottom",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "s",
+			"label": "t:sections.all.section-margin.margin_bottom.label"
+		}
+	],
+	"presets": [
+		{
+			"name": "t:sections.countdown.presets.name"
+		}
+	]
+}
+{% endschema %}

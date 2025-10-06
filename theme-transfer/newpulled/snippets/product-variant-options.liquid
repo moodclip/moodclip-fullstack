@@ -1,0 +1,324 @@
+{% comment %}
+	Renders product variant options
+	Accepts:
+	- product: {Object} product object.
+	- option: {Object} current product_option object.
+	- block: {Object} block object.
+	Usage:
+	{% render 'product-variant-options',
+	  product: product,
+	  option: option,
+	  block: block
+	%}
+{% endcomment %}
+
+{%- liquid
+	assign variants_available_arr = product.variants | map: 'available'
+	assign variants_option1_arr = product.variants | map: 'option1'
+	assign variants_option2_arr = product.variants | map: 'option2'
+	assign variants_option3_arr = product.variants | map: 'option3'
+
+	assign product_form_id = 'product-form-' | append: section.id
+-%}
+
+{% comment %}
+	{% if product.available %}
+		{% for product_option in product.options_with_values %}
+			{% if product_option.name == 'Color'
+				or product_option.name == 'color'
+				or product_option.name == '色'
+			%}
+				<div class="product_color-count">
+					{{ product_option.values | size }}
+					{{ 'products.product.colors' | t }}
+				</div>
+			{% endif %}
+		{% endfor %}
+	{% endif %}
+{% endcomment %}
+ 	{% assign count = 0 %}
+	{% assign remaining = 0 %}
+	{% assign card_max_visible = 5 %}
+{%- for value in option.values -%}
+	{%- liquid
+		assign option_disabled = true
+
+		for option1_name in variants_option1_arr
+			case option.position
+				when 1
+					if variants_option1_arr[forloop.index0] == value and variants_available_arr[forloop.index0]
+						assign option_disabled = false
+					endif
+				when 2
+					if option1_name == product.selected_or_first_available_variant.option1 and variants_option2_arr[forloop.index0] == value and variants_available_arr[forloop.index0]
+						assign option_disabled = false
+					endif
+				when 3
+					if option1_name == product.selected_or_first_available_variant.option1 and variants_option2_arr[forloop.index0] == product.selected_or_first_available_variant.option2 and variants_option3_arr[forloop.index0] == value and variants_available_arr[forloop.index0]
+						assign option_disabled = false
+					endif
+			endcase
+		endfor
+	-%}
+
+	{% liquid
+		assign color_value = value | handle | strip
+		assign color_value_custom = color_value
+
+		if settings.custom_colors != blank
+			assign custom_colors_string = settings.custom_colors | strip
+			assign custom_colors_obj = custom_colors_string | newline_to_br | split: '<br />'
+
+			for obj in custom_colors_obj
+				assign obj_strip = obj | strip
+				assign obj_key = obj_strip | split: ':' | first
+				assign obj_value = obj_strip | split: ':' | last
+				assign obj_color_name = obj_key | handle | strip
+
+				if color_value == obj_color_name
+					assign obj_color_value = obj_value
+					assign color_value_custom = obj_color_value | strip
+					break
+				endif
+			endfor
+		endif
+	%}
+
+	{% liquid
+		assign variant_link = product.url
+
+		for variant in product.variants
+			assign flag = false
+			if variant.available
+				for option_variant in variant.options
+					if option_variant == value
+						assign flag = true
+						break
+					endif
+				endfor
+			endif
+
+			if flag == true
+				assign variant_link = variant.url
+				assign variant_id = variant.id
+				if product_variant_type == 'image'
+					assign variant_img = variant.image
+				endif
+			endif
+		endfor
+	%}
+
+	{% liquid
+		assign color_trigger = settings.trigger_swatch | handle | strip
+		assign name_option = option.name | handle | strip
+	%}
+
+	{% if product_page %}
+		{%- if block.settings.picker_type == 'button' -%}
+			<input
+				type="radio"
+				id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+				name="{{ option.name }}"
+				value="{{ value | escape }}"
+				{% if no_form_id != true %}
+					form="{{ product_form_id }}"
+				{% endif %}
+				{% if option.selected_value == value %}
+					checked
+				{% endif %}
+				{% if option_disabled %}
+					class="disabled"
+				{% endif %}
+			>
+				{%- if color_trigger == name_option and product_variant_type == 'image' -%}
+					<label
+						data-{{ option.name }}="{{value}}"
+						style="
+							background-image:url(
+								{%- liquid
+									assign optionIndex = option.position | minus: 1
+									for variant in product.variants
+											if variant.options[optionIndex] == value
+												if variant.image != blank
+													echo variant.image | image_url: width: 250
+												else
+													echo 'data:image/svg+xml,%3Csvg%20width%3D%2250%22%20height%3D%2267%22%20viewBox%3D%220%200%2050%2067%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2250%22%20height%3D%2267%22%20fill%3D%22%23F5F5F5%22%2F%3E%3Cg%20opacity%3D%220.3%22%3E%3Cpath%20d%3D%22M17.5%2036.8333L23.3333%2034.3333L26.6667%2035.8483M29.0658%2041.1008L30.8333%2039.3333M30.8333%2039.3333L32.6008%2037.5658M30.8333%2039.3333L29.0658%2037.5658M30.8333%2039.3333L32.6008%2041.1008M28.3333%2031.8333C27.8913%2031.8333%2027.4674%2031.6577%2027.1548%2031.3452C26.8423%2031.0326%2026.6667%2030.6087%2026.6667%2030.1667C26.6667%2029.7246%2026.8423%2029.3007%2027.1548%2028.9882C27.4674%2028.6756%2027.8913%2028.5%2028.3333%2028.5C28.7754%2028.5%2029.1993%2028.6756%2029.5118%2028.9882C29.8244%2029.3007%2030%2029.7246%2030%2030.1667C30%2030.6087%2029.8244%2031.0326%2029.5118%2031.3452C29.1993%2031.6577%2028.7754%2031.8333%2028.3333%2031.8333Z%22%20stroke%3D%22black%22%20stroke-width%3D%221.1%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3Cpath%20d%3D%22M25.8333%2041H18C17.8674%2041%2017.7402%2040.9473%2017.6464%2040.8536C17.5527%2040.7598%2017.5%2040.6326%2017.5%2040.5V26.5C17.5%2026.3674%2017.5527%2026.2402%2017.6464%2026.1464C17.7402%2026.0527%2017.8674%2026%2018%2026H32C32.1326%2026%2032.2598%2026.0527%2032.3536%2026.1464C32.4473%2026.2402%2032.5%2026.3674%2032.5%2026.5V34.3333%22%20stroke%3D%22black%22%20stroke-width%3D%221.1%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E'
+												endif
+												break
+											endif
+									endfor
+							-%}
+								);
+						"
+						class="variant-swatch variant-swatch image-swatch"
+						for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+						title="{{- value -}}"
+					>
+						<span class="visually-hidden">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span>
+					</label>
+					{%- elsif color_trigger == name_option and product_variant_type == 'color' -%}
+					<label
+						for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+						class=" color-swatch "
+						style="--swatch-color: {{ color_value_custom | remove: '-' }}; --swatch-bg: {{ swatch_bg }};--disable-color:{{ disable_color }};--checkbox-bg: {{ checkbox_bg }}; border-radius: {{ border_radius }}%"
+					>
+						{% assign count = count | plus: 1 %}
+						<span class="visually-hidden">{{- value -}}</span>
+						<span class="color"></span>
+					</label>
+				{%- else -%}
+				<label
+					for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+					class="pills-variant-labels"
+				>
+					<span class="pills-variant-labels-text small-font">{{ value -}}</span>
+					<span class="visually-hidden">
+						{{- 'products.product.variant_sold_out_or_unavailable' | t -}}
+					</span>
+				</label>
+				{%- endif -%}
+			
+		{%- elsif block.settings.picker_type == 'dropdown' -%}
+			{% comment %}<option
+				value="{{ value | escape }}"
+				{% if option.selected_value == value %}
+					selected="selected"
+				{% endif %}
+			>
+				{% if option_disabled -%}
+					{{- 'products.product.value_unavailable' | t: option_value: value -}}
+				{%- else -%}
+					{{- value -}}
+				{%- endif %}
+			</option>{% endcomment %}
+			<li>
+				<input
+					type="radio"
+					id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+					name="{{ option.name }}"
+					value="{{ value | escape }}"
+					{% if no_form_id != true %}
+						form="{{ product_form_id }}"
+					{% endif %}
+					{% if option.selected_value == value %}
+						checked
+					{% endif %}
+					{% if option_disabled %}
+						class="disabled"
+					{% endif %}
+				>
+				<label
+					for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+					class="pills-variant-labels secondary_text"
+				>
+					<span class="select-labels">
+						{% comment %}{% if option_disabled -%}
+							{{- 'products.product.value_unavailable' | t: option_value: value -}}
+						{%- else -%}
+							{{- value -}}
+						{%- endif %}	{% endcomment %}
+						{{- value -}}
+					</span>
+				</label>
+			</li>
+		{% endif %}
+	{% else %}
+		{% if color_trigger == name_option %}
+			<input
+				type="radio"
+				id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}-{{ product.id }}"
+				name="{{ option.name }}-{{ product.id }}-{{ section.id }}"
+				value="{{ value | escape }}"
+				{% if variant_link %}
+					data-variant-link="{{ variant_link }}"
+				{% endif %}
+				{% if variant_id %}
+					data-variant-id="{{ variant_id }}"
+				{% endif %}
+				{% if no_form_id != true %}
+					form="{{ product_form_id }}"
+				{% endif %}
+				{% if option.selected_value == value %}
+					checked
+				{% endif %}
+				{% if option_disabled and no_form_id != true %}
+					class="disabled"
+				{% endif %}
+			>
+			{% liquid
+				if color_value_custom == 'white' or color_value_custom == '#fff' or color_value_custom == '#ffffff' or color_value_custom == '255,255,255' or color_value_custom == '255,255,255,1'
+					assign swatch_bg = 'rgb(var(--color-border))'
+					assign disable_color = 'rgb(var(--color-foreground-title))'
+					assign checkbox_bg = 'rgb(var(--color-border))'
+				else
+					assign swatch_bg = 'transparent'
+					assign disable_color = 'white'
+					assign checkbox_bg = 'white'
+				endif
+				if variant_img != blank
+					assign border_radius = 4
+				elsif product_variant_type == 'color'
+					assign border_radius = settings.swatch_border_radius
+				endif
+			%}
+			{% assign count = count | plus: 1 %}
+			{% if count <= card_max_visible %}
+				{% if settings.type_color_swatch == 'custom' and product_variant_type == 'color' %}
+						<label
+							for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}-{{ product.id }}"
+							class=" color-swatch "
+							style="--swatch-color: {{ color_value_custom | remove: '-' }}; --swatch-bg: {{ swatch_bg }};--disable-color:{{ disable_color }};--checkbox-bg: {{ checkbox_bg }}; border-radius: {{ border_radius }}%"
+						>
+							<span class="visually-hidden">{{- value -}}</span>
+							<span class="color"></span>
+						</label>
+				{%- elsif product_variant_type == 'image' -%}
+					<label
+						for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}-{{ product.id }}"
+						class="color-swatch variant-swatch image-swatch"
+						style="
+							background-image:url(
+								{%- liquid
+									assign optionIndex = option.position | minus: 1
+									for variant in product.variants
+											if variant.options[optionIndex] == value
+												if variant.image != blank
+													echo variant.image | image_url: width: 250
+												else
+													echo 'data:image/svg+xml,%3Csvg%20width%3D%2250%22%20height%3D%2267%22%20viewBox%3D%220%200%2050%2067%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2250%22%20height%3D%2267%22%20fill%3D%22%23F5F5F5%22%2F%3E%3Cg%20opacity%3D%220.3%22%3E%3Cpath%20d%3D%22M17.5%2036.8333L23.3333%2034.3333L26.6667%2035.8483M29.0658%2041.1008L30.8333%2039.3333M30.8333%2039.3333L32.6008%2037.5658M30.8333%2039.3333L29.0658%2037.5658M30.8333%2039.3333L32.6008%2041.1008M28.3333%2031.8333C27.8913%2031.8333%2027.4674%2031.6577%2027.1548%2031.3452C26.8423%2031.0326%2026.6667%2030.6087%2026.6667%2030.1667C26.6667%2029.7246%2026.8423%2029.3007%2027.1548%2028.9882C27.4674%2028.6756%2027.8913%2028.5%2028.3333%2028.5C28.7754%2028.5%2029.1993%2028.6756%2029.5118%2028.9882C29.8244%2029.3007%2030%2029.7246%2030%2030.1667C30%2030.6087%2029.8244%2031.0326%2029.5118%2031.3452C29.1993%2031.6577%2028.7754%2031.8333%2028.3333%2031.8333Z%22%20stroke%3D%22black%22%20stroke-width%3D%221.1%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3Cpath%20d%3D%22M25.8333%2041H18C17.8674%2041%2017.7402%2040.9473%2017.6464%2040.8536C17.5527%2040.7598%2017.5%2040.6326%2017.5%2040.5V26.5C17.5%2026.3674%2017.5527%2026.2402%2017.6464%2026.1464C17.7402%2026.0527%2017.8674%2026%2018%2026H32C32.1326%2026%2032.2598%2026.0527%2032.3536%2026.1464C32.4473%2026.2402%2032.5%2026.3674%2032.5%2026.5V34.3333%22%20stroke%3D%22black%22%20stroke-width%3D%221.1%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E'
+												endif
+												break
+											endif
+									endfor
+							-%}
+								);
+						"
+					>
+						<span class="visually-hidden">
+							{{- 'products.product.variant_sold_out_or_unavailable' | t -}}
+						</span>
+					</label>
+				{% endif %}
+			{% else %}
+				{% assign remaining = option.values.size | minus: card_max_visible %}
+				{% if remaining > 0 %}
+					<span class="remaining-count small-font">+{{ remaining }}</span>
+				{% endif %}
+				{% break %}
+			{% endif %}
+		{% endif %}
+	{% endif %}
+{%- endfor -%}
+
+
+
+{% if color_trigger == name_option and settings.swatch_type == 'variant_image' %}
+  <script>
+    document.querySelectorAll('input+label[data-{{ option.name | downcase }}]').forEach((el) => {
+      el.addEventListener('click', () => {
+        document.querySelector('#selected-{{option.name}}').textContent =
+          ' ' + el.getAttribute('data-{{ option.name | downcase }}');
+      });
+    });
+  </script>
+{% endif %}

@@ -1,0 +1,331 @@
+{{ 'customer.css' | asset_url | stylesheet_tag }}
+
+<div class="customer account">
+	<div class="container">
+		{% comment %}
+			<div class="page-header">
+				<div class="page-header__inner">
+					<div class="customer__top">
+						<h1 class="main-page-title page-title title--page h2">
+							{{ 'customer.account.title_1' | t }}
+							<span>{{ 'customer.account.title_2' | t }}</span>
+						</h1>
+						<a
+							class="title-link button--simple"
+							href="{{ routes.account_logout_url }}"
+						>
+							<span class="button-label">
+								{{ 'customer.log_out' | t }}
+							</span>
+						</a>
+					</div>
+				</div>
+			</div>
+		{% endcomment %}
+
+		<div class="account-row row {% if customer.addresses_count == 0 and customer.orders.size == 0 %} account-row_border {% endif %} ">
+			<div class="account-left">
+				<h3 class="h3">{{ 'customer.orders.title' | t }}</h3>
+				{% paginate customer.orders by 20 %}
+					{%- if customer.orders.size > 0 -%}
+						{% comment %}<h2 class="h3">{{ 'customer.orders.title' | t }}</h2>{% endcomment %}
+						<div class="order-table">
+							<div class="visually-hidden">
+								{{ 'customer.orders.title' | t }}
+							</div>
+							<div class="row thead">
+								<div id="ColumnOrder">
+									{{ 'customer.orders.order_number' | t }}
+								</div>
+								<div id="ColumnDate">{{ 'customer.orders.date' | t }}</div>
+								<div id="ColumnPayment">
+									{{ 'customer.orders.payment_status' | t }}
+								</div>
+
+								{% comment %}
+									<div id="ColumnFulfillment">
+										{{ 'customer.orders.fulfillment_status' | t }}
+									</div>
+								{% endcomment %}
+
+								<div id="ColumnTotal">{{ 'customer.orders.total' | t }}</div>
+							</div>
+							{%- for order in customer.orders -%}
+								<a
+									class="row tbody"
+									href="{{ order.customer_url }}"
+									aria-label="{{ 'customer.orders.order_number_link' | t: number: order.name }}"
+								>
+									<span
+										class=""
+										id="RowOrder"
+										data-label="{{ 'customer.orders.order_number' | t }}"
+									>
+										{{ order.name }}
+									</span>
+									<span
+										class=""
+										data-label="{{ 'customer.orders.date' | t }}"
+									>
+										{{ order.created_at | time_tag: format: 'date' }}
+									</span>
+									<div>
+										<span
+											class="tbody_payments"
+											data-label="{{ 'customer.orders.payment_status' | t }}"
+										>
+											{{ order.financial_status_label }}
+										</span>
+									</div>
+
+									{% comment %}
+										<span data-label="{{ 'customer.orders.fulfillment_status' | t }}">
+											{{ order.fulfillment_status_label }}
+										</span>
+									{% endcomment %}
+
+									<span
+										class=""
+										data-label="{{ 'customer.orders.total' | t }}"
+									>
+										{{ order.total_price | money_with_currency }}
+									</span>
+								</a>
+							{%- endfor -%}
+						</div>
+					{%- else -%}
+						<div class="account-none account-none-order">
+							<div class="account-none-title subtitle">
+								{{ 'customer.orders.none' | t }}
+							</div>
+							<span class=" account-none-text">
+								{{- 'customer.addresses.text_none' | t -}}
+							</span>
+							<a
+								href="{{ routes.collections_url | sort_by: 'best-selling' }}"
+								class="button button--primary button--arrow account-none-button"
+							>
+								{% if settings.button_animation %}
+									<span class="animation-wrapper" hoverstagger="link">
+										<span class="button-label animation" hoverstagger="text">
+											<span class="word" id="word1">
+												{{- 'customer.account.account_button_shop' | t -}}
+											</span>
+										</span>
+										<span
+											class="button-label is-2 animation"
+											hoverstagger="text"
+										>
+											<span class="word" id="word2">
+												{{- 'customer.account.account_button_shop' | t -}}
+											</span>
+										</span>
+									</span>
+								{% else %}
+									<span class="button-label">
+										{{- 'customer.account.account_button_shop' | t -}}
+									</span>
+								{% endif %}
+							</a>
+						</div>
+					{%- endif -%}
+
+					{%- if paginate.pages > 1 -%}
+						{%- if paginate.parts.size > 0 -%}
+							<nav
+								class="pagination"
+								role="navigation"
+								aria-label="{{ 'general.pagination.label' | t }}"
+							>
+								<ul role="list">
+									{%- if paginate.previous -%}
+										<li>
+											<a
+												href="{{ paginate.previous.url }}"
+												aria-label="{{ 'general.pagination.previous' | t }}"
+											>
+												<div class="breadcrumb__delimiter">
+													{% render 'icon-breadcrumbs' %}
+												</div>
+											</a>
+										</li>
+									{%- endif -%}
+
+									{%- for part in paginate.parts -%}
+										<li>
+											{%- if part.is_link -%}
+												<a
+													href="{{ part.url }}"
+													aria-label="{{ 'general.pagination.page' | t: number: part.title }}"
+												>
+													{{- part.title -}}
+												</a>
+											{%- else -%}
+												{%- if part.title == paginate.current_page -%}
+													<span
+														aria-current="page"
+														aria-label="{{ 'general.pagination.page' | t: number: part.title }}"
+													>
+														{{- part.title -}}
+													</span>
+												{%- else -%}
+													<span>{{ part.title }}</span>
+												{%- endif -%}
+											{%- endif -%}
+										</li>
+									{%- endfor -%}
+
+									{%- if paginate.next -%}
+										<li>
+											<a
+												href="{{ paginate.next.url }}"
+												aria-label="{{ 'general.pagination.next' | t }}"
+											>
+												<div class="breadcrumb__delimiter">
+													{% render 'icon-breadcrumbs' %}
+												</div>
+											</a>
+										</li>
+									{%- endif -%}
+								</ul>
+							</nav>
+						{%- endif -%}
+					{%- endif -%}
+				{% endpaginate %}
+			</div>
+			<div class="account-right {% if customer.addresses_count > 0 %} account-right-address {%- else -%} account-none-border {% endif %} ">
+				<h3 class="h3">{{ 'customer.account.details' | t }}</h3>
+				{%- if customer.addresses_count > 0 -%}
+					{% comment %}<h2 class="h3">{{ 'customer.account.details' | t }}</h2>{% endcomment %}
+					<div class="customer-address__list-wrapper">
+						<ul class="customer-address__list customer-address__default">
+							{%- if customer.default_address.name != blank -%}
+								<li class="customer-address__item subtitle">
+									{{ customer.default_address.name }}
+								</li>
+							{%- endif -%}
+
+							{%- if customer.default_address != blank -%}
+								<li>
+									{%- if customer.default_address.street != blank -%}
+										<span class="customer-address__item customer-address__item-name">
+											{{- customer.default_address.street -}}
+										</span>
+									{%- endif -%}
+
+									{%- if customer.default_address.company != blank -%}
+										<span class="customer-address__item">
+											{{- customer.default_address.company -}}</span
+										>,
+									{%- endif -%}
+
+									{%- if customer.default_address.city != blank -%}
+										<span class="customer-address__item">
+											{{- customer.default_address.city -}}</span
+										>,
+									{%- endif -%}
+
+									{%- if customer.default_address.zip != blank -%}
+										<span class="customer-address__item">
+											{{- customer.default_address.zip -}}</span
+										>,
+									{%- endif -%}
+
+									{%- if customer.default_address.phone != blank -%}
+										<span class="customer-address__item">
+											{{- customer.default_address.phone -}}
+										</span>
+									{%- endif -%}
+								</li>
+							{%- endif -%}
+
+							{%- if customer.default_address.country != blank -%}
+								<li>
+									<span class="customer-address__item customer-address__item-address">
+										{{- customer.default_address.country -}}
+									</span>
+								</li>
+							{%- endif -%}
+						</ul>
+						<a
+							class="button button--primary customer-address__link"
+							href="{{ routes.account_addresses_url }}"
+						>
+							{% comment %}
+								<span>
+									{{ 'customer.account.view_addresses' | t }}
+									({{ customer.addresses_count }})
+								</span>
+							{% endcomment %}
+							{% if settings.button_animation %}
+								<span class="animation-wrapper" hoverstagger="link">
+									<span class="button-label animation" hoverstagger="text">
+										<span class="word" id="word1">
+											{{- 'customer.account.view_addresses' | t }}: <br>
+											{{- customer.addresses_count -}}
+										</span>
+									</span>
+									<span class="button-label is-2 animation" hoverstagger="text">
+										<span class="word" id="word2">
+											{{- 'customer.account.view_addresses' | t }}: <br>
+											{{- customer.addresses_count -}}
+										</span>
+									</span>
+								</span>
+							{% else %}
+								<span class="button-label">
+									{{- 'customer.account.view_addresses' | t }} (
+									{{- customer.addresses_count -}}
+									)</span
+								>
+							{% endif %}
+						</a>
+					</div>
+				{%- else -%}
+					<div class="account-none account-none-address ">
+						{% comment %}
+							<div class="account-none-icon">
+								{% render 'icon-account-address-none' %}
+							</div>
+						{% endcomment %}
+						<div class="account-none-title ">
+							{{ 'customer.addresses.none' | t }}
+						</div>
+						<span class=" account-none-text">
+							{{- 'customer.addresses.text_none' | t -}}
+						</span>
+						<a
+							href="{{ routes.account_addresses_url }}"
+							class="button button--primary button--arrow account-none-button account-none-button--big"
+						>
+							{% if settings.button_animation %}
+								<span class="animation-wrapper" hoverstagger="link">
+									<span class="button-label animation" hoverstagger="text">
+										<span class="word" id="word1">
+											{{ 'customer.addresses.add_new' | t -}}
+										</span>
+									</span>
+									<span class="button-label is-2 animation" hoverstagger="text">
+										<span class="word" id="word2">
+											{{- 'customer.addresses.add_new' | t -}}
+										</span>
+									</span>
+								</span>
+							{% else %}
+								<span class="button-label">
+									{{- 'customer.addresses.add_new' | t -}}
+								</span>
+							{% endif %}
+						</a>
+					</div>
+				{%- endif -%}
+			</div>
+		</div>
+	</div>
+</div>
+
+{% schema %}
+{
+	"name": "t:sections.main-account.name"
+}
+{% endschema %}

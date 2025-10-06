@@ -1,0 +1,13 @@
+{% comment %}{%- render 'icon-cart' -%}{% endcomment %}
+<span class="header-tabs">{{ 'general.cart.bag' | t }}:</span>
+<span class="header__cart-text hidden">{{ 'templates.cart.cart' | t }}</span>
+<span class="cart-count-bubble header-tabs">
+	{%- if cart.item_count < 100 -%}
+		<span aria-hidden="true">
+			{{- 'sections.header.cart_count' | t: count: cart.item_count -}}
+		</span>
+	{%- endif -%}
+	<span class="visually-hidden hidden">
+		{{- 'sections.header.cart_count' | t: count: cart.item_count -}}
+	</span>
+</span>

@@ -1,0 +1,430 @@
+{% comment %}
+  This is a Shopify section for embedding a public Frame.io showroom.
+  It's designed to be responsive and easily managed in the Theme Customizer.
+
+  How to use:
+  1. In your Shopify Admin, go to "Online Store" > "Themes".
+  2. Find your theme, click "Actions" > "Edit code".
+  3. In the "Sections" directory, click "Add a new section".
+  4. Name the file "frame-io-embed.liquid" and paste this entire code into it.
+  5. Click "Save".
+  6. Now you can add the "Frame.io Showroom" section to any page from the Theme Customizer.
+{% endcomment %}
+
+{% comment %}
+  Section settings for the theme customizer.
+  These allow the merchant to change the content without editing code.
+{% endcomment %}
+{%- schema -%}
+{
+  "name": "Frame.io Showroom",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "url",
+      "id": "frameio_url",
+      "label": "Frame.io Showroom URL",
+      "info": "Paste the public share link for your Frame.io showroom here."
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_info_panel",
+      "label": "Hide Asset Info Panel by Default",
+      "default": true,
+      "info": "Check this to hide the side panel. If the panel still appears on desktop, it is likely a browser caching issue. Try a hard refresh (Cmd+Shift+R or Ctrl+Shift+R)."
+    },
+    {
+      "type": "checkbox",
+      "id": "lazy_load",
+      "label": "Enable Lazy Loading",
+      "default": false,
+      "info": "If checked, the showroom will only load when it is about to enter the screen. Keep unchecked to load it immediately."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Our Latest Work"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Browse through our latest projects and see our process in action.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_desktop",
+      "min": 24,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading Size (Desktop)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "min": 20,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading Size (Mobile)",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "description_size_desktop",
+      "min": 14,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Description Size (Desktop)",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "description_size_mobile",
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Description Size (Mobile)",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Section Background"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Background Image"
+    },
+    {
+      "type": "select",
+      "id": "bg_fit",
+      "label": "Background Image Fit",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "color",
+      "id": "bg_overlay_color",
+      "label": "Background Overlay Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "bg_overlay_opacity",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "label": "Background Overlay Opacity",
+      "default": 0.3
+    },
+    {
+      "type": "header",
+      "content": "Background Music"
+    },
+    {
+      "type": "text",
+      "id": "music_url",
+      "label": "Music URL",
+      "info": "Upload an audio file to Shopify (Content > Files), then paste the URL here."
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_music_toggle",
+      "label": "Show Music Toggle Button",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Section Styling"
+    },
+    {
+      "type": "color",
+      "id": "section_bg",
+      "label": "Section Background Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Embed Sizing"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width",
+      "min": 50,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Desktop Embed Width",
+      "default": 100,
+      "info": "Controls the max-width of the embed on screens wider than 768px."
+    },
+    {
+      "type": "range",
+      "id": "desktop_aspect_ratio",
+      "min": 40,
+      "max": 125,
+      "step": 1,
+      "unit": "%",
+      "label": "Desktop Embed Height",
+      "default": 56,
+      "info": "Controls the height on screens wider than 768px. 56% is a 16:9 ratio."
+    },
+    {
+      "type": "range",
+      "id": "mobile_aspect_ratio",
+      "min": 75,
+      "max": 400,
+      "step": 5,
+      "unit": "%",
+      "label": "Mobile Embed Height",
+      "default": 120,
+      "info": "Controls height on screens smaller than 768px. To scroll the main page, swipe outside the embed area."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Frame.io Showroom"
+    }
+  ]
+}
+{%- endschema -%}
+
+{% comment %}
+  The CSS for styling the section.
+{% endcomment %}
+<style>
+  .frameio-section-wrapper {
+    position: relative;
+    background-color: {{ section.settings.section_bg }};
+    color: {{ section.settings.text_color }};
+    padding: 50px 15px;
+    {% if section.settings.bg_image != blank %}
+      background-image: url('{{ section.settings.bg_image | image_url }}');
+      background-size: {{ section.settings.bg_fit }};
+      background-position: center;
+      background-repeat: no-repeat;
+    {% endif %}
+  }
+
+  .frameio-section-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: {{ section.settings.bg_overlay_color }};
+    opacity: {{ section.settings.bg_overlay_opacity }};
+    z-index: 1;
+  }
+
+  .frameio-section-container {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  @media (min-width: 768px) {
+    .frameio-section-wrapper {
+      padding: 80px 40px;
+    }
+  }
+
+  .frameio-section-heading {
+    font-size: {{ section.settings.heading_size_mobile }}px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    line-height: 1.2;
+    color: {{ section.settings.text_color }};
+  }
+  
+  @media (min-width: 768px) {
+    .frameio-section-heading {
+      font-size: {{ section.settings.heading_size_desktop }}px;
+    }
+  }
+
+  .frameio-section-description {
+    max-width: 600px;
+    margin: 0 auto 30px auto;
+    font-size: {{ section.settings.description_size_mobile }}px;
+    line-height: 1.6;
+    color: {{ section.settings.text_color }};
+  }
+
+  @media (min-width: 768px) {
+    .frameio-section-description {
+        margin: 0 auto 40px auto;
+        font-size: {{ section.settings.description_size_desktop }}px;
+    }
+  }
+
+  .frameio-section-description p {
+    margin: 0;
+  }
+
+  .frameio-embed-wrapper {
+    position: relative;
+    width: 100%;
+    height: 0;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    background-color: #f0f0f0;
+    margin-left: auto;
+    margin-right: auto;
+    padding-bottom: {{ section.settings.mobile_aspect_ratio }}%;
+  }
+
+  @media (min-width: 768px) {
+    .frameio-embed-wrapper {
+      max-width: {{ section.settings.desktop_width }}%;
+      padding-bottom: {{ section.settings.desktop_aspect_ratio }}%;
+    }
+  }
+
+  .frameio-embed-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  
+  .frameio-placeholder-wrapper {
+    padding: 60px 20px;
+    border: 2px dashed #cccccc;
+    border-radius: 12px;
+    background-color: #f9f9f9;
+  }
+
+  .frameio-placeholder-wrapper p {
+      margin: 0;
+      color: #555555;
+      font-size: 1rem;
+  }
+  .music-toggle-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 3;
+    background-color: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .music-toggle-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+  .music-toggle-btn .icon-pause { display: none; }
+  .music-toggle-btn.is-playing .icon-pause { display: block; }
+  .music-toggle-btn.is-playing .icon-play { display: none; }
+</style>
+
+{%- liquid
+  assign final_frameio_url = section.settings.frameio_url
+
+  if section.settings.hide_info_panel
+    if final_frameio_url contains '?'
+      assign final_frameio_url = final_frameio_url | append: '&info=false'
+    else
+      assign final_frameio_url = final_frameio_url | append: '?info=false'
+    endif
+  endif
+-%}
+
+<div class="frameio-section-wrapper" data-section-id="{{ section.id }}">
+  <div class="frameio-section-container">
+    
+    {%- if section.settings.heading != blank -%}
+      <h2 class="frameio-section-heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+
+    {%- if section.settings.description != blank -%}
+      <div class="frameio-section-description">
+        {{ section.settings.description }}
+      </div>
+    {%- endif -%}
+
+    {%- if final_frameio_url != blank -%}
+      <div class="frameio-embed-wrapper" id="FrameioWrapper-{{ section.id }}">
+        <iframe
+          src="{{ final_frameio_url }}"
+          {% if section.settings.lazy_load %}loading="lazy"{% endif %}
+          frameborder="0"
+          id="FrameioIframe-{{ section.id }}"
+          allow="autoplay; fullscreen"
+          allowfullscreen>
+        </iframe>
+      </div>
+    {%- else -%}
+      {%- if shop.design_mode -%}
+        <div class="frameio-placeholder-wrapper">
+          <p>Please paste a Frame.io Showroom URL in the section settings to display the embed here.</p>
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+
+  </div>
+  
+  {%- if section.settings.enable_music_toggle and section.settings.music_url != blank -%}
+    <audio id="background-audio-{{ section.id }}" loop>
+      <source src="{{ section.settings.music_url }}" type="audio/mpeg">
+    </audio>
+    <button class="music-toggle-btn" id="music-toggle-{{ section.id }}" aria-label="Play/Pause music">
+      <svg class="icon-play" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" /></svg>
+      <svg class="icon-pause" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M5.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75A.75.75 0 007.25 3h-1.5zM12.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75a.75.75 0 00-.75-.75h-1.5z" /></svg>
+    </button>
+  {%- endif -%}
+</div>
+
+{%- if section.settings.enable_music_toggle and section.settings.music_url != blank -%}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const audio = document.getElementById('background-audio-{{ section.id }}');
+    const toggleBtn = document.getElementById('music-toggle-{{ section.id }}');
+
+    if (audio && toggleBtn) {
+      toggleBtn.addEventListener('click', function() {
+        if (audio.paused) {
+          audio.play();
+          toggleBtn.classList.add('is-playing');
+        } else {
+          audio.pause();
+          toggleBtn.classList.remove('is-playing');
+        }
+      });
+    }
+  });
+</script>
+{%- endif -%}

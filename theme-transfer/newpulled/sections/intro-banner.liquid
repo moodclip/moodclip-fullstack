@@ -1,0 +1,98 @@
+{% comment %}{{ 'intro-banner.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'intro-banner.js' | asset_url }}" defer="defer"></script>
+
+<div
+	class="intro-banner color-{{ section.settings.color_scheme }} background"
+	data-introduction-wrapper
+	data-intro-ticker-id="{{ section.id }}"
+>
+	<div class="intro-banner_image">
+		{%- if section.settings.image != blank -%}
+			{% assign image_height = section.settings.image.width
+				| divided_by: section.settings.image.aspect_ratio
+			%}
+			{{
+				section.settings.image
+				| image_url: width: 3840
+				| image_tag:
+					loading: 'lazy',
+					width: section.settings.image.width,
+					height: image_height,
+					sizes: '100vw',
+					widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+			}}
+		{%- endif -%}
+	</div>
+	{%- if section.settings.image_logo != blank -%}
+		<div class="intro-banner_logo">
+			{% assign image_height = section.settings.image_logo.width
+				| divided_by: section.settings.image_logo.aspect_ratio
+			%}
+			{{
+				section.settings.image_logo
+				| image_url: width: 3840
+				| image_tag:
+					loading: 'lazy',
+					width: section.settings.image_logo.width,
+					height: image_height,
+					sizes: '100vw',
+					widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+			}}
+		</div>
+	{%- endif -%}
+	{%- if section.settings.ticker_text != blank -%}
+		<div
+			class="intro-banner_ticker-wrapper"
+		>
+			<div class="intro-banner_ticker ticker-js-{{ section.id }}">
+				{% for i in (1..10) %}
+					<span class="intro-banner_ticker-text">
+						{{ section.settings.ticker_text }}
+					</span>
+				{% endfor %}
+			</div>
+		</div>
+	{%- endif -%}
+	{% comment %}<div class="intro-banner_wrapper"></div>{% endcomment %}
+</div>
+
+{% schema %}
+{
+	"name": "t:sections.intro-banner.name",
+	"tag": "section",
+	"class": "intro-banner-section",
+	"enabled_on": {
+		"groups": ["header"]
+	},
+	"settings": [
+		{
+			"type": "color_scheme",
+			"id": "color_scheme",
+			"default": "background-2",
+			"label": "t:sections.all.color_scheme.label"
+		},
+		{
+			"type": "image_picker",
+			"id": "image",
+			"label": "t:sections.all.image.label"
+		},
+		{
+			"type": "image_picker",
+			"id": "image_logo",
+			"label": "t:sections.all.image.logo"
+		},
+		{
+			"type": "inline_richtext",
+			"id": "ticker_text",
+			"default": "Some text",
+			"label": "t:sections.all.ticker.settings.ticker_text.label"
+		}
+	],
+	"presets": [
+		{
+			"name": "t:sections.intro-banner.name"
+		}
+	]
+}
+{% endschema %}{% endcomment %}

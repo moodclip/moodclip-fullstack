@@ -1,0 +1,104 @@
+<div class="search-modal header-modal" role="dialog" aria-modal="true" aria-label="{{ 'general.search.search' | t }}" id="search-modal">
+<div class="search__content header-modal_content">
+	<div class="search__header">
+		<h4 class="search__header-title">
+			{{- 'general.search.search_modal_title' | t -}}
+		</h4>
+		<button
+			type="button"
+			class="search__close button focus-inset modal-close-button"
+			aria-label="{{ 'accessibility.close' | t }}"
+			id="search-modal-close"
+			onclick="this.parentElement.parentElement.open = false"
+		>
+			{% comment %}{% render 'icon-close' %}{% endcomment %}
+			{{ 'general.close.title' | t }}
+		</button>
+		</div>
+		<div class="search-modal__item">
+			<div class="search-modal__content">
+				{%- if settings.predictive_search_enabled -%}
+					<predictive-search class="search-modal__form" data-loading-text="{{ 'accessibility.loading' | t }}">
+				{%- endif -%}
+					<form action="{{ routes.search_url }}" method="get" role="search" class="search search-modal__form">
+						<div class="search__form-inner">
+							<div class="field">
+									<div class="search__form__wrapper">
+										{% comment %}<button class="search__button" aria-label="{{ 'general.search.search' | t }}" type="submit">
+											{% render 'icon-search' %}
+										</button>{% endcomment %}
+										<div class="search__input-wrapper">
+											<input class="search__input field__input" 
+												id="Search-In-Modal" 
+												type="search" 
+												name="q" 
+												value="{{ search.terms | escape }}"
+												placeholder=" "
+												{%- if settings.predictive_search_enabled -%}
+													role="combobox"
+													aria-expanded="false"
+													aria-owns="predictive-search-results-list"
+													aria-controls="predictive-search-results-list"
+													aria-haspopup="listbox"
+													aria-autocomplete="list"
+													autocorrect="off"
+													autocomplete="off"
+													autocapitalize="off"
+													spellcheck="false"
+												{%- endif -%}
+											>
+											<label class="field__label" for="Search-In-Modal">{{ 'general.search.placeholder' | t }}</label>
+											<button type="reset" class="reset-search" aria-label="{{ 'general.search.reset' | t }}">{% render 'icon-close' %}</button>
+											<input type="hidden" name="options[prefix]" value="last">
+										</div>
+										<button class="button button--primary" aria-label="{{ 'general.search.search' | t }}">
+											{% if settings.button_animation %}
+												<span class="animation-wrapper" hoverstagger="link">
+													<span class="button-label animation" hoverstagger="text">
+														<span class="word" id="word1">{{ 'general.search.search' | t }}</span>
+													</span>
+													<span class="button-label is-2 animation" hoverstagger="text">
+														<span class="word" id="word2">{{ 'general.search.search' | t }}</span>
+													</span>
+												</span>
+											{% else %}
+												<span class="button-label">{{ 'general.search.search' | t }}</span>
+											{% endif %}
+										</button>
+									</div>
+							</div>
+							{%- if settings.predictive_search_enabled -%}
+								<div class="predictive-search__wrapper">
+										<div class="predictive-search__wrapper-box">
+											<div class="predictive-search predictive-search--header" tabindex="-1" data-predictive-search>
+												<div class="predictive-search__loading-state">
+													{% render 'icon-spinner' %}
+												</div>
+											</div>
+											<span class="predictive-search-status visually-hidden" role="status" aria-hidden="true"></span>
+									</div>
+								</div>
+							{%- endif -%}
+						</div>
+						{%- if settings.search_collection_list != blank -%}
+							<div class="search__categories-wrapper search__recomendation">
+								{%- for collection in settings.search_collection_list -%}
+									<span class="collection-card__title medium-font">
+										<a
+											class="full-unstyled-link" href="{{ collection.url }}">
+												{{ collection.title }}
+										</a>
+									</span>
+								{%- endfor -%}
+							</div>
+						{%- endif -%}
+					</form>
+				{%- if settings.predictive_search_enabled -%}
+					</predictive-search>
+				{%- endif -%}
+			</div>
+		</div>
+	</div>
+	<div class="search-modal__overlay modal__overlay"></div>
+
+</div>

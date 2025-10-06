@@ -1,0 +1,338 @@
+{{ 'lookbook.css' | asset_url | stylesheet_tag }}
+<script src="{{ "lookbook.js" | asset_url }}" defer="defer"></script>
+
+{%- style -%}
+	{% render 'section-margin' %}
+{%- endstyle -%}
+
+<div
+	class="lookbook {% if section.settings.scroll_type == true %}lookbook_container{% endif %}"
+	data-id="shopify-section-{{ section.id }}"
+>
+	{% render 'section-header' %}
+	<div class="">
+		{%- style -%}
+			#shopify-section-{{ section.id }} {
+			 --per-row: {{ section.blocks.size }};
+				}
+		{%- endstyle -%}
+		<div class="{% if section.settings.scroll_type == true %}swiper{% endif %} container">
+			<div class="lookbook__wrapper swiper-wrapper ">
+				{%- for block in section.blocks -%}
+					<div class="lookbook__box swiper-slide ">
+						<div class="lookbook__cards ">
+							{% liquid
+								case section.settings.image_ratio
+									when 'landscape'
+										assign section_size = '56.25%'
+										assign margin_top = '30%'
+									when 'portrait'
+										assign section_size = '125%'
+										assign margin_top = '97%'
+									when 'square'
+										assign section_size = '100%'
+										assign margin_top = '60%'
+									else
+										assign section_size = '100%'
+										assign margin_top = '60%'
+								endcase
+							%}
+							<div
+								class="lookbook-card"
+								style="--image-size: {{ section_size }};"
+							>
+								<div class="lookbook__img-wrapper">
+									<div class="lookbook__img-wrapper-item">
+										<div class="lookbook__img color-inverse {% if block.settings.image != blank %}lookbook__img-inverse{% endif %}">
+											{% if block.settings.video != blank %}
+												{% liquid
+													assign video_height = block.settings.video.sources[0].width | divided_by: block.settings.video.aspect_ratio
+												%}
+												{{
+													block.settings.video
+													| video_tag:
+														width: block.settings.video.sources[0].width,
+														height: video_height,
+														autoplay: true,
+														loop: true,
+														controls: false,
+														muted: true
+												}}
+											{%- elsif block.settings.image != blank -%}
+												{%- capture sizes -%}
+													(min-width: 1920px) calc(100vw - 100px),
+													(min-width: 750px) calc((100vw - 50px)), calc((100vw - 50px) / 2)
+												{%- endcapture -%}
+												{%- assign image_height = block.settings.image.width
+													| divided_by: block.settings.image.aspect_ratio
+												-%}
+												{{
+													block.settings.image
+													| image_url: width: 3840
+													| image_tag:
+														loading: 'lazy',
+														sizes: sizes,
+														widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840',
+														height: image_height,
+														class: 'lookbook__image'
+												}}
+											{%- else %}
+												{{
+													'image'
+													| placeholder_svg_tag: 'placeholder-svg cards-grid__image placeholder'
+												}}
+											{%- endif -%}
+											<div class="lookbook-product-card-box lookbook-product-card-item">
+												<div></div>
+												<div class="lookbook-product-card">
+													{%
+														render 'product-card',
+														product_card_product: block.settings.product,
+														media_size: block.settings.image_ratio,
+														show_vendor: section.settings.show_vendor,
+													%}
+												</div>
+												{%- if block.settings.heading != blank -%}
+													<h2 class="lookbook__heading">
+														{{ block.settings.heading }}
+													</h2>
+												{%- endif -%}
+												{%- if block.settings.description != blank -%}
+													<div class="lookbook__desc medium-font richtext__content">
+														{{ block.settings.description }}
+													</div>
+												{%- endif -%}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+</div>
+{% schema %}
+{
+	"name": "t:sections.lookbook.name",
+	"class": "spaced-section lookbook-section",
+	"tag": "section",
+	"enabled_on": {
+		"templates": ["*"]
+	},
+	"settings": [
+		{
+			"type": "checkbox",
+			"id": "scroll_type",
+			"default": true,
+			"label": "t:sections.lookbook.label"
+		},
+		{
+			"type": "text",
+			"id": "subheading",
+			"default": "Subheading",
+			"label": "t:sections.all.subheading.label"
+		},
+		{
+			"type": "inline_richtext",
+			"id": "heading",
+			"default": "Heading",
+			"label": "t:sections.all.heading.label"
+		},
+		{
+			"type": "richtext",
+			"id": "description",
+			"default": "<p>Description</p>",
+			"label": "t:sections.all.description.label"
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_border_top",
+			"default": true,
+			"label": "t:sections.all.section_header.border"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.button.header.content"
+		},
+		{
+			"type": "text",
+			"id": "button_label",
+			"default": "Button label",
+			"label": "t:sections.all.button.label.label",
+			"info": "t:sections.all.button.label.info"
+		},
+		{
+			"type": "url",
+			"id": "button_link",
+			"label": "t:sections.all.button.link.label"
+		},
+		{
+			"type": "select",
+			"id": "button_style",
+			"options": [
+				{
+					"value": "primary",
+					"label": "t:sections.all.button.style.options__1.label"
+				},
+				{
+					"value": "secondary",
+					"label": "t:sections.all.button.style.options__2.label"
+				},
+				{
+					"value": "tertiary",
+					"label": "t:sections.all.button.style.options__3.label"
+				}
+			],
+			"default": "primary",
+			"label": "t:sections.all.button.style.label"
+		},
+		{
+			"type": "checkbox",
+			"id": "button_arrow",
+			"default": false,
+			"label": "t:sections.all.button.arrow.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.section-margin.header.content"
+		},
+		{
+			"type": "select",
+			"id": "margin_top",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "no-indent",
+			"label": "t:sections.all.section-margin.margin_top.label"
+		},
+		{
+			"type": "select",
+			"id": "margin_bottom",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "l",
+			"label": "t:sections.all.section-margin.margin_bottom.label"
+		}
+	],
+	"blocks": [
+		{
+			"type": "categories",
+			"name": "t:sections.lookbook.blocks.name",
+			"settings": [
+				{
+					"type": "header",
+					"content": "t:sections.all.product_card.header.content"
+				},
+				{
+					"type": "product",
+					"id": "product",
+					"label": "t:sections.all.product_card.product.label"
+				},
+				{
+					"type": "select",
+					"id": "image_ratio",
+					"options": [
+						{
+							"value": "landscape",
+							"label": "t:sections.all.image.ratio.options__1.label"
+						},
+						{
+							"value": "portrait",
+							"label": "t:sections.all.image.ratio.options__2.label"
+						},
+						{
+							"value": "square",
+							"label": "t:sections.all.image.ratio.options__3.label"
+						}
+					],
+					"default": "portrait",
+					"label": "t:sections.all.image.ratio.label"
+				},
+				{
+					"type": "image_picker",
+					"id": "image",
+					"label": "t:sections.all.image.label"
+				},
+				{
+					"type": "video",
+					"id": "video",
+					"label": "t:sections.all.video.label"
+				},
+				{
+					"type": "inline_richtext",
+					"id": "heading",
+					"default": "Heading",
+					"label": "t:sections.all.heading.label"
+				},
+				{
+					"type": "richtext",
+					"id": "description",
+					"default": "<p>Description</p>",
+					"label": "t:sections.all.description.label"
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "t:sections.lookbook.presets.name",
+			"blocks": [
+				{
+					"type": "categories"
+				},
+				{
+					"type": "categories"
+				},
+				{
+					"type": "categories"
+				},
+				{
+					"type": "categories"
+				}
+			]
+		}
+	]
+}
+{% endschema %}

@@ -1,0 +1,49 @@
+--color-background: {{ scheme.settings.colors_background_1.red }},{{ scheme.settings.colors_background_1.green }},{{ scheme.settings.colors_background_1.blue }};
+--color-background-secondary: {{ scheme.settings.colors_background_2.red }},{{ scheme.settings.colors_background_2.green }},{{ scheme.settings.colors_background_2.blue }};
+{% if scheme.settings.background_gradient != empty %}
+	--gradient-background: {{ scheme.settings.background_gradient }};
+{% else %}
+	--gradient-background: {{ scheme.settings.colors_background_1 }};
+{% endif %}
+--color-foreground: {{ scheme.settings.colors_text.red }}, {{ scheme.settings.colors_text.green }}, {{ scheme.settings.colors_text.blue }};
+--color-foreground-secondary: {{ scheme.settings.colors_secondary_text.red }}, {{ scheme.settings.colors_secondary_text.green }}, {{ scheme.settings.colors_secondary_text.blue }};
+--color-foreground-title: {{ scheme.settings.colors_text_title.red }}, {{ scheme.settings.colors_text_title.green }}, {{ scheme.settings.colors_text_title.blue }};
+--menu-shadow-color: var(--color-foreground);
+--color-button-text: {{ scheme.settings.colors_primary_button_labels.red }}, {{ scheme.settings.colors_primary_button_labels.green }}, {{ scheme.settings.colors_primary_button_labels.blue }};
+--color-button-text-hover: {{ scheme.settings.colors_primary_button_labels_hover.red }}, {{ scheme.settings.colors_primary_button_labels_hover.green }}, {{ scheme.settings.colors_primary_button_labels_hover.blue }};
+--color-button: {{ scheme.settings.colors_primary_button_background.red }}, {{ scheme.settings.colors_primary_button_background.green }}, {{ scheme.settings.colors_primary_button_background.blue }};
+--color-button-hover: {{ scheme.settings.colors_primary_button_background_hover.red }}, {{ scheme.settings.colors_primary_button_background_hover.green }}, {{ scheme.settings.colors_primary_button_background_hover.blue }};
+
+--color-button-secondary: {{ scheme.settings.colors_secondary_button_background.red }}, {{ scheme.settings.colors_secondary_button_background.green }}, {{ scheme.settings.colors_secondary_button_background.blue }};
+--color-button-secondary-hover: {{ scheme.settings.colors_secondary_button_background_hover.red }}, {{ scheme.settings.colors_secondary_button_background_hover.green }}, {{ scheme.settings.colors_secondary_button_background_hover.blue }};
+--color-button-secondary-text: {{ scheme.settings.colors_secondary_button_labels.red }}, {{ scheme.settings.colors_secondary_button_labels.green }}, {{ scheme.settings.colors_secondary_button_labels.blue }};
+--color-button-secondary-text-hover: {{ scheme.settings.colors_secondary_button_labels_hover.red }}, {{ scheme.settings.colors_secondary_button_labels_hover.green }}, {{ scheme.settings.colors_secondary_button_labels_hover.blue }};
+
+--color-button-tertiary-text: {{ scheme.settings.colors_tertiary_button_labels.red }}, {{ scheme.settings.colors_tertiary_button_labels.green }}, {{ scheme.settings.colors_tertiary_button_labels.blue }};
+--color-button-tertiary-text-hover: {{ scheme.settings.colors_tertiary_button_labels_hover.red }}, {{ scheme.settings.colors_tertiary_button_labels_hover.green }}, {{ scheme.settings.colors_tertiary_button_labels_hover.blue }};
+
+--color-overlay: {{ scheme.settings.colors_background_overlay.red }}, {{ scheme.settings.colors_background_overlay.green }}, {{ scheme.settings.colors_background_overlay.blue }};
+--color-border-input: {{ scheme.settings.colors_input_border.red }}, {{ scheme.settings.colors_input_border.green }}, {{ scheme.settings.colors_input_border.blue }};
+--color-border-input-hover: {{ scheme.settings.colors_input_hover_border.red }}, {{ scheme.settings.colors_input_hover_border.green }}, {{ scheme.settings.colors_input_hover_border.blue }};
+--color-background-input: {{ scheme.settings.colors_input_background.red }}, {{ scheme.settings.colors_input_background.green }}, {{ scheme.settings.colors_input_background.blue }};
+--color-background-input-hover: {{ scheme.settings.colors_input_hover_background.red }}, {{ scheme.settings.colors_input_hover_background.green }}, {{ scheme.settings.colors_input_hover_background.blue }};
+--color-border: {{ scheme.settings.color_border.red }}, {{ scheme.settings.color_border.green }}, {{ scheme.settings.color_border.blue }};
+--color-accent: {{ scheme.settings.color_accent.red }}, {{ scheme.settings.color_accent.green }}, {{ scheme.settings.color_accent.blue }};
+--color-emphasis: {{ scheme.settings.color_emphasis.red }}, {{ scheme.settings.color_emphasis.green }}, {{ scheme.settings.color_emphasis.blue }};
+
+--color-badge-background: {{ scheme.settings.color_badge_background.red }}, {{ scheme.settings.color_badge_background.green }}, {{ scheme.settings.color_badge_background.blue }};
+--color-badge-text: {{ scheme.settings.color_badge_text.red }}, {{ scheme.settings.color_badge_text.green }}, {{ scheme.settings.color_badge_text.blue }};
+
+--color-badge-sale-background: {{ settings.badge_sale_background_color.red }}, {{ settings.badge_sale_background_color.green }}, {{ settings.badge_sale_background_color.blue }};
+--color-badge-sale-text: {{ settings.badge_sale_text_color.red }}, {{ settings.badge_sale_text_color.green }}, {{ settings.badge_sale_text_color.blue }};
+--color-badge-soldout-background: {{ settings.badge_soldout_background_color.red }}, {{ settings.badge_soldout_background_color.green }}, {{ settings.badge_soldout_background_color.blue }};
+--color-badge-soldout-text: {{ settings.badge_soldout_text_color.red }}, {{ settings.badge_soldout_text_color.green }}, {{ settings.badge_soldout_text_color.blue }};
+--color-badge-custom-background: {{ settings.badge_custom_background_color.red }}, {{ settings.badge_custom_background_color.green }}, {{ settings.badge_custom_background_color.blue }};
+--color-badge-custom-text: {{ settings.badge_custom_text_color.red }}, {{ settings.badge_custom_text_color.green }}, {{ settings.badge_custom_text_color.blue }};
+
+--color-pagination-text: {{ settings.colors_pagination_text.red }}, {{ settings.colors_pagination_text.green }}, {{ settings.colors_pagination_text.blue }};
+--color-pagination-background: {{ settings.colors_pagination_background.red }}, {{ settings.colors_pagination_background.green }}, {{ settings.colors_pagination_background.blue }};
+--color-pagination-border: {{ settings.colors_pagination_border.red }}, {{ settings.colors_pagination_border.green }}, {{ settings.colors_pagination_border.blue }};
+--color-pagination-active-text: {{ settings.colors_pagination_active_text.red }}, {{ settings.colors_pagination_active_text.green }}, {{ settings.colors_pagination_active_text.blue }};
+--color-pagination-active-background: {{ settings.colors_pagination_active_background.red }}, {{ settings.colors_pagination_active_background.green }}, {{ settings.colors_pagination_active_background.blue }};
+--color-pagination-active-border: {{ settings.colors_pagination_active_border.red }}, {{ settings.colors_pagination_active_border.green }}, {{ settings.colors_pagination_active_border.blue }};

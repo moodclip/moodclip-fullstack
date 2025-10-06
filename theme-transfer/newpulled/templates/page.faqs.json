@@ -1,0 +1,86 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "padding_top": "no-indent",
+        "padding_bottom": "no-indent"
+      }
+    },
+    "collapsible_content_hLVMDn": {
+      "type": "collapsible-content",
+      "blocks": {
+        "text_block_nRJ9EC": {
+          "type": "text-block",
+          "settings": {
+            "heading": "Heading",
+            "description": "<p>Description<\/p>"
+          }
+        },
+        "text_block_3NPVTn": {
+          "type": "text-block",
+          "settings": {
+            "heading": "Heading",
+            "description": "<p>Description<\/p>"
+          }
+        },
+        "text_block_wCW4jM": {
+          "type": "text-block",
+          "settings": {
+            "heading": "Heading",
+            "description": "<p>Description<\/p>"
+          }
+        },
+        "text_block_VhhaBp": {
+          "type": "text-block",
+          "settings": {
+            "heading": "Heading",
+            "description": "<p>Description<\/p>"
+          }
+        },
+        "text_block_b4P4Uh": {
+          "type": "text-block",
+          "settings": {
+            "heading": "Heading",
+            "description": "<p>Description<\/p>"
+          }
+        }
+      },
+      "block_order": [
+        "text_block_nRJ9EC",
+        "text_block_3NPVTn",
+        "text_block_wCW4jM",
+        "text_block_VhhaBp",
+        "text_block_b4P4Uh"
+      ],
+      "settings": {
+        "color_scheme": "background-1",
+        "show_image_content": false,
+        "subheading": "Subheading",
+        "heading": "Heading",
+        "text_animation": true,
+        "description": "<p>Description<\/p>",
+        "button_label": "",
+        "button_link": "",
+        "button_style": "primary",
+        "button_arrow": false,
+        "margin_top": "no-indent",
+        "margin_bottom": "l"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "collapsible_content_hLVMDn"
+  ]
+}

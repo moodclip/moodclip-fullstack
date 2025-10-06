@@ -1,0 +1,425 @@
+{% comment %}
+ISSUES FIXED (Final Attempt):
+1. 'max' value for 'image_width_mobile' increased to 100 to remove the setting limit error.
+2. CSS for mobile image width is now more aggressive, using `!important` to force override theme styles and ensure the control works as expected.
+3. The combination of `width`, `min-width`, and `flex-basis` should now correctly resize the images in the side-by-side mobile layout.
+
+PREVIOUS FIXES RETAINED:
+- Side-by-side layout on all devices.
+- Controls for desktop image width and image fit (`Contain`/`Cover`).
+- Dynamic aspect-ratio containers to prevent image stretching.
+{% endcomment %}
+
+{{ 'collapsible-with-image.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'collapsible-with-image.js' | asset_url }}" defer="defer"></script>
+
+{%- style -%}
+	{% render 'section-margin' %}
+
+    #shopify-section-{{ section.id }} .collapsible-with-image_image-wrapper {
+        width: {{ section.settings.image_width_desktop }}%;
+        margin-left: auto;
+        margin-right: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #shopify-section-{{ section.id }} .collapsible-with-image_image,
+    #shopify-section-{{ section.id }} .collapsible-with-image_second {
+        position: relative;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    #shopify-section-{{ section.id }} .collapsible-with-image_image img,
+    #shopify-section-{{ section.id }} .collapsible-with-image_image video,
+    #shopify-section-{{ section.id }} .collapsible-with-image_second img,
+    #shopify-section-{{ section.id }} .collapsible-with-image_second video,
+    #shopify-section-{{ section.id }} .placeholder-svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: {{ section.settings.image_fit }};
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    @media screen and (max-width: 749px) {
+        #shopify-section-{{ section.id }} .collapsible-with-image_image-wrapper {
+            width: 100%;
+            gap: 1.5rem;
+        }
+
+        #shopify-section-{{ section.id }} .collapsible-with-image_image,
+        #shopify-section-{{ section.id }} .collapsible-with-image_second {
+            /* Forcefully set the size of the image containers and prevent them from shrinking */
+            width: {{ section.settings.image_width_mobile }}% !important;
+            min-width: {{ section.settings.image_width_mobile }}% !important;
+            flex-basis: {{ section.settings.image_width_mobile }}% !important;
+            flex-shrink: 0 !important;
+        }
+
+        #shopify-section-{{ section.id }} .collapsible-with-image_content {
+            /* Allow the text to grow and shrink to fill the available space */
+            flex-grow: 1;
+            flex-shrink: 1;
+        }
+    }
+{%- endstyle -%}
+
+<div class="collapsible-with-image color-{{ section.settings.color_scheme }} background">
+	{% render 'section-header' %}
+	<div class="container">
+		<div class="collapsible-with-image_wrapper">
+			{%- liquid
+                assign desktop_vw = section.settings.image_width_desktop | divided_by: 2.0
+                assign mobile_vw = section.settings.image_width_mobile
+                assign image_sizes = "(max-width: 749px) " | append: mobile_vw | append: "vw, " | append: desktop_vw | append: "vw"
+            -%}
+			{%- for block in section.blocks -%}
+				<div class="collapsible-with-image_item-wrapper">
+					<div class="collapsible-with-image_image-wrapper">
+						{%- liquid
+                          assign image_one_aspect_ratio = '1 / 1'
+                          if block.settings.video != blank
+                            assign image_one_aspect_ratio = block.settings.video.aspect_ratio
+                          elsif block.settings.image != blank
+                            assign image_one_aspect_ratio = block.settings.image.aspect_ratio
+                          endif
+
+                          assign image_two_aspect_ratio = '1 / 1'
+                          if block.settings.video_second != blank
+                            assign image_two_aspect_ratio = block.settings.video_second.aspect_ratio
+                          elsif block.settings.image_second != blank
+                            assign image_two_aspect_ratio = block.settings.image_second.aspect_ratio
+                          endif
+                        -%}
+						<div class="collapsible-with-image_image" style="aspect-ratio: {{ image_one_aspect_ratio }};">
+							{%- if block.settings.video != blank -%}
+								{{
+									block.settings.video
+									| video_tag:
+										autoplay: true,
+										loop: true,
+										controls: false,
+										muted: true
+								}}
+							{%- elsif block.settings.image != blank -%}
+								{{
+									block.settings.image
+									| image_url: width: 3840
+									| image_tag:
+										loading: 'lazy',
+										sizes: image_sizes,
+										widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+								}}
+							{%- else -%}
+								{{
+									'image'
+									| placeholder_svg_tag: 'placeholder-svg placeholder'
+								}}
+							{%- endif -%}
+						</div>
+						<div class="collapsible-with-image_content">
+							<div class="collapsible-with-image_top">
+								<h2 class="collapsible-with-image_heading">
+									{{ block.settings.heading }}
+								</h2>
+								<span class="collapsible-with-image_desc medium-font">
+									{{- block.settings.description -}}
+								</span>
+							</div>
+						</div>
+						<div class="collapsible-with-image_second" style="aspect-ratio: {{ image_two_aspect_ratio }};">
+							{%- if block.settings.video_second != blank -%}
+								{{
+									block.settings.video_second
+									| video_tag:
+										autoplay: true,
+										loop: true,
+										controls: false,
+										muted: true
+								}}
+							{%- elsif block.settings.image_second != blank -%}
+								{{
+									block.settings.image_second
+									| image_url: width: 3840
+									| image_tag:
+										loading: 'lazy',
+										sizes: image_sizes,
+										widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+								}}
+							{%- else -%}
+								{{
+									'image'
+									| placeholder_svg_tag: 'placeholder-svg placeholder'
+								}}
+							{%- endif -%}
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+		{% if section.settings.section_header_type == 'type1'
+			and section.settings.button_label != blank
+		%}
+			<div class="section-header_btn">
+				{% render 'button', layout: section %}
+			</div>
+		{% endif %}
+	</div>
+</div>
+
+{% schema %}
+{
+	"name": "t:sections.collapsible-with-image.name",
+	"tag": "section",
+	"class": "collapsible-with-image-section",
+	"enabled_on": {
+		"templates": ["*"]
+	},
+	"settings": [
+		{
+			"type": "select",
+			"id": "section_header_type",
+			"label": "t:sections.all.section_header.header.content",
+			"default": "type1",
+			"options": [
+				{
+					"value": "type1",
+					"label": "t:sections.all.section_header.options.options__1.label"
+				},
+				{
+					"value": "type2",
+					"label": "t:sections.all.section_header.options.options__2.label"
+				}
+			]
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_border_top",
+			"default": false,
+			"label": "t:sections.all.section_header.border"
+		},
+		{
+			"type": "text",
+			"id": "subheading",
+			"default": "Subheading",
+			"label": "t:sections.all.subheading.label"
+		},
+		{
+			"type": "inline_richtext",
+			"id": "heading",
+			"label": "t:sections.all.heading.label"
+		},
+		{
+			"type": "richtext",
+			"id": "description",
+			"label": "t:sections.all.description.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.image.header.content"
+		},
+		{
+			"type": "range",
+			"id": "image_width_desktop",
+			"min": 20,
+			"max": 100,
+			"step": 2,
+			"unit": "%",
+			"label": "Image width on desktop",
+			"default": 60
+		},
+		{
+			"type": "range",
+			"id": "image_width_mobile",
+			"min": 5,
+			"max": 100,
+			"step": 1,
+			"unit": "%",
+			"label": "Image width on mobile",
+			"default": 25
+		},
+		{
+			"type": "select",
+			"id": "image_fit",
+			"label": "Image fit",
+			"options": [
+				{
+					"value": "contain",
+					"label": "Contain"
+				},
+				{
+					"value": "cover",
+					"label": "Cover"
+				}
+			],
+			"default": "contain",
+			"info": "Choose 'Contain' to show the entire image without cropping. Choose 'Cover' to make the image fill the entire space, which may lead to cropping."
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.button.header.content"
+		},
+		{
+			"type": "text",
+			"id": "button_label",
+			"label": "t:sections.all.button.label.label",
+			"info": "t:sections.all.button.label.info"
+		},
+		{
+			"type": "url",
+			"id": "button_link",
+			"label": "t:sections.all.button.link.label"
+		},
+		{
+			"type": "select",
+			"id": "button_style",
+			"options": [
+				{
+					"value": "primary",
+					"label": "t:sections.all.button.style.options__1.label"
+				},
+				{
+					"value": "secondary",
+					"label": "t:sections.all.button.style.options__2.label"
+				},
+				{
+					"value": "tertiary",
+					"label": "t:sections.all.button.style.options__3.label"
+				}
+			],
+			"default": "primary",
+			"label": "t:sections.all.button.style.label"
+		},
+		{
+			"type": "checkbox",
+			"id": "button_arrow",
+			"default": false,
+			"label": "t:sections.all.button.arrow.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.section-margin.header.content"
+		},
+		{
+			"type": "select",
+			"id": "margin_top",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "no-indent",
+			"label": "t:sections.all.section-margin.margin_top.label"
+		},
+		{
+			"type": "select",
+			"id": "margin_bottom",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "l",
+			"label": "t:sections.all.section-margin.margin_bottom.label"
+		}
+	],
+	"blocks": [
+		{
+			"type": "collage",
+			"name": "t:sections.collapsible-with-image.blocks.name",
+			"settings": [
+				{
+					"type": "image_picker",
+					"id": "image",
+					"label": "t:sections.all.image.label"
+				},
+				{
+					"type": "image_picker",
+					"id": "image_second",
+					"label": "Second Image"
+				},
+				{
+					"type": "video",
+					"id": "video",
+					"label": "t:sections.all.video.label"
+				},
+				{
+					"type": "video",
+					"id": "video_second",
+					"label": "Second Video"
+				},
+				{
+					"type": "inline_richtext",
+					"id": "heading",
+					"default": "Heading",
+					"label": "t:sections.all.heading.label"
+				},
+				{
+					"type": "richtext",
+					"id": "description",
+					"default": "<p>Description</p>",
+					"label": "t:sections.all.description.label"
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "t:sections.collapsible-with-image.presets.name",
+			"blocks": [
+				{
+					"type": "collage"
+				},
+				{
+					"type": "collage"
+				},
+				{
+					"type": "collage"
+				},
+				{
+					"type": "collage"
+				}
+			]
+		}
+	]
+}
+{% endschema %}

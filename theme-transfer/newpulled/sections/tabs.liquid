@@ -1,0 +1,643 @@
+{{ 'section-tabs.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'tabs.js' | asset_url }}" defer="defer"></script>
+
+{%- style -%}
+	{% render 'section-margin' %}
+{%- endstyle -%}
+
+<div
+	class="tabs"
+	data-id="shopify-section-{{ section.id }}"
+	data-autoplay="{{ section.settings.is_autoplay }}"
+	data-speed="{{ section.settings.slider_speed }}"
+	data-delay="{{ section.settings.slider_delay }}"
+	data-effect="{{ section.settings.slide_effects }}"
+	data-per-row="{{ section.blocks.size }}"
+>
+	{%- style -%}
+		#shopify-section-{{ section.id }} {
+			--delay: {{ section.settings.slider_delay }}s;
+			--speed: {{ section.settings.slider_speed }}s;
+		}
+	{%- endstyle -%}
+
+	{% render 'section-header' %}
+	<div class="container">
+		{% if section.settings.blocks_type == 'type1' %}
+			<div class="tabs_wrapper-type1">
+				<div class="tabs_box swiper">
+					<div class="swiper-wrapper">
+						{%- for block in section.blocks -%}
+							<div class="swiper-slide">
+								<div class="tab__item-img">
+									{% if block.settings.video != blank %}
+										{% liquid
+											assign video_height = block.settings.video.sources[0].width | divided_by: block.settings.video.aspect_ratio
+										%}
+										{{
+											block.settings.video
+											| video_tag:
+												width: block.settings.video.sources[0].width,
+												height: video_height,
+												autoplay: true,
+												loop: true,
+												controls: false,
+												muted: true
+										}}
+									{% elsif block.settings.image != blank %}
+										{% assign image_height = block.settings.image.width
+											| divided_by: block.settings.image.aspect_ratio
+										%}
+										{{
+											block.settings.image
+											| image_url: width: 3840
+											| image_tag:
+												loading: 'lazy',
+												sizes: '100vw',
+												widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840',
+												height: image_height
+										}}
+									{% else %}
+										{{
+											'collection-1'
+											| placeholder_svg_tag: 'placeholder-svg placeholder'
+										}}
+									{% endif %}
+								</div>
+							</div>
+						{%- endfor -%}
+					</div>
+					<div class="tabs-thumb_wrapper swiper">
+						<div class="swiper-wrapper">
+							{%- for block in section.blocks -%}
+								<div class="swiper-slide">
+									<div class="tab-thumb_item-wrapper">
+										<div
+											class="tab-thumb_item-pagination{% if section.settings.is_autoplay %} tab-thumb_item-pagination-animation{% endif %}"
+										></div>
+										<h3 class="tab__item-info-title">
+											{% if block.settings.heading != blank %}
+												{{ block.settings.heading }}
+											{% endif %}
+										</h3>
+
+										<div class="tab__item-info-block">
+											{%- if block.settings.subheading != blank -%}
+												<div class="tab__item-info-subtitle subtitle">
+													{{ block.settings.subheading }}
+												</div>
+											{%- endif -%}
+											{% if block.settings.description != blank %}
+												<div class="tab__item-info-desc medium-font">
+													{{ block.settings.description }}
+												</div>
+											{% endif %}
+											{% render 'button', layout: block %}
+										</div>
+									</div>
+								</div>
+							{%- endfor -%}
+						</div>
+					</div>
+				</div>
+			</div>
+		{% elsif section.settings.blocks_type == 'type2' %}
+			<div class="tabs_wrapper-type2">
+				<div class="tab_item-wrapper">
+					<div class="tabs_box swiper">
+						<div class="swiper-wrapper">
+							{%- for block in section.blocks -%}
+								<div class="swiper-slide">
+									<div class="tab__item-img">
+										{% if block.settings.video != blank %}
+											{% liquid
+												assign video_height = block.settings.video.sources[0].width | divided_by: block.settings.video.aspect_ratio
+											%}
+											{{
+												block.settings.video
+												| video_tag:
+													width: block.settings.video.sources[0].width,
+													height: video_height,
+													autoplay: true,
+													loop: true,
+													controls: false,
+													muted: true
+											}}
+										{% elsif block.settings.image != blank %}
+											{% assign image_height = block.settings.image.width
+												| divided_by: block.settings.image.aspect_ratio
+											%}
+											{{
+												block.settings.image
+												| image_url: width: 3840
+												| image_tag:
+													loading: 'lazy',
+													sizes: '100vw',
+													widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840',
+													height: image_height
+											}}
+										{% else %}
+											{{
+												'collection-1'
+												| placeholder_svg_tag: 'placeholder-svg placeholder'
+											}}
+										{% endif %}
+									</div>
+								</div>
+							{%- endfor -%}
+						</div>
+					</div>
+					<div class="tabs_box-content swiper">
+						<div class="swiper-wrapper">
+							{%- for block in section.blocks -%}
+								<div class="swiper-slide">
+									<div class="tab__item-info-block">
+										{%- if block.settings.subheading != blank -%}
+											<div class="tab__item-info-subtitle subtitle">
+												{{ block.settings.subheading }}
+											</div>
+										{%- endif -%}
+										{% if block.settings.description != blank %}
+											<div class="tab__item-info-desc">
+												{{ block.settings.description }}
+											</div>
+										{% endif %}
+										{% render 'button', layout: block %}
+									</div>
+								</div>
+							{%- endfor -%}
+						</div>
+					</div>
+				</div>
+				<div class="tabs-thumb_wrapper swiper">
+					<div class="swiper-wrapper">
+						{%- for block in section.blocks -%}
+							<div class="swiper-slide">
+								<div class="tab-thumb_item-wrapper">
+									<div
+										class="tab-thumb_item-pagination{% if section.settings.is_autoplay %} tab-thumb_item-pagination-animation{% endif %}"
+									></div>
+									{% if block.settings.heading != blank %}
+										<h3 class="tab__item-info-title">
+											{{ block.settings.heading }}
+										</h3>
+									{% endif %}
+								</div>
+							</div>
+						{%- endfor -%}
+					</div>
+				</div>
+			</div>
+		{% else %}
+			<div class="tabs_wrapper-type3">
+				<div class="tab_item-wrapper">
+					<div class="tabs_box swiper">
+						<div class="swiper-wrapper">
+							{%- for block in section.blocks -%}
+								<div class="swiper-slide">
+									<div class="tab__item-img">
+										{% if block.settings.video != blank %}
+											{% liquid
+												assign video_height = block.settings.video.sources[0].width | divided_by: block.settings.video.aspect_ratio
+											%}
+											{{
+												block.settings.video
+												| video_tag:
+													width: block.settings.video.sources[0].width,
+													height: video_height,
+													autoplay: true,
+													loop: true,
+													controls: false,
+													muted: true
+											}}
+										{% elsif block.settings.image != blank %}
+											{% assign image_height = block.settings.image.width
+												| divided_by: block.settings.image.aspect_ratio
+											%}
+											{{
+												block.settings.image
+												| image_url: width: 3840
+												| image_tag:
+													loading: 'lazy',
+													sizes: '100vw',
+													widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840',
+													height: image_height
+											}}
+										{% else %}
+											{{
+												'collection-1'
+												| placeholder_svg_tag: 'placeholder-svg placeholder'
+											}}
+										{% endif %}
+									</div>
+								</div>
+							{%- endfor -%}
+						</div>
+					</div>
+					<div class="tabs_box-content swiper">
+						<div class="swiper-wrapper">
+							{%- for block in section.blocks -%}
+								<div class="swiper-slide">
+									<div class="tab__item-info-block">
+										{% if block.settings.heading != blank %}
+											<h3 class="tab__item-info-title">
+												{{ block.settings.heading }}
+											</h3>
+										{% endif %}
+										{%- if block.settings.subheading != blank -%}
+											<div class="tab__item-info-subtitle subtitle">
+												{{ block.settings.subheading }}
+											</div>
+										{%- endif -%}
+										{% if block.settings.description != blank %}
+											<div class="tab__item-info-desc">
+												{{ block.settings.description }}
+											</div>
+										{% endif %}
+										{% render 'button', layout: block %}
+									</div>
+								</div>
+							{%- endfor -%}
+						</div>
+						<div class="tabs-thumb_wrapper swiper">
+							<div class="swiper-wrapper">
+								{%- for block in section.blocks -%}
+									<div class="swiper-slide">
+										<div class="tab-thumb_item-wrapper">
+											{% if block.settings.video != blank %}
+												{% liquid
+													assign video_height = block.settings.video.sources[0].width | divided_by: block.settings.video.aspect_ratio
+												%}
+												{{
+													block.settings.video
+													| video_tag:
+														width: block.settings.video.sources[0].width,
+														height: video_height,
+														autoplay: true,
+														loop: true,
+														controls: false,
+														muted: true
+												}}
+											{% elsif block.settings.image != blank %}
+												{% assign image_height = block.settings.image.width
+													| divided_by: block.settings.image.aspect_ratio
+												%}
+												{{
+													block.settings.image
+													| image_url: width: 3840
+													| image_tag:
+														loading: 'lazy',
+														sizes: '100vw',
+														widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840',
+														height: image_height
+												}}
+											{% else %}
+												{{
+													'collection-1'
+													| placeholder_svg_tag: 'placeholder-svg placeholder'
+												}}
+											{% endif %}
+										</div>
+									</div>
+								{%- endfor -%}
+							</div>
+						</div>
+					</div>
+
+				</div>
+				
+			</div>
+		{% endif %}
+		{% if section.settings.section_header_type == 'type1'
+			and section.settings.button_label != blank
+		%}
+			<div class="section-header_btn">
+				{% render 'button', layout: section %}
+			</div>
+		{% endif %}
+	</div>
+</div>
+
+{% schema %}
+{
+	"name": "t:sections.tabs.name",
+	"tag": "section",
+	"class": "tabs-section",
+	"enabled_on": {
+		"templates": ["*"],
+		"groups": ["footer"]
+	},
+	"settings": [
+		{
+			"type": "select",
+			"id": "section_header_type",
+			"label": "t:sections.all.section_header.header.content",
+			"default": "type2",
+			"options": [
+				{
+					"value": "type1",
+					"label": "t:sections.all.section_header.options.options__1.label"
+				},
+				{
+					"value": "type2",
+					"label": "t:sections.all.section_header.options.options__2.label"
+				}
+			]
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_border_top",
+			"default": true,
+			"label": "t:sections.all.section_header.border"
+		},
+		{
+			"type": "text",
+			"id": "subheading",
+			"default": "Subheading",
+			"label": "t:sections.all.subheading.label"
+		},
+		{
+			"type": "inline_richtext",
+			"id": "heading",
+			"default": "Heading",
+			"label": "t:sections.all.heading.label"
+		},
+		{
+			"type": "richtext",
+			"id": "description",
+			"default": "<p>Description</p>",
+			"label": "t:sections.all.description.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.button.header.content"
+		},
+		{
+			"type": "text",
+			"id": "button_label",
+			"default": "Button label",
+			"label": "t:sections.all.button.label.label",
+			"info": "t:sections.all.button.label.info"
+		},
+		{
+			"type": "url",
+			"id": "button_link",
+			"label": "t:sections.all.button.link.label"
+		},
+		{
+			"type": "select",
+			"id": "button_style",
+			"options": [
+				{
+					"value": "primary",
+					"label": "t:sections.all.button.style.options__1.label"
+				},
+				{
+					"value": "secondary",
+					"label": "t:sections.all.button.style.options__2.label"
+				},
+				{
+					"value": "tertiary",
+					"label": "t:sections.all.button.style.options__3.label"
+				}
+			],
+			"default": "primary",
+			"label": "t:sections.all.button.style.label"
+		},
+		{
+			"type": "checkbox",
+			"id": "button_arrow",
+			"default": false,
+			"label": "t:sections.all.button.arrow.label"
+		},
+		{
+			"type": "select",
+			"id": "blocks_type",
+			"label": "t:sections.tabs.settings.blocks_type.label",
+			"default": "type1",
+			"options": [
+				{
+					"value": "type1",
+					"label": "t:sections.tabs.settings.blocks_type.option_1"
+				},
+				{
+					"value": "type2",
+					"label": "t:sections.tabs.settings.blocks_type.option_2"
+				},
+				{
+					"value": "type3",
+					"label": "t:sections.tabs.settings.blocks_type.option_3"
+				}
+			]
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.slider_options.header.content"
+		},
+		{
+			"type": "checkbox",
+			"id": "is_autoplay",
+			"default": true,
+			"label": "t:sections.all.slider_options.slider_is_autoplay.label"
+		},
+		{
+			"type": "range",
+			"id": "slider_speed",
+			"min": 0,
+			"max": 6,
+			"step": 0.1,
+			"default": 1.1,
+			"unit": "s",
+			"label": "t:sections.all.slider_options.speed.label"
+		},
+		{
+			"type": "range",
+			"id": "slider_delay",
+			"min": 0,
+			"max": 8,
+			"step": 0.1,
+			"default": 3,
+			"unit": "s",
+			"label": "t:sections.all.slider_options.delay.label"
+		},
+		{
+			"type": "select",
+			"id": "slide_effects",
+			"options": [
+				{
+					"value": "slide",
+					"label": "t:sections.all.slider_options.effects.options.options__1.label"
+				},
+				{
+					"value": "fade",
+					"label": "t:sections.all.slider_options.effects.options.options__2.label"
+				},
+				{
+					"value": "coverflow",
+					"label": "t:sections.all.slider_options.effects.options.options__3.label"
+				}
+			],
+			"default": "fade",
+			"label": "t:sections.all.slider_options.effects.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.section-margin.header.content"
+		},
+		{
+			"type": "select",
+			"id": "margin_top",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "no-indent",
+			"label": "t:sections.all.section-margin.margin_top.label"
+		},
+		{
+			"type": "select",
+			"id": "margin_bottom",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "l",
+			"label": "t:sections.all.section-margin.margin_bottom.label"
+		}
+	],
+	"blocks": [
+		{
+			"type": "tab",
+			"name": "t:sections.tabs.blocks.name",
+			"limit": 6,
+			"settings": [
+				{
+					"type": "inline_richtext",
+					"id": "heading",
+					"default": "Heading",
+					"label": "t:sections.tabs.blocks.settings.tab_heading"
+				},
+				{
+					"type": "image_picker",
+					"id": "image",
+					"label": "t:sections.all.image.label"
+				},
+				{
+					"type": "video",
+					"id": "video",
+					"label": "t:sections.all.video.label"
+				},
+				{
+					"type": "text",
+					"id": "subheading",
+					"default": "Subheading",
+					"label": "t:sections.all.subheading.label"
+				},
+				{
+					"type": "inline_richtext",
+					"id": "description",
+					"default": "Description",
+					"label": "t:sections.all.description.label"
+				},
+				{
+					"type": "header",
+					"content": "t:sections.all.button.header.content"
+				},
+				{
+					"type": "text",
+					"id": "button_label",
+					"default": "Button label",
+					"label": "t:sections.all.button.label.label",
+					"info": "t:sections.all.button.label.info"
+				},
+				{
+					"type": "url",
+					"id": "button_link",
+					"label": "t:sections.all.button.link.label"
+				},
+				{
+					"type": "select",
+					"id": "button_style",
+					"options": [
+						{
+							"value": "primary",
+							"label": "t:sections.all.button.style.options__1.label"
+						},
+						{
+							"value": "secondary",
+							"label": "t:sections.all.button.style.options__2.label"
+						},
+						{
+							"value": "tertiary",
+							"label": "t:sections.all.button.style.options__3.label"
+						}
+					],
+					"default": "tertiary",
+					"label": "t:sections.all.button.style.label"
+				},
+				{
+					"type": "checkbox",
+					"id": "button_arrow",
+					"default": true,
+					"label": "t:sections.all.button.arrow.label"
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "t:sections.tabs.name",
+			"blocks": [
+				{
+					"type": "tab"
+				},
+				{
+					"type": "tab"
+				},
+				{
+					"type": "tab"
+				},
+				{
+					"type": "tab"
+				}
+			]
+		}
+	]
+}
+{% endschema %}

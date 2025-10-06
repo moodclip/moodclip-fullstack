@@ -1,0 +1,253 @@
+{% if settings.intro_desktop_video != blank %}
+
+<div id="shopi_video_intro">
+  <div id="just-black"></div>
+  {% if settings.intro_skip != blank %}
+    <button type="button" class="skip-button" onclick="skipVideoIntro()" aria-label="{{ settings.intro_skip }}">{{ settings.intro_skip }}</button>
+  {% endif %}
+  <div class="vi-intro-window">
+    <audio id="enter-sound">
+      <source src="{{ settings.intro_audio_file }}">
+    </audio>
+    <div id="package3" class="vi-animation-container vi-animation">
+      <video class="vi-desktop-only vid" id="animation-desktop" muted playsinline webkit-playsinline onended="removeIntroWindow()" preload="auto">
+        <source src="{{ settings.intro_desktop_video }}">
+      </video>
+      <video class="vi-mobile-only vid" id="animation-mobile" muted playsinline onended="removeIntroWindow()" preload="auto">
+        <source src="{{ settings.intro_mobile_video }}">
+      </video>
+    </div>
+  </div>
+</div>
+
+<style>
+  #just-black {
+    position: absolute;
+    background: black;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9997; /* Changed from 9998 to be below vi-intro-window */
+  }
+  .vi-intro-window {
+    display: none; /* Changed to none by default */
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 9998; /* Changed from 9999 to be below preloader (9999) */
+  }
+  .vi-intro-window.show { display: block; }
+  .vi-intro-window.fade-out { opacity: 0; transition: opacity .5s linear; }
+  body.vi-video-active { overflow: hidden; }
+  .vi-animation-container { width: 100%; height: 100%; z-index: 80; } /* This z-index is fine as it's a child of vi-intro-window */
+  .vi-animation-container video { width: 100%; height: 100%; object-fit: cover; }
+  @media (max-width: 768px) {
+    .vi-desktop-only { display: none !important; }
+    .vi-mobile-only { display: block; }
+  }
+  .skip-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(255,255,255,0.2);
+    color: {{ settings.skip_color | default: '#ffffff' }};
+    border: 1px solid {{ settings.skip_color | default: '#ffffff' }};
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    z-index: 9999; /* Changed from 10001 to be same as preloader, or 9998 if you want it under the preloader. If this button belongs to the *intro video*, it should be lower than the preloader. Let's make it 9998. */
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    pointer-events: auto;
+    display: block !important;
+    opacity: 1;
+    visibility: visible;
+  }
+  .skip-button.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .skip-button:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.05);
+  }
+  @media (max-width: 768px) {
+    .skip-button {
+      top: 12px;
+      right: 12px;
+      padding: 8px 12px;
+      font-size: 11px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid {{ settings.skip_color | default: '#ffffff' }};
+      opacity: 0.8;
+    }
+    .skip-button:active {
+      background: rgba(255,255,255,0.2);
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  // Check if the video has already been played in this session
+  if (sessionStorage.getItem("videoPlayed")) {
+    const intro = document.getElementById('shopi_video_intro');
+    if (intro) {
+      intro.parentNode.removeChild(intro); // Immediately remove if already played
+    }
+  } else {
+    const justBlack = document.getElementById("just-black");
+    const enterSound = document.getElementById("enter-sound");
+    const introWindow = document.querySelector(".vi-intro-window");
+    const animationVideoContainer = document.querySelector(".vi-animation");
+    const animationVideos = document.querySelectorAll(".vi-animation video");
+    const skipButton = document.querySelector(".skip-button");
+    const volumeIntro = {{settings.volume_intro | default: '100'}}; // Add a default for volume
+
+    let videoPlaying = false; // New flag to track if video is currently playing
+    let videosLoaded = false; // Flag to indicate if all videos have loaded their metadata
+
+    function checkConnectionSpeed() {
+      if ('connection' in navigator) {
+        const connection = navigator.connection;
+        if (connection.effectiveType === '3g' || connection.effectiveType === '2g' || (connection.downlink && connection.downlink < 1)) {
+          sessionStorage.setItem("videoPlayed", true);
+          return true;
+        }
+        return false;
+      } else {
+        return false;
+      }
+    }
+
+    function preloadVideos() {
+      const videos = document.querySelectorAll('.vid');
+      let loadedCount = 0;
+      videos.forEach(video => {
+        video.addEventListener('loadeddata', () => {
+          loadedCount++;
+          if (loadedCount === videos.length) {
+            videosLoaded = true;
+            // Now that videos are loaded, we can make the intro window visible
+            // The video's first frame should be visible due to preload="auto" and no initial opacity:0
+            if (justBlack) justBlack.style.display = 'block';
+            introWindow.style.display = 'block';
+            introWindow.classList.add('show');
+            document.body.classList.add('vi-video-active');
+          }
+        });
+        video.addEventListener('error', () => {
+          console.error('Video loading error, skipping intro.');
+          removeIntroWindow(); // Skip intro if any video fails to load
+        });
+        video.load(); // Start preloading the video data
+      });
+    }
+
+    // This function now specifically starts the playback (called on click)
+    function startPlayback() {
+      if (videoPlaying) return; // Prevent multiple plays if already playing
+      if (!videosLoaded) {
+        console.warn("Videos not fully loaded, attempting to play anyway.");
+        // Consider removing intro here if videos aren't loading, or waiting
+        // This scenario should be handled by the preload/error listeners, but as a fallback
+      }
+
+      animationVideos.forEach(vid => {
+        // vid.style.opacity = '1'; // REMOVED: No longer needed as video starts visible
+        vid.play().catch(error => {
+          console.warn("Video play prevented:", error);
+          showSkipButton(); // Show skip button if play is blocked
+        });
+      });
+
+      if (enterSound) {
+        enterSound.volume = volumeIntro / 100;
+        enterSound.play().catch(error => {
+          console.warn("Audio play prevented:", error);
+        });
+      }
+      hideSkipButton(); // Hide skip button once playback starts
+      videoPlaying = true;
+    }
+
+    function removeIntroWindow() {
+      if (introWindow) {
+        introWindow.classList.add("fade-out");
+        setTimeout(removeIntroCompletely, 500);
+      }
+    }
+
+    function removeIntroCompletely() {
+      sessionStorage.setItem("videoPlayed", true);
+      document.body.classList.remove('vi-video-active');
+      const intro = document.getElementById('shopi_video_intro');
+      if (intro) {
+          intro.parentNode.removeChild(intro);
+      }
+    }
+
+    window.skipVideoIntro = function() {
+      animationVideos.forEach(vid => {
+        vid.pause();
+        vid.currentTime = 0;
+      });
+      if (enterSound) {
+        enterSound.pause();
+        enterSound.currentTime = 0;
+      }
+      removeIntroWindow();
+    }
+
+    function hideSkipButton() {
+      if (skipButton) skipButton.classList.add('hidden');
+    }
+
+    function showSkipButton() {
+      if (skipButton) skipButton.classList.remove('hidden');
+    }
+
+    // Initialize the video intro on DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!sessionStorage.getItem("videoPlayed")) {
+        if (!checkConnectionSpeed()) {
+          preloadVideos(); // Preload videos, show the intro window, but don't play yet
+        } else {
+          removeIntroCompletely(); // Skip intro if connection is bad
+        }
+      } else {
+        removeIntroCompletely(); // Ensure removal if session storage already has it
+      }
+    });
+
+    // Event listener for video ending
+    document.querySelectorAll('.vid').forEach(video => {
+      video.addEventListener('ended', () => {
+        videoPlaying = false; // Reset flag
+        removeIntroWindow();
+      });
+      video.addEventListener('error', () => {
+        console.error('Video playback error, showing skip button.');
+        showSkipButton();
+      });
+    });
+
+    // THIS IS THE CRUCIAL CHANGE: Start playback only on click
+    if (animationVideoContainer) {
+      animationVideoContainer.addEventListener("click", () => {
+        // Only start if not already playing, videos are loaded, and connection is good
+        if (!videoPlaying && videosLoaded && !checkConnectionSpeed()) {
+          startPlayback(); // Call the function to begin video/audio playback
+        }
+      });
+    }
+  }
+</script>
+
+{% endif %}

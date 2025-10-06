@@ -1,0 +1,1070 @@
+{% liquid
+	if section.settings.layout == 'bar'
+		if section.settings.position != 'bottom' and section.settings.position != 'top'
+			assign width = section.settings.width | append: 'px'
+		else
+			assign width = '100%'
+		endif
+	else
+		assign width = section.settings.width | append: 'px'
+	endif
+%}
+
+<div
+	class="
+		popup-main popup
+		popup--{{ section.settings.position }}
+		popup-main-image--{{ section.settings.image_layout }}
+		{% if section.settings.full-height %}popup-full-height{% endif %}
+	"
+	{% if section.settings['popup-id'] != blank %}
+		id="{{ section.settings.popup-id }}"
+	{% endif %}
+	data-limit-display="{{ section.settings.limit-display }}"
+	data-limit-lifetime="{{ section.settings.limit-cache }}"
+	data-open-trigger="{{ section.settings.trigger-open }}"
+	data-open-delay-number="{{ section.settings.trigger-open-delay }}"
+	data-open-scroll-position="{{ section.settings.open-scroll-position }}"
+	data-open-scroll-type="{{ section.settings.open-scroll-type }}"
+	{% if section.settings['manual-selector'] != blank %}
+		data-open-manual-selector="{{ section.settings.manual-selector }}"
+	{% endif %}
+	data-close-trigger="{{ section.settings.trigger-close }}"
+	data-close-delay-number="{{ section.settings.trigger-close-delay }}"
+	data-close-scroll-position="{{ section.settings.close-scroll-position }}"
+	data-close-scroll-type="{{ section.settings.close-scroll-type }}"
+	data-open-animation="popupOpen{{ section.settings.open-animation }}"
+	data-exit-animation="popupExit{{ section.settings.exit-animation }}"
+	data-overlay="{{ section.settings.show-overlay }}"
+	data-mobile-disable="{{ section.settings.mobile }}"
+	data-body-scroll-disable="{{ section.settings.scrolling }}"
+	data-overlay-close="{{ section.settings.overlay-close }}"
+	data-esc-close="{{ section.settings.esc-close }}"
+	data-f4-close="{{ section.settings.f4-close }}"
+	data-id="{{ section.id }}"
+	style="width: {{ width }}"
+>
+	{%- style -%}
+		#shopify-section-{{ section.id }} {
+
+			--ticker-speed : {{ section.settings.ticker_speed }}s;
+		}
+	{%- endstyle -%}
+	<div
+		class="popup-wrap color-{{ section.settings.color_scheme }} background"
+		data-introduction-wrapper
+		data-popup-ticker-id="{{ section.id }}"
+	>
+		<button
+			type="button"
+			class="button modal-close-button popup-close {%- if section.settings.image_layout == "left" %} popup-close_image-left {% endif %} {%- if section.settings.image != blank %} popup-close_image {% endif %}"
+			aria-label="{{ 'accessibility.close' | t }}"
+		>
+			{% if settings.button_animation %}
+				<span class="animation-wrapper" hoverstagger="link">
+					<span class="button-label animation" hoverstagger="text">
+						<span class="word" id="word1">
+							{{ 'general.close.title' | t }}
+						</span>
+					</span>
+					<span
+						class="button-label is-2 animation"
+						hoverstagger="text"
+					>
+						<span class="word" id="word2">
+							{{ 'general.close.title' | t }}
+						</span>
+					</span>
+				</span>
+			{% else %}
+				<span class="button-label">
+					{{ 'general.close.title' | t }}
+				</span>
+			{% endif %}
+		</button>
+		<div class="popup-container">
+			<div class="popup-outer {%- if section.settings.image != blank %} popup-outer_image {% endif %}">
+				{% if section.settings.image != blank %}
+					<div class="popup-thumbnail">
+						{% capture style %}
+            object-fit: {{ section.settings.image_fit }};
+          {% endcapture %}
+						{{
+							section.settings.image
+							| image_url: width: section.settings.image.width
+							| image_tag:
+								loading: 'lazy',
+								widths: '275, 550, 750',
+								style: style
+						}}
+						{% if section.settings.ticker_text != blank %}
+							<div
+								class="popup__ticker-wrapper"
+							>
+								<div class="marquee">
+									<div class="marquee-content">
+										{% for i in (1..50) %}
+											<div class="marquee-tag">
+												<div class="ticker_title">
+													<h2 class="ticker_heading h1">
+														{{ section.settings.ticker_text }}
+													</h2>
+												</div>
+											</div>
+										{% endfor %}
+									</div>
+								</div>
+							</div>
+						{% endif %}
+					</div>
+				{% endif %}
+
+				<div class="popup-content">
+					<div
+						class="popup-wraper-text"
+						style="text-align: {{ section.settings.alignment }}"
+					>
+						{%- for block in section.blocks -%}
+							{%- case block.type -%}
+								{%- when 'popup_heading' -%}
+									{% if block.settings.heading != blank %}
+										<h2
+											class="popup-heading h3 {% if "popup_text" != blank %} popup-heading-small {% endif %}"
+											{{ block.shopify_attributes }}
+										>
+											{{ block.settings.heading }}
+										</h2>
+									{% endif %}
+								{% when 'popup_text' %}
+									{%- if block.settings.text != blank -%}
+										<div class="popup-desc ">{{ block.settings.text }}</div>
+									{%- endif -%}
+								{%- when 'subscribe_form' -%}
+									<div class="popup-newsletter">
+										{% form 'customer', class: 'newsletter-form' %}
+											<div
+												class="newsletter-form__inner {% if section.settings.width < 400 %} newsletter-form__inner_column {% endif %}"
+												{{ block.shopify_attributes }}
+											>
+												{% if block.settings.show_email != blank %}
+													<input
+														type="hidden"
+														name="contact[tags]"
+														value="newsletter"
+													>
+													<div class="newsletter-form__field-wrapper">
+														<div class="field">
+															<input
+																id="NewsletterForm--{{ section.id }}"
+																type="email"
+																name="contact[email]"
+																pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"
+																class="field__input field"
+																value="{{ form.email }}"
+																aria-required="true"
+																autocorrect="off"
+																autocapitalize="off"
+																autocomplete="email"
+																{% if form.errors %}
+																	autofocus
+																	aria-invalid="true"
+																	aria-describedby="Newsletter-error--{{ section.id }}"
+																{% elsif form.posted_successfully? %}
+																	aria-describedby="Newsletter-success--{{ section.id }}"
+																{% endif %}
+																placeholder=" "
+																required
+															>
+															<label
+																class="field__label"
+																for="NewsletterForm--{{ section.id }}"
+																type="hidden"
+															>
+																{{ block.settings.placeholder_input }}
+															</label>
+														</div>
+														{%- if form.errors -%}
+															<small
+																class="newsletter-form__message form__message"
+																id="Newsletter-error--{{ section.id }}"
+															>
+																{%- render 'icon-error' -%}
+																{{-
+																	form.errors.translated_fields.email
+																	| capitalize
+																}}
+																{{ form.errors.messages.email -}}
+															</small>
+														{%- endif -%}
+													</div>
+												{% endif %}
+												{% comment %}
+													<button
+														type="submit"
+														class="button button--{{ block.settings.button_style }}"
+														name="commit"
+													>
+														<span class="button-label">
+															{{- block.settings.button_label -}}
+														</span>
+													</button>
+												{% endcomment %}
+												{% if block.settings.button_label != blank %}
+													{% if block.settings.button_action == 'accept' %}
+														<button class="button button--{{ block.settings.button_style }} popup-button popup-accept">
+															{% if settings.button_animation %}
+																<span class="animation-wrapper" hoverstagger="link">
+																	<span class="button-label animation" hoverstagger="text">
+																		<span class="word" id="word1">
+																			{{ block.settings.button_label }}
+																		</span>
+																	</span>
+																	<span
+																		class="button-label is-2 animation"
+																		hoverstagger="text"
+																	>
+																		<span class="word" id="word2">
+																			{{ block.settings.button_label }}
+																		</span>
+																	</span>
+																</span>
+															{% else %}
+																<span class="button-label">
+																	{{ block.settings.button_label }}
+																</span>
+															{% endif %}
+														</button>
+													{% else %}
+														<a
+															class="button button--{{ block.settings.button_style }} popup-button"
+															target="_blank"
+															{% if block.settings.button_link %}
+																href="{{ block.settings.button_link }}"
+															{% endif %}
+														>
+															{% if settings.button_animation %}
+																<span class="animation-wrapper" hoverstagger="link">
+																	<span class="button-label animation" hoverstagger="text">
+																		<span class="word" id="word1">
+																			{{ block.settings.button_label }}
+																		</span>
+																	</span>
+																	<span
+																		class="button-label is-2 animation"
+																		hoverstagger="text"
+																	>
+																		<span class="word" id="word2">
+																			{{ block.settings.button_label }}
+																		</span>
+																	</span>
+																</span>
+															{% else %}
+																<span class="button-label">
+																	{{ block.settings.button_label }}
+																</span>
+															{% endif %}
+														</a>
+													{% endif %}
+												{% endif %}
+											</div>
+											{%- if form.posted_successfully? -%}
+												<h3
+													class="newsletter-form__message newsletter-form__message--success form__message"
+													id="Newsletter-success--{{ section.id }}"
+													tabindex="-1"
+													autofocus
+												>
+													{% render 'icon-success' -%}
+													{{- 'newsletter.success' | t }}
+												</h3>
+											{%- endif -%}
+										{% endform %}
+										{% if block.settings.additional_text != blank %}
+											<div class="popup-text" {{ block.shopify_attributes }}>
+												{{ block.settings.additional_text }}
+											</div>
+										{% endif %}
+									</div>
+								{%- when 'social_links' -%}
+									{%- if block.settings.show_twitter
+										and settings.social_twitter_link != blank
+										or block.settings.show_facebook
+										and settings.social_facebook_link != blank
+										or block.settings.show_pinterest
+										and settings.social_pinterest_link != blank
+										or block.settings.show_instagram
+										and settings.social_instagram_link != blank
+										or block.settings.show_tiktok
+										and settings.social_tiktok_link != blank
+										or block.settings.show_tumblr
+										and settings.social_tumblr_link != blank
+										or block.settings.show_snapchat
+										and settings.social_snapchat_link != blank
+										or block.settings.show_youtube
+										and settings.social_youtube_link != blank
+										or block.settings.show_vimeo
+										and settings.social_vimeo_link != blank
+									-%}
+										{%- style -%}
+											#shopify-section-{{ section.id }}  .popup-main .list-social__item .icon {
+											  color: {{ block.settings.icon-color }};
+											}
+											#shopify-section-{{ section.id }}  .popup-main .list-social__item:hover .icon {
+											  color: {{ block.settings.icon-color-hover }};
+												opacity: 1;
+											}
+										{%- endstyle -%}
+										<ul
+											class="list-unstyled list-social"
+											style="justify-content: {{ section.settings.alignment }}"
+											role="list"
+											{{ block.shopify_attributes }}
+										>
+											{%- if block.settings.show_twitter
+												and settings.social_twitter_link != blank
+											-%}
+												<li class="list-social__item">
+													<a
+														href="{{ settings.social_twitter_link }}"
+														class="link link--text list-social__link"
+														aria-describedby="a11y-external-message"
+													>
+														{%- render 'icon-twitter' -%}
+														<span class="visually-hidden">
+															{{- 'general.social.links.twitter' | t -}}
+														</span>
+													</a>
+												</li>
+											{%- endif -%}
+											{%- if block.settings.show_facebook
+												and settings.social_facebook_link != blank
+											-%}
+												<li class="list-social__item">
+													<a
+														href="{{ settings.social_facebook_link }}"
+														class="link link--text list-social__link"
+														aria-describedby="a11y-external-message"
+													>
+														{%- render 'icon-facebook' -%}
+														<span class="visually-hidden">
+															{{- 'general.social.links.facebook' | t -}}
+														</span>
+													</a>
+												</li>
+											{%- endif -%}
+											{%- if block.settings.show_pinterest
+												and settings.social_pinterest_link != blank
+											-%}
+												<li class="list-social__item">
+													<a
+														href="{{ settings.social_pinterest_link }}"
+														class="link link--text list-social__link"
+														aria-describedby="a11y-external-message"
+													>
+														{%- render 'icon-pinterest' -%}
+														<span class="visually-hidden">
+															{{- 'general.social.links.pinterest' | t -}}
+														</span>
+													</a>
+												</li>
+											{%- endif -%}
+											{%- if block.settings.show_instagram
+												and settings.social_instagram_link != blank
+											-%}
+												<li class="list-social__item">
+													<a
+														href="{{ settings.social_instagram_link }}"
+														class="link link--text list-social__link"
+														aria-describedby="a11y-external-message"
+													>
+														{%- render 'icon-instagram' -%}
+														<span class="visually-hidden">
+															{{- 'general.social.links.instagram' | t -}}
+														</span>
+													</a>
+												</li>
+											{%- endif -%}
+											{%- if block.settings.show_tiktok
+												and settings.social_tiktok_link != blank
+											-%}
+												<li class="list-social__item">
+													<a
+														href="{{ settings.social_tiktok_link }}"
+														class="link link--text list-social__link"
+														aria-describedby="a11y-external-message"
+													>
+														{%- render 'icon-tiktok' -%}
+														<span class="visually-hidden">
+															{{- 'general.social.links.tiktok' | t -}}
+														</span>
+													</a>
+												</li>
+											{%- endif -%}
+											{%- if block.settings.show_tumblr
+												and settings.social_tumblr_link != blank
+											-%}
+												<li class="list-social__item">
+													<a
+														href="{{ settings.social_tumblr_link }}"
+														class="link link--text list-social__link"
+														aria-describedby="a11y-external-message"
+													>
+														{%- render 'icon-tumblr' -%}
+														<span class="visually-hidden">
+															{{- 'general.social.links.tumblr' | t -}}
+														</span>
+													</a>
+												</li>
+											{%- endif -%}
+											{%- if block.settings.show_snapchat
+												and settings.social_snapchat_link != blank
+											-%}
+												<li class="list-social__item">
+													<a
+														href="{{ settings.social_snapchat_link }}"
+														class="link link--text list-social__link"
+														aria-describedby="a11y-external-message"
+													>
+														{%- render 'icon-snapchat' -%}
+														<span class="visually-hidden">
+															{{- 'general.social.links.snapchat' | t -}}
+														</span>
+													</a>
+												</li>
+											{%- endif -%}
+											{%- if block.settings.show_youtube
+												and settings.social_youtube_link != blank
+											-%}
+												<li class="list-social__item">
+													<a
+														href="{{ settings.social_youtube_link }}"
+														class="link link--text list-social__link"
+														aria-describedby="a11y-external-message"
+													>
+														{%- render 'icon-youtube' -%}
+														<span class="visually-hidden">
+															{{- 'general.social.links.youtube' | t -}}
+														</span>
+													</a>
+												</li>
+											{%- endif -%}
+											{%- if block.settings.show_vimeo
+												and settings.social_vimeo_link != blank
+											-%}
+												<li class="list-social__item">
+													<a
+														href="{{ settings.social_vimeo_link }}"
+														class="link link--text list-social__link"
+														aria-describedby="a11y-external-message"
+													>
+														{%- render 'icon-vimeo' -%}
+														<span class="visually-hidden">
+															{{- 'general.social.links.vimeo' | t -}}
+														</span>
+													</a>
+												</li>
+											{%- endif -%}
+										</ul>
+									{%- endif -%}
+									{% comment %}
+										{% when 'popup_icon' %}
+										{%- if block.settings.icon_item != 'none' -%}
+											<div class="popup-icon">
+												{%- render 'icon-accordion',
+													icon: block.settings.icon_item,
+													size: block.settings.icon_size,
+													custom_icon: block.settings.custom_icon,
+													custom_icon_dark: block.settings.custom_icon_dark
+												-%}
+											</div>
+										{%- endif -%}
+									{% endcomment %}
+							{% endcase %}
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% if section.settings['show-overlay'] %}
+	<div
+		class="popup-overlay color-inverse"
+		style="backdrop-filter: blur(5px);"
+	></div>
+{% endif %}
+
+{% schema %}
+{
+	"name": "t:sections.overlay-group.popup.name",
+	"enabled_on": {
+		"groups": ["custom.overlay"]
+	},
+	"settings": [
+		{
+			"type": "color_scheme",
+			"id": "color_scheme",
+			"default": "background-1",
+			"label": "t:sections.all.color_scheme.label"
+		},
+		{
+			"type": "image_picker",
+			"id": "image",
+			"label": "t:sections.overlay-group.popup.settings.image.label"
+		},
+		{
+			"type": "select",
+			"id": "image_layout",
+			"label": "t:sections.overlay-group.popup.settings.image_layout.label",
+			"options": [
+				{
+					"value": "left",
+					"label": "t:sections.overlay-group.popup.settings.image_layout.options__1.label"
+				},
+				{
+					"value": "right",
+					"label": "t:sections.overlay-group.popup.settings.image_layout.options__2.label"
+				},
+				{
+					"value": "top",
+					"label": "t:sections.overlay-group.popup.settings.image_layout.options__3.label"
+				},
+				{
+					"value": "bottom",
+					"label": "t:sections.overlay-group.popup.settings.image_layout.options__4.label"
+				}
+			],
+			"default": "top"
+		},
+		{
+			"type": "select",
+			"id": "image_fit",
+			"label": "t:sections.overlay-group.popup.settings.image_fit.label",
+			"options": [
+				{
+					"value": "contain",
+					"label": "t:sections.overlay-group.popup.settings.image_fit.options__1.label"
+				},
+				{
+					"value": "cover",
+					"label": "t:sections.overlay-group.popup.settings.image_fit.options__2.label"
+				}
+			],
+			"default": "cover"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.ticker.header.content"
+		},
+		{
+			"type": "text",
+			"id": "ticker_text",
+			"default": "t:sections.overlay-group.popup.settings.ticker_text.default",
+			"label": "t:sections.all.ticker.settings.ticker_text.label",
+			"info": "t:sections.all.ticker.info"
+		},
+		{
+			"type": "range",
+			"id": "ticker_speed",
+			"min": 1,
+			"max": 10,
+			"step": 0.1,
+			"default": 5,
+			"unit": "s",
+			"label": "t:sections.all.ticker.settings.ticker_speed.label"
+		},
+		{
+			"type": "text_alignment",
+			"id": "alignment",
+			"label": "t:sections.all.content_alignment.label",
+			"default": "center"
+		},
+		{
+			"type": "range",
+			"id": "limit-display",
+			"min": 0,
+			"max": 100,
+			"default": 0,
+			"label": "t:sections.overlay-group.all.settings.limit-display.label",
+			"info": "t:sections.overlay-group.all.settings.limit-display.info"
+		},
+		{
+			"type": "number",
+			"id": "limit-cache",
+			"default": 30,
+			"label": "t:sections.overlay-group.all.settings.limit-cache.label"
+		},
+		{
+			"type": "select",
+			"id": "position",
+			"options": [
+				{
+					"value": "top-left",
+					"label": "t:sections.overlay-group.all.settings.position.options__1.label"
+				},
+				{
+					"value": "top",
+					"label": "t:sections.overlay-group.all.settings.position.options__2.label"
+				},
+				{
+					"value": "top-right",
+					"label": "t:sections.overlay-group.all.settings.position.options__3.label"
+				},
+				{
+					"value": "left",
+					"label": "t:sections.overlay-group.all.settings.position.options__4.label"
+				},
+				{
+					"value": "center",
+					"label": "t:sections.overlay-group.all.settings.position.options__5.label"
+				},
+				{
+					"value": "right",
+					"label": "t:sections.overlay-group.all.settings.position.options__6.label"
+				},
+				{
+					"value": "bottom-left",
+					"label": "t:sections.overlay-group.all.settings.position.options__7.label"
+				},
+				{
+					"value": "bottom",
+					"label": "t:sections.overlay-group.all.settings.position.options__8.label"
+				},
+				{
+					"value": "bottom-right",
+					"label": "t:sections.overlay-group.all.settings.position.options__9.label"
+				}
+			],
+			"default": "center",
+			"label": "t:sections.overlay-group.all.settings.position.label"
+		},
+		{
+			"type": "checkbox",
+			"id": "full-height",
+			"default": false,
+			"label": "t:sections.overlay-group.all.settings.layout.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.overlay-group.all.settings.trigger.header.content"
+		},
+		{
+			"type": "text",
+			"id": "popup-id",
+			"label": "t:sections.overlay-group.all.settings.popup-id.label"
+		},
+		{
+			"type": "select",
+			"id": "trigger-open",
+			"label": "t:sections.overlay-group.all.settings.trigger-open.label",
+			"options": [
+				{
+					"value": "delay",
+					"label": "t:sections.overlay-group.all.settings.trigger.options__1.label"
+				},
+				{
+					"value": "scroll",
+					"label": "t:sections.overlay-group.all.settings.trigger.options__2.label"
+				},
+				{
+					"value": "exit",
+					"label": "t:sections.overlay-group.all.settings.trigger.options__3.label"
+				},
+				{
+					"value": "manual",
+					"label": "t:sections.overlay-group.all.settings.trigger.options__4.label"
+				}
+			],
+			"default": "delay"
+		},
+		{
+			"type": "range",
+			"id": "trigger-open-delay",
+			"label": "t:sections.overlay-group.all.settings.trigger-open-delay.label",
+			"min": 0,
+			"max": 100,
+			"unit": "sec",
+			"default": 1
+		},
+		{
+			"type": "select",
+			"id": "open-scroll-type",
+			"options": [
+				{
+					"value": "px",
+					"label": "t:sections.overlay-group.all.settings.scroll-type.options__1.label"
+				},
+				{
+					"value": "%",
+					"label": "t:sections.overlay-group.all.settings.scroll-type.options__2.label"
+				}
+			],
+			"default": "%",
+			"label": "t:sections.overlay-group.all.settings.open-scroll-type.label"
+		},
+		{
+			"type": "number",
+			"id": "open-scroll-position",
+			"default": 50,
+			"label": "t:sections.overlay-group.all.settings.open-scroll-position.label"
+		},
+		{
+			"type": "text",
+			"id": "manual-selector",
+			"label": "t:sections.overlay-group.all.settings.manual-selector.label",
+			"info": "t:sections.overlay-group.all.settings.manual-selector.info"
+		},
+		{
+			"type": "select",
+			"id": "trigger-close",
+			"label": "t:sections.overlay-group.all.settings.trigger-close.label",
+			"options": [
+				{
+					"value": "delay",
+					"label": "t:sections.overlay-group.all.settings.trigger.options__1.label"
+				},
+				{
+					"value": "scroll",
+					"label": "t:sections.overlay-group.all.settings.trigger.options__2.label"
+				},
+				{
+					"value": "none",
+					"label": "t:sections.overlay-group.all.settings.trigger.options__5.label"
+				}
+			],
+			"default": "none"
+		},
+		{
+			"type": "range",
+			"id": "trigger-close-delay",
+			"label": "t:sections.overlay-group.all.settings.trigger-close-delay.label",
+			"min": 1,
+			"max": 100,
+			"unit": "sec",
+			"default": 30
+		},
+		{
+			"type": "select",
+			"id": "close-scroll-type",
+			"options": [
+				{
+					"value": "px",
+					"label": "t:sections.overlay-group.all.settings.scroll-type.options__1.label"
+				},
+				{
+					"value": "%",
+					"label": "t:sections.overlay-group.all.settings.scroll-type.options__2.label"
+				}
+			],
+			"default": "%",
+			"label": "t:sections.overlay-group.all.settings.close-scroll-type.label"
+		},
+		{
+			"type": "number",
+			"id": "close-scroll-position",
+			"default": 50,
+			"label": "t:sections.overlay-group.all.settings.close-scroll-position.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.overlay-group.all.settings.animation.header.content"
+		},
+		{
+			"type": "range",
+			"id": "width",
+			"min": 200,
+			"max": 1920,
+			"unit": "px",
+			"step": 20,
+			"default": 460,
+			"label": "t:sections.overlay-group.all.settings.width.label"
+		},
+		{
+			"type": "select",
+			"id": "open-animation",
+			"label": "t:sections.overlay-group.all.settings.open-animation.label",
+			"options": [
+				{
+					"value": "Fade",
+					"label": "t:sections.overlay-group.all.settings.animation.options__1.label"
+				},
+				{
+					"value": "Slide",
+					"label": "t:sections.overlay-group.all.settings.animation.options__2.label"
+				},
+				{
+					"value": "Zoom",
+					"label": "t:sections.overlay-group.all.settings.animation.options__3.label"
+				},
+				{
+					"value": "SlideFade",
+					"label": "t:sections.overlay-group.all.settings.animation.options__4.label"
+				}
+			],
+			"default": "Slide"
+		},
+		{
+			"type": "select",
+			"id": "exit-animation",
+			"label": "t:sections.overlay-group.all.settings.exit-animation.label",
+			"options": [
+				{
+					"value": "Fade",
+					"label": "t:sections.overlay-group.all.settings.animation.options__1.label"
+				},
+				{
+					"value": "Slide",
+					"label": "t:sections.overlay-group.all.settings.animation.options__2.label"
+				},
+				{
+					"value": "Zoom",
+					"label": "t:sections.overlay-group.all.settings.animation.options__3.label"
+				},
+				{
+					"value": "SlideFade",
+					"label": "t:sections.overlay-group.all.settings.animation.options__4.label"
+				}
+			],
+			"default": "Slide"
+		},
+		{
+			"type": "checkbox",
+			"id": "show-overlay",
+			"label": "t:sections.overlay-group.all.settings.show-overlay.label",
+			"default": true
+		},
+		{
+			"type": "header",
+			"content": "t:sections.overlay-group.all.settings.advanced.header.content"
+		},
+		{
+			"type": "checkbox",
+			"id": "mobile",
+			"label": "t:sections.overlay-group.all.settings.advanced.mobile.label",
+			"info": "t:sections.overlay-group.all.settings.advanced.mobile.info",
+			"default": false
+		},
+		{
+			"type": "checkbox",
+			"id": "scrolling",
+			"label": "t:sections.overlay-group.all.settings.advanced.scrolling.label",
+			"info": "t:sections.overlay-group.all.settings.advanced.scrolling.info",
+			"default": false
+		},
+		{
+			"type": "checkbox",
+			"id": "overlay-close",
+			"label": "t:sections.overlay-group.all.settings.advanced.overlay-close.label",
+			"info": "t:sections.overlay-group.all.settings.advanced.overlay-close.info",
+			"default": true
+		},
+		{
+			"type": "checkbox",
+			"id": "esc-close",
+			"label": "t:sections.overlay-group.all.settings.advanced.esc-close.label",
+			"info": "t:sections.overlay-group.all.settings.advanced.esc-close.info",
+			"default": true
+		},
+		{
+			"type": "checkbox",
+			"id": "f4-close",
+			"label": "t:sections.overlay-group.all.settings.advanced.f4-close.label",
+			"info": "t:sections.overlay-group.all.settings.advanced.f4-close.info",
+			"default": true
+		}
+	],
+	"blocks": [
+		{
+			"type": "popup_heading",
+			"name": "t:sections.overlay-group.popup.blocks.popup_heading.name",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "inline_richtext",
+					"id": "heading",
+					"default": "t:sections.overlay-group.popup.blocks.popup_heading.settings.heading.default",
+					"label": "t:sections.overlay-group.popup.blocks.popup_heading.settings.heading.label"
+				}
+			]
+		},
+		{
+			"type": "popup_text",
+			"name": "t:sections.overlay-group.popup.blocks.popup_text.name",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "richtext",
+					"id": "text",
+					"default": "t:sections.overlay-group.popup.blocks.popup_text.settings.text.default",
+					"label": "t:sections.overlay-group.popup.blocks.popup_text.settings.text.label"
+				}
+			]
+		},
+		{
+			"type": "subscribe_form",
+			"name": "t:sections.overlay-group.popup.blocks.subscribe_form.name",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "text",
+					"id": "placeholder_input",
+					"default": "E-mail",
+					"label": "t:sections.overlay-group.popup.blocks.subscribe_form.settings.placeholder_input.label"
+				},
+				{
+					"type": "checkbox",
+					"id": "show_email",
+					"default": false,
+					"label": "t:sections.overlay-group.popup.blocks.subscribe_form.settings.placeholder_input.show"
+				},
+				{
+					"type": "header",
+					"content": "t:sections.all.button.header.content"
+				},
+				{
+					"type": "text",
+					"id": "button_label",
+					"default": "t:sections.overlay-group.popup.blocks.subscribe_form.settings.button_label.default",
+					"label": "t:sections.all.button.label.label",
+					"info": "t:sections.all.button.label.info"
+				},
+				{
+					"type": "select",
+					"id": "button_action",
+					"options": [
+						{
+							"value": "link",
+							"label": "t:sections.overlay-group.notification-banner.settings.button_action.options__1.label"
+						},
+						{
+							"value": "accept",
+							"label": "t:sections.overlay-group.notification-banner.settings.button_action.options__2.label"
+						}
+					],
+					"default": "accept",
+					"label": "t:sections.overlay-group.notification-banner.settings.button_action.label"
+				},
+				{
+					"type": "url",
+					"id": "button_link",
+					"label": "t:sections.all.button.link.label"
+				},
+				{
+					"type": "select",
+					"id": "button_style",
+					"options": [
+						{
+							"value": "primary",
+							"label": "t:sections.all.button.style.options__1.label"
+						},
+						{
+							"value": "secondary",
+							"label": "t:sections.all.button.style.options__2.label"
+						},
+						{
+							"value": "tertiary",
+							"label": "t:sections.all.button.style.options__3.label"
+						}
+					],
+					"default": "primary",
+					"label": "t:sections.all.button.style.label"
+				},
+				{
+					"type": "richtext",
+					"id": "additional_text",
+					"label": "t:sections.overlay-group.popup.blocks.subscribe_form.settings.description.label"
+				}
+			]
+		},
+		{
+			"type": "social_links",
+			"name": "t:sections.overlay-group.popup.blocks.social_links.name",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "color",
+					"id": "icon-color",
+					"default": "#000000",
+					"label": "t:sections.overlay-group.popup.blocks.social_links.settings.icon-color.label"
+				},
+				{
+					"type": "color",
+					"id": "icon-color-hover",
+					"default": "#DFDFDF",
+					"label": "t:sections.overlay-group.popup.blocks.social_links.settings.icon-color-hover.label"
+				},
+				{
+					"type": "checkbox",
+					"id": "show_twitter",
+					"default": true,
+					"label": "t:sections.overlay-group.popup.blocks.social_links.settings.show_twitter.label"
+				},
+				{
+					"type": "checkbox",
+					"id": "show_facebook",
+					"default": true,
+					"label": "t:sections.overlay-group.popup.blocks.social_links.settings.show_facebook.label"
+				},
+				{
+					"type": "checkbox",
+					"id": "show_pinterest",
+					"default": true,
+					"label": "t:sections.overlay-group.popup.blocks.social_links.settings.show_pinterest.label"
+				},
+				{
+					"type": "checkbox",
+					"id": "show_instagram",
+					"default": true,
+					"label": "t:sections.overlay-group.popup.blocks.social_links.settings.show_instagram.label"
+				},
+				{
+					"type": "checkbox",
+					"id": "show_tiktok",
+					"default": false,
+					"label": "t:sections.overlay-group.popup.blocks.social_links.settings.show_tiktok.label"
+				},
+				{
+					"type": "checkbox",
+					"id": "show_tumblr",
+					"default": false,
+					"label": "t:sections.overlay-group.popup.blocks.social_links.settings.show_tumblr.label"
+				},
+				{
+					"type": "checkbox",
+					"id": "show_snapchat",
+					"default": false,
+					"label": "t:sections.overlay-group.popup.blocks.social_links.settings.show_snapchat.label"
+				},
+				{
+					"type": "checkbox",
+					"id": "show_youtube",
+					"default": false,
+					"label": "t:sections.overlay-group.popup.blocks.social_links.settings.show_youtube.label"
+				},
+				{
+					"type": "checkbox",
+					"id": "show_vimeo",
+					"default": false,
+					"label": "t:sections.overlay-group.popup.blocks.social_links.settings.show_vimeo.label"
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "t:sections.overlay-group.popup.name",
+			"blocks": [
+				{
+					"type": "popup_heading"
+				},
+				{
+					"type": "popup_text"
+				},
+				{
+					"type": "subscribe_form"
+				}
+			]
+		}
+	]
+}
+{% endschema %}

@@ -1,0 +1,36 @@
+<a
+	{% if link.links == blank %}
+		href="{{ link.url }}"
+	{% else %}
+		href="##"
+	{% endif %}
+	class="header__menu-item list-menu__item button-animation focus-inset{% if link.current %} current-link{% endif %}{% if link.links != blank %} cursor-default{% endif %}"
+	{% if link.current %}
+		aria-current="page"
+	{% endif %}
+	{% if link.type == 'http_link' and settings.open_new_tab %}
+		target="_blank"
+	{% endif %}
+	aria-label="{{ link.title | escape }}"
+>
+	<span
+		{%- if link.active %}
+			class="header__active-menu-item"
+		{% endif %}
+		title="{{ link.title | escape }}"
+	>
+		{% comment %}{{ link.title | escape }}{% endcomment %}
+		{% if settings.header_links_animation %}
+			<span class="animation-wrapper" hoverstagger="link">
+				<span class="animation" hoverstagger="text">
+					<span class="word" id="word1">{{ link.title | escape }}</span>
+				</span>
+				<span class="is-2 animation" hoverstagger="text">
+					<span class="word" id="word2">{{ link.title | escape }}</span>
+				</span>
+			</span>
+		{% else %}
+			{{ link.title | escape }}
+		{% endif %}
+	</span>
+</a>

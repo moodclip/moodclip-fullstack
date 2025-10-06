@@ -1,0 +1,565 @@
+{% comment %}
+====================================================================================
+  SECTION: Parallax Gallery
+
+  DESCRIPTION:
+  This Shopify section creates a dynamic and visually engaging "Parallax Gallery".
+  It displays media items (images or videos) that move at different speeds as the
+  user scrolls down the page, creating a compelling depth effect. It also supports
+  a full-width background video with extensive customization options.
+
+  FEATURES:
+  - **Parallax Scroll Effect:** The core feature, powered by 'section-parallax-gallery.js',
+    animates the gallery items on scroll for a modern user experience.
+  - **Unlimited Blocks:** Add as many images or foreground videos as you need.
+  - **Background Video:** A dedicated block to add a background video with controls
+    for desktop/mobile height, object fit, and object position.
+  - **Flexible Media:** Each column can contain either a user-uploaded image or an
+    auto-playing, looped, and muted video.
+  - **Customizable Content:** Includes an optional subheading, main heading, and
+    description, all with independent color and responsive font size controls.
+    Also includes a call-to-action button.
+  - **Responsive Layout:** The section is fully responsive. The aspect ratio for each
+    media item can be independently set to landscape, portrait, or square.
+  - **Performance Optimized:** Images use lazy loading and responsive 'sizes' and
+    'widths' attributes. The JavaScript is deferred to prevent render-blocking.
+  - **Full Theme Editor Integration:** All settings are configurable through the
+    Shopify Theme Editor.
+  - **A preset is available to quickly add the section with three empty columns.
+
+  DEPENDENCIES:
+  - 'parallax-gallery.css': Stylesheet for the gallery layout and appearance.
+  - 'section-parallax-gallery.js': JavaScript file that handles the parallax animation logic.
+  - 'section-padding' & 'section-margin' snippets: For applying consistent spacing.
+  - 'button' snippet: For rendering the call-to-action button.
+====================================================================================
+{% endcomment %}
+
+{{ 'parallax-gallery.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  {% render 'section-padding' %}
+  {% render 'section-margin' %}
+
+  [data-id="{{ section.id }}"] .parallax-gallery__subheading {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+      font-size: {{ section.settings.subheading_size_mobile }}px;
+  }
+
+  [data-id="{{ section.id }}"] .parallax-gallery__heading {
+      font-size: {{ section.settings.heading_size_mobile }}px;
+  }
+
+  [data-id="{{ section.id }}"] .parallax-gallery__description {
+      font-size: {{ section.settings.description_size_mobile }}px;
+  }
+
+  .parallax-gallery__background-video-wrapper {
+    overflow: hidden;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+
+  .parallax-gallery__background-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+  }
+
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'background_video' -%}
+      [data-id="{{ section.id }}"] .parallax-gallery__background-video-wrapper video {
+        object-fit: {{ block.settings.video_fit }};
+        object-position: {{ block.settings.video_alignment }};
+        height: {{ block.settings.mobile_video_height }}vh;
+      }
+    {%- endif -%}
+  {%- endfor -%}
+
+  @media screen and (min-width: 750px) {
+      [data-id="{{ section.id }}"] .parallax-gallery__subheading {
+          font-size: {{ section.settings.subheading_size_desktop }}px;
+      }
+      [data-id="{{ section.id }}"] .parallax-gallery__heading {
+          font-size: {{ section.settings.heading_size_desktop }}px;
+      }
+      [data-id="{{ section.id }}"] .parallax-gallery__description {
+          font-size: {{ section.settings.description_size_desktop }}px;
+      }
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'background_video' -%}
+          [data-id="{{ section.id }}"] .parallax-gallery__background-video-wrapper video {
+            height: {{ block.settings.desktop_video_height }}vh;
+          }
+        {%- endif -%}
+      {%- endfor -%}
+  }
+{%- endstyle -%}
+<script
+  src="{{ 'section-parallax-gallery.js' | asset_url }}"
+  defer="defer"
+></script>
+{% liquid
+  assign image_size = section.settings.image_size
+  case image_size
+    when 'adapt'
+      assign section_size = 0
+    when 'small'
+      assign section_size = '60vh'
+    when 'medium'
+      assign section_size = '80vh'
+    when 'large'
+      assign section_size = '100vh'
+    else
+      assign section_size = '100vh'
+  endcase
+%}
+{% style %}
+  [data-id="{{ section.id }}"].parallax-gallery {
+    --slide-height  : {{ section_size }};
+  }
+{% endstyle %}
+<div
+  class="parallax-gallery tsi section-{{ section.id }}-padding color-{{ section.settings.color_scheme }} background"
+  data-id="{{ section.id }}"
+  style="position: relative;"
+>
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'background_video' and block.settings.video != blank -%}
+      <div class="parallax-gallery__background-video-wrapper">
+        {{
+          block.settings.video
+          | video_tag:
+            class: 'parallax-gallery__background-video',
+            autoplay: true,
+            loop: true,
+            controls: false,
+            muted: true
+        }}
+      </div>
+    {%- endif -%}
+  {%- endfor -%}
+
+  <div class="container">
+
+
+        <div
+          class="tsi__text"
+          style="translate: none; rotate: none; scale: none; transform: translate(0px, 30px);"
+        >
+                    {%- if section.settings.subheading != blank -%}
+                        <p
+                          class="parallax-gallery__subheading"
+                          style="color: {{ section.settings.subheading_color }};"
+                        >
+                          {{ section.settings.subheading }}
+                        </p>
+                    {%- endif -%}
+          {%- if section.settings.heading != blank -%}
+            <h2 class="parallax-gallery__heading h1">
+              {{ section.settings.heading }}
+            </h2>
+          {%- endif -%}
+
+          {%- if section.settings.description != blank -%}
+            <div class="parallax-gallery__description rte">
+              {{ section.settings.description }}
+            </div>
+          {%- endif -%}
+
+          {% render 'button', layout: section %}
+        </div>
+
+
+
+    <div class="parallax-gallery_block tsi__wrapper">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'column' -%}
+          {% liquid
+            assign media_size = block.settings.image_ratio
+            case media_size
+              when 'landscape'
+                assign image_size = '56.25%'
+              when 'portrait'
+                assign image_size = '130%'
+              when 'square'
+                assign image_size = '100%'
+              else
+                assign image_size = '100%'
+            endcase
+          %}
+
+          <div
+            class="parallax-gallery_item js-parallax-gallery_item tsi__row"
+            data-id="{{ block.id }}"
+            data-index="{{ forloop.index }}"
+          >
+            {%- style -%}
+              [data-id="{{ block.id }}"] .parallax-gallery_img {
+                    --image_size: {{ image_size }};
+                  }
+            {%- endstyle -%}
+
+            <div
+              class="parallax-gallery_img tsi__parallax"
+              data-parallax
+            >
+              {%- if block.settings.video != blank -%}
+                {% liquid
+                  assign video_height = block.settings.video.sources[0].width | divided_by: block.settings.video.aspect_ratio
+                %}
+                {{
+                  block.settings.video
+                  | video_tag:
+                    width: block.settings.video.sources[0].width,
+                    height: video_height,
+                    autoplay: true,
+                    loop: true,
+                    controls: false,
+                    muted: true
+                }}
+              {%- elsif block.settings.image != blank -%}
+                {% assign image_height = block.settings.image.width
+                  | divided_by: block.settings.image.aspect_ratio
+                %}
+                {%- capture style -%}
+                            object-fit: {{ section.settings.object_fit }}; object-position: {{ block.settings.image.presentation.focal_point }};
+                          {%- endcapture -%}
+                {{
+                  block.settings.image
+                  | image_url: width: 3840
+                  | image_tag:
+                    loading: 'lazy',
+                    width: block.settings.image.width,
+                    height: image_height,
+                    sizes: '100vw (min-width: 767px) 50vw',
+                    widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840',
+                    class: 'zoomOut',
+                    style: 'translate: none; rotate: none; scale: none; transform: scale(1.25, 1.25);'
+                }}
+              {% else %}
+                {{ 'image' | placeholder_svg_tag: 'placeholder' }}
+              {%- endif -%}
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+
+  {% schema %}
+  {
+    "name": "Parallax Gallery",
+    "tag": "section",
+    "class": "parallax-gallery-section spaced-section",
+    "enabled_on": {
+      "templates": ["*"]
+    },
+    "settings": [
+      {
+        "type": "color_scheme",
+        "id": "color_scheme",
+        "default": "background-1",
+        "label": "Color scheme"
+      },
+      {
+        "type": "text",
+        "id": "subheading",
+        "default": "Subheading",
+        "label": "Subheading"
+      },
+          {
+        "type": "color",
+        "id": "subheading_color",
+        "label": "Subheading Color",
+        "default": "#FFFFFF"
+          },
+      {
+        "type": "range",
+        "id": "subheading_size_desktop",
+        "min": 10,
+        "max": 30,
+        "step": 1,
+        "unit": "px",
+        "label": "Subheading Font Size (Desktop)",
+        "default": 14
+      },
+      {
+        "type": "range",
+        "id": "subheading_size_mobile",
+        "min": 8,
+        "max": 24,
+        "step": 1,
+        "unit": "px",
+        "label": "Subheading Font Size (Mobile)",
+        "default": 12
+      },
+      {
+        "type": "inline_richtext",
+        "id": "heading",
+        "default": "Heading",
+        "label": "Heading"
+      },
+      {
+        "type": "range",
+        "id": "heading_size_desktop",
+        "min": 24,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Heading Font Size (Desktop)",
+        "default": 48
+      },
+      {
+        "type": "range",
+        "id": "heading_size_mobile",
+        "min": 20,
+        "max": 60,
+        "step": 1,
+        "unit": "px",
+        "label": "Heading Font Size (Mobile)",
+        "default": 36
+      },
+      {
+        "type": "richtext",
+        "id": "description",
+        "default": "<p>Add a description for your gallery.</p>",
+        "label": "Description"
+      },
+      {
+        "type": "range",
+        "id": "description_size_desktop",
+        "min": 12,
+        "max": 30,
+        "step": 1,
+        "unit": "px",
+        "label": "Description Font Size (Desktop)",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "description_size_mobile",
+        "min": 10,
+        "max": 24,
+        "step": 1,
+        "unit": "px",
+        "label": "Description Font Size (Mobile)",
+        "default": 14
+      },
+      {
+        "type": "header",
+        "content": "Button"
+      },
+      {
+        "type": "text",
+        "id": "button_label",
+        "default": "Button label",
+        "label": "Button label"
+      },
+      {
+        "type": "url",
+        "id": "button_link",
+        "label": "Button link"
+      },
+      {
+        "type": "select",
+        "id": "button_style",
+        "options": [
+          {
+            "value": "primary",
+            "label": "Primary"
+          },
+          {
+            "value": "secondary",
+            "label": "Secondary"
+          },
+          {
+            "value": "tertiary",
+            "label": "Tertiary"
+          }
+        ],
+        "default": "primary",
+        "label": "Button style"
+      },
+      {
+        "type": "checkbox",
+        "id": "button_arrow",
+        "default": false,
+        "label": "Show arrow on button"
+      },
+      {
+        "type": "header",
+        "content": "Section Margin"
+      },
+      {
+        "type": "select",
+        "id": "margin_top",
+        "options": [
+          { "value": "no-indent", "label": "None" },
+          { "value": "xs", "label": "Extra Small" },
+          { "value": "s", "label": "Small" },
+          { "value": "m", "label": "Medium" },
+          { "value": "l", "label": "Large" }
+        ],
+        "default": "no-indent",
+        "label": "Top margin"
+      },
+      {
+        "type": "select",
+        "id": "margin_bottom",
+        "options": [
+          { "value": "no-indent", "label": "None" },
+          { "value": "xs", "label": "Extra Small" },
+          { "value": "s", "label": "Small" },
+          { "value": "m", "label": "Medium" },
+          { "value": "l", "label": "Large" }
+        ],
+        "default": "no-indent",
+        "label": "Bottom margin"
+      },
+      {
+        "type": "header",
+        "content": "Section Padding"
+      },
+      {
+        "type": "select",
+        "id": "padding_top",
+        "options": [
+          { "value": "no-indent", "label": "None" },
+          { "value": "xs", "label": "Extra Small" },
+          { "value": "s", "label": "Small" },
+          { "value": "m", "label": "Medium" },
+          { "value": "l", "label": "Large" }
+        ],
+        "default": "no-indent",
+        "label": "Top padding"
+      },
+      {
+        "type": "select",
+        "id": "padding_bottom",
+        "options": [
+          { "value": "no-indent", "label": "None" },
+          { "value": "xs", "label": "Extra Small" },
+          { "value": "s", "label": "Small" },
+          { "value": "m", "label": "Medium" },
+          { "value": "l", "label": "Large" }
+        ],
+        "default": "no-indent",
+        "label": "Bottom padding"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "column",
+        "name": "Column",
+        "limit": 4,
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          },
+          {
+            "type": "video",
+            "id": "video",
+            "label": "Video"
+          },
+          {
+            "type": "select",
+            "id": "image_ratio",
+            "options": [
+              { "value": "landscape", "label": "Landscape" },
+              { "value": "portrait", "label": "Portrait" },
+              { "value": "square", "label": "Square" }
+            ],
+            "default": "landscape",
+            "label": "Image ratio"
+          }
+        ]
+      },
+      {
+        "type": "background_video",
+        "name": "Background Video",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "video",
+            "id": "video",
+            "label": "Background Video"
+          },
+          {
+            "type": "range",
+            "id": "desktop_video_height",
+            "min": 50,
+            "max": 150,
+            "step": 5,
+            "unit": "vh",
+            "label": "Desktop Video Height",
+            "default": 100
+          },
+          {
+            "type": "range",
+            "id": "mobile_video_height",
+            "min": 50,
+            "max": 150,
+            "step": 5,
+            "unit": "vh",
+            "label": "Mobile Video Height",
+            "default": 100
+          },
+          {
+            "type": "select",
+            "id": "video_fit",
+            "label": "Video Fit",
+            "options": [
+              { "value": "cover", "label": "Cover" },
+              { "value": "contain", "label": "Contain" }
+            ],
+            "default": "cover"
+          },
+          {
+            "type": "select",
+            "id": "video_alignment",
+            "label": "Video Alignment",
+            "options": [
+              { "value": "center", "label": "Center" },
+              { "value": "top", "label": "Top" },
+              { "value": "bottom", "label": "Bottom" },
+              { "value": "left", "label": "Left" },
+              { "value": "right", "label": "Right" }
+            ],
+            "default": "center"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Parallax Gallery",
+        "blocks": [
+          {
+            "type": "column"
+          },
+          {
+            "type": "column"
+          },
+          {
+            "type": "column"
+          }
+        ]
+      }
+    ]
+  }
+  {% endschema %}
+</div>

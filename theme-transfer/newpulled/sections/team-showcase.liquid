@@ -1,0 +1,649 @@
+{% comment %}
+  This is a Liquid file for a Shopify section.
+  To use it:
+  1. Go to your Shopify Admin > Online Store > Themes.
+  2. Find your theme and click "Actions" > "Edit code".
+  3. In the "Sections" directory, click "Add a new section".
+  4. Name the file "team-showcase-section.liquid" and paste this entire code into it.
+  5. Click "Save".
+  6. You can now add this "Team Showcase" section to any page from the Shopify Theme Customizer.
+{% endcomment %}
+
+{% comment %}
+  Define CSS variables from section settings for easy styling.
+  This makes the CSS cleaner and respects the user's choices in the customizer.
+{% endcomment %}
+<style>
+  #shopify-section-{{ section.id }} {
+    --heading-color: {{ section.settings.heading_color }};
+    --heading-font-size: {{ section.settings.heading_size_mobile }}px;
+    --heading-margin-bottom: {{ section.settings.heading_margin_bottom }}px;
+    --padding-top: {{ section.settings.padding_top }}px;
+    --padding-bottom: {{ section.settings.padding_bottom }}px;
+
+    --box-title-font-size: {{ section.settings.box_title_size_mobile }}px;
+    --box-bg-color: {{ section.settings.box_background_color }};
+    
+    --animation-duration: {{ section.settings.animation_duration }}s;
+  }
+
+  /* Base styles for the section */
+  .team-showcase-section {
+    padding: var(--padding-top) 20px var(--padding-bottom);
+    background-size: cover;
+    background-position: center;
+    text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    position: relative; /* Needed for z-index context */
+  }
+  
+  .team-showcase__container {
+    position: relative;
+    z-index: 2; /* Ensure content is above the background image */
+  }
+
+  /* Heading styles */
+  .team-showcase__heading {
+    font-size: var(--heading-font-size);
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 auto var(--heading-margin-bottom);
+    max-width: 600px;
+    color: var(--heading-color);
+  }
+
+  .team-showcase__heading-highlight {
+    background: linear-gradient(to right, {{ section.settings.underline_gradient_start }}, {{ section.settings.underline_gradient_end }});
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 100% 12%; /* Second value is thickness */
+    padding-bottom: 4px;
+    display: inline;
+  }
+  
+  .team-showcase__box-title-highlight {
+    background: linear-gradient(to right, {{ section.settings.box_underline_gradient_start }}, {{ section.settings.box_underline_gradient_end }});
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 100% 12%; /* Second value is thickness */
+    padding-bottom: 4px;
+    display: inline;
+  }
+
+
+  /* Box containing the team members */
+  .team-showcase__box {
+    background-color: var(--box-bg-color);
+    border: 2px solid {{ section.settings.box_border_color }};
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 900px;
+    margin: 0 auto;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  }
+
+  /* Title inside the box */
+  .team-showcase__box-title {
+    font-size: var(--box-title-font-size);
+    font-weight: 600;
+    color: {{ section.settings.box_title_color }};
+    margin: 0 0 30px;
+  }
+
+  /* Container for the team members grid/flex layout */
+  .team-showcase__members {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* Individual team member item */
+  .team-showcase__member {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background-color: var(--member-card-bg);
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .team-showcase__member-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .team-showcase__member-name {
+    font-size: var(--member-name-font-size);
+    font-weight: 500;
+    color: var(--member-name-color);
+    margin: 0;
+  }
+
+  /* --- ANIMATION STYLES --- */
+  {% if section.settings.entrance_animation != 'none' %}
+    .animated-item {
+      opacity: 0;
+      transition: opacity var(--animation-duration) ease, transform var(--animation-duration) ease;
+    }
+    
+    [data-animation="fade-in"] .animated-item {
+      transform: none;
+    }
+
+    [data-animation="slide-up"] .animated-item {
+      transform: translateY(30px);
+    }
+    
+    [data-animation="scale-in"] .animated-item {
+      transform: scale(0.95);
+    }
+
+    /* Final state when visible */
+    .is-visible .animated-item {
+      opacity: 1;
+      transform: none;
+    }
+  {% endif %}
+
+  /* Hover effects for interactivity */
+  @media (hover: hover) {
+    .team-showcase__members:hover .team-showcase__member:not(:hover) {
+        opacity: 0.6;
+    }
+
+    .team-showcase__member {
+        transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .team-showcase__member:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+  }
+  
+  /* Button container */
+  .team-showcase__buttons {
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+  }
+
+  .team-showcase__button {
+      display: inline-block;
+      padding: 12px 24px;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .team-showcase__button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+  }
+
+  .team-showcase__button--primary {
+      background-color: #000;
+      color: #fff;
+      border: 2px solid #000;
+  }
+
+  .team-showcase__button--secondary {
+      background-color: #fff;
+      color: #000;
+      border: 2px solid #000;
+  }
+
+
+  /* Desktop styles using a min-width media query (mobile-first approach) */
+  @media (min-width: 768px) {
+    #shopify-section-{{ section.id }} {
+        --heading-font-size: {{ section.settings.heading_size_desktop }}px;
+        --box-title-font-size: {{ section.settings.box_title_size_desktop }}px;
+    }
+
+    .team-showcase__members {
+      flex-direction: row;
+      justify-content: space-around;
+      gap: 30px;
+    }
+
+    .team-showcase__member {
+      flex-direction: row;
+      justify-content: center;
+      padding: 20px;
+      flex: 1;
+    }
+    
+    .team-showcase__buttons {
+      flex-direction: row;
+      gap: 20px;
+    }
+  }
+
+</style>
+
+<section
+  id="shopify-section-{{ section.id }}"
+  class="team-showcase-section"
+  data-animation="{{ section.settings.entrance_animation }}"
+  {% if section.settings.background_image %}
+    style="background-image: url('{{ section.settings.background_image | image_url }}');"
+  {% endif %}
+>
+  <div class="team-showcase__container">
+    <h2 class="team-showcase__heading animated-item">
+      {{ section.settings.heading | escape }}
+      <span class="team-showcase__heading-highlight">
+        {{ section.settings.heading_highlighted | escape }}
+      </span>
+    </h2>
+
+    <div class="team-showcase__box animated-item" style="transition-delay: {{ section.settings.stagger_delay }}ms;">
+      <h3 class="team-showcase__box-title">
+        {{ section.settings.box_title_part1 | escape }}
+        <span class="team-showcase__box-title-highlight">
+          {{ section.settings.box_title_highlighted | escape }}
+        </span>
+        {{ section.settings.box_title_part2 | escape }}
+      </h3>
+      <div class="team-showcase__members">
+        {% for block in section.blocks %}
+          {%- liquid
+            assign member_name_font_size_mobile = block.settings.member_name_size_mobile | append: 'px'
+            assign member_name_font_size_desktop = block.settings.member_name_size_desktop | append: 'px'
+            assign animation_delay = forloop.index | plus: 1
+            assign stagger_delay = animation_delay | times: section.settings.stagger_delay | append: 'ms'
+          -%}
+          <div 
+            class="team-showcase__member animated-item" 
+            style="--member-name-color: {{ block.settings.member_name_color }}; --member-name-font-size: {{ member_name_font_size_mobile }}; --member-card-bg: {{ block.settings.member_card_color }}; transition-delay: {{ stagger_delay }};"
+            {{ block.shopify_attributes }}
+          >
+            {% if block.settings.image %}
+              <img
+                src="{{ block.settings.image | image_url: width: 100, height: 100, crop: 'center' }}"
+                alt="{{ block.settings.image.alt | default: 'Team member photo' | escape }}"
+                class="team-showcase__member-img"
+                width="50"
+                height="50"
+                loading="lazy"
+              >
+            {% else %}
+               <div class="team-showcase__member-img" style="background-color: #e0e0e0;"></div>
+            {% endif %}
+            <p class="team-showcase__member-name">{{ block.settings.name | escape }}</p>
+          </div>
+          <style>
+             @media (min-width: 768px) {
+                #shopify-section-{{ section.id }} .team-showcase__member:nth-of-type({{ forloop.index }}) {
+                    --member-name-font-size: {{ member_name_font_size_desktop }};
+                }
+             }
+          </style>
+        {% endfor %}
+      </div>
+    </div>
+    
+    {% if section.settings.button_primary_label != blank or section.settings.button_secondary_label != blank %}
+        <div class="team-showcase__buttons animated-item" style="transition-delay: {{ section.blocks.size | plus: 2 | times: section.settings.stagger_delay }}ms;">
+            {% if section.settings.button_primary_label != blank %}
+                <a href="{{ section.settings.button_primary_link }}" class="team-showcase__button team-showcase__button--secondary">
+                    {{ section.settings.button_primary_label | escape }}
+                </a>
+            {% endif %}
+            {% if section.settings.button_secondary_label != blank %}
+                <a href="{{ section.settings.button_secondary_link }}" class="team-showcase__button team-showcase__button--primary">
+                    {{ section.settings.button_secondary_label | escape }} →
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+    
+  </div>
+</section>
+
+{% if section.settings.entrance_animation != 'none' %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const sectionElement = document.querySelector('#shopify-section-{{ section.id }}');
+    if (!sectionElement) return;
+
+    const observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          sectionElement.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.1
+    });
+
+    observer.observe(sectionElement);
+  });
+</script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Team Showcase",
+  "tag": "section",
+  "class": "team-showcase",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Background & Spacing"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background Image"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Entrance Animation"
+    },
+    {
+      "type": "select",
+      "id": "entrance_animation",
+      "label": "Animation Style",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "fade-in", "label": "Fade In" },
+        { "value": "slide-up", "label": "Slide Up" },
+        { "value": "scale-in", "label": "Scale In" }
+      ],
+      "default": "slide-up"
+    },
+    {
+        "type": "range",
+        "id": "animation_duration",
+        "min": 0.2,
+        "max": 1.5,
+        "step": 0.1,
+        "unit": "s",
+        "label": "Animation Duration",
+        "default": 0.6
+    },
+    {
+        "type": "range",
+        "id": "stagger_delay",
+        "min": 50,
+        "max": 300,
+        "step": 10,
+        "unit": "ms",
+        "label": "Stagger Delay",
+        "info": "Delay between each item animating in.",
+        "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Main Heading"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading (First Part)",
+      "default": "On-Demand Video Editing Support"
+    },
+    {
+      "type": "text",
+      "id": "heading_highlighted",
+      "label": "Heading (Underlined Part)",
+      "default": "for Growing Businesses"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#2D2D2D"
+    },
+    {
+      "type": "color",
+      "id": "underline_gradient_start",
+      "label": "Underline Gradient Start",
+      "default": "#FFD700"
+    },
+     {
+      "type": "color",
+      "id": "underline_gradient_end",
+      "label": "Underline Gradient End",
+      "default": "#FFA500"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "min": 24,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Font Size (Mobile)",
+      "default": 36
+    },
+     {
+      "type": "range",
+      "id": "heading_size_desktop",
+      "min": 24,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Font Size (Desktop)",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Space Below Heading",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Team Box"
+    },
+    {
+      "type": "color",
+      "id": "box_background_color",
+      "label": "Box Background Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "text",
+      "id": "box_title_part1",
+      "label": "Box Title (Part 1)",
+      "default": "You get a"
+    },
+    {
+      "type": "text",
+      "id": "box_title_highlighted",
+      "label": "Box Title (Underlined Part)",
+      "default": "full team of professionals"
+    },
+    {
+      "type": "text",
+      "id": "box_title_part2",
+      "label": "Box Title (Part 2)",
+      "info": "Leave blank if not needed."
+    },
+    {
+      "type": "color",
+      "id": "box_title_color",
+      "label": "Box Title Color",
+      "default": "#32CD32"
+    },
+    {
+      "type": "color",
+      "id": "box_underline_gradient_start",
+      "label": "Box Underline Start",
+      "default": "#32CD32"
+    },
+     {
+      "type": "color",
+      "id": "box_underline_gradient_end",
+      "label": "Box Underline End",
+      "default": "#98FB98"
+    },
+    {
+      "type": "color",
+      "id": "box_border_color",
+      "label": "Box Border Color",
+      "default": "#32CD32"
+    },
+     {
+      "type": "range",
+      "id": "box_title_size_mobile",
+      "min": 18,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Box Title Font Size (Mobile)",
+      "default": 22
+    },
+     {
+      "type": "range",
+      "id": "box_title_size_desktop",
+      "min": 18,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Box Title Font Size (Desktop)",
+      "default": 34
+    },
+    {
+        "type": "header",
+        "content": "Buttons"
+    },
+    {
+        "type": "text",
+        "id": "button_primary_label",
+        "label": "Button 1 Label",
+        "default": "View Pricing"
+    },
+    {
+        "type": "url",
+        "id": "button_primary_link",
+        "label": "Button 1 Link"
+    },
+    {
+        "type": "text",
+        "id": "button_secondary_label",
+        "label": "Button 2 Label",
+        "default": "Book a Call"
+    },
+    {
+        "type": "url",
+        "id": "button_secondary_link",
+        "label": "Button 2 Link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "team_member",
+      "name": "Team Member",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Member Image"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Member Name or Role",
+          "default": "Creative Producer"
+        },
+        {
+            "type": "color",
+            "id": "member_name_color",
+            "label": "Name Color",
+            "default": "#333333"
+        },
+        {
+            "type": "color",
+            "id": "member_card_color",
+            "label": "Card Background",
+            "default": "#f9f9f9"
+        },
+        {
+            "type": "range",
+            "id": "member_name_size_mobile",
+            "min": 12,
+            "max": 24,
+            "step": 1,
+            "unit": "px",
+            "label": "Name Font Size (Mobile)",
+            "default": 16
+        },
+        {
+            "type": "range",
+            "id": "member_name_size_desktop",
+            "min": 12,
+            "max": 30,
+            "step": 1,
+            "unit": "px",
+            "label": "Name Font Size (Desktop)",
+            "default": 18
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Team Showcase",
+      "blocks": [
+        {
+          "type": "team_member",
+          "settings": {
+            "name": "Video Editor"
+          }
+        },
+        {
+          "type": "team_member",
+           "settings": {
+            "name": "Project Manager"
+          }
+        },
+        {
+          "type": "team_member",
+           "settings": {
+            "name": "Creative Producer"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

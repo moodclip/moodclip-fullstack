@@ -1,0 +1,163 @@
+<div class="contact__account contact-modal" id="contact-modal">
+	<div class="contact__content header-modal_content ">
+		<div class="contact-form__block ">
+			<div class="contact-form__header">
+				{%- if section.settings.heading_modal != blank -%}
+					<h3 class="contact-modal__title">
+						{{ section.settings.heading_modal }}
+					</h3>
+				{%- endif -%}
+				{% if description_modal != blank %}
+					<div class="contact-modal__desc richtext__content">
+						{{ description_modal }}
+					</div>
+				{% endif %}
+			</div>
+
+			{%- form 'contact', id: 'ContactForm' -%}
+				{%- if form.posted_successfully? -%}
+					<div
+						class="form-status form-status-list form__message"
+						tabindex="-1"
+						autofocus
+					>
+						{% render 'icon-success' %}
+						{{ 'templates.contact.form.post_success' | t }}
+					</div>
+				{%- elsif form.errors -%}
+				{%- endif -%}
+
+				<label class="field__label medium-font" for="ContactForm-name">
+					{{- 'templates.contact.form.name' | t -}}
+					<span class="form-asterisk">*</span>
+				</label>
+
+				<div class="field field__name">
+					<input
+						class="field__input"
+						autocomplete="name"
+						type="text"
+						id="ContactForm-name"
+						name="contact[{{ 'templates.contact.form.name' | t }}]"
+						aria-required="true"
+						value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+						placeholder=" "
+						required
+					>
+					{% comment %}
+						<label class="field__label " for="ContactForm-name">
+							{{- 'templates.contact.form.name' | t -}}
+						</label>
+					{% endcomment %}
+				</div>
+				<label class="field__label medium-font" for="ContactForm-email">
+					{{- 'templates.contact.form.email' | t -}}
+					<span class="form-asterisk">*</span>
+				</label>
+				<div class="field">
+					<input
+						autocomplete="email"
+						type="email"
+						id="ContactForm-email"
+						class="field__input"
+						name="contact[email]"
+						spellcheck="false"
+						autocapitalize="off"
+						value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+						aria-required="true"
+						{% if form.errors contains 'email' %}
+							aria-invalid="true"
+							aria-describedby="ContactForm-email-error"
+						{% endif %}
+						placeholder=" "
+						required
+					>
+					{% comment %}
+						<label class="field__label" for="ContactForm-email">
+							{{- 'templates.contact.form.email' | t -}}
+						</label>
+					{% endcomment %}
+					{%- if form.errors contains 'email' -%}
+						<small
+							class="contact__field-error"
+							id="ContactForm-email-error"
+						>
+							<span class="visually-hidden">
+								{{- 'accessibility.error' | t -}}
+							</span>
+							<span class="form__message">
+								{{- form.errors.translated_fields.email | capitalize }}
+								{{ form.errors.messages.email -}}
+							</span>
+						</small>
+					{%- endif -%}
+				</div>
+
+				<label
+					class=" field__label medium-font"
+					for="ContactForm-body"
+				>
+					{{- 'templates.contact.form.comment' | t -}}
+				</label>
+				<div class="field">
+					<textarea
+						rows="10"
+						id="ContactForm-body"
+						class="text-area field__input"
+						name="contact[{{ 'templates.contact.form.comment' | t }}]"
+						placeholder=" "
+						aria-required="true"
+						required
+					>
+						{{- form.body -}}
+					</textarea>
+					<label
+						class="form__label field__label"
+						for="ContactForm-body"
+					>
+						{% comment %}
+							{{- 'templates.contact.form.comment' | t -}}
+							<span class="form-asterisk">*</span>
+						{% endcomment %}
+					</label>
+				</div>
+				<div class="contact__bottom">
+					<button type="submit" class="button button--primary">
+						{% if settings.button_animation %}
+							<span class="animation-wrapper" hoverstagger="link">
+								<span class="button-label animation" hoverstagger="text">
+									<span class="word" id="word1">
+										{{- 'templates.contact.form.submit' | t -}}
+									</span>
+								</span>
+								<span
+									class="button-label is-2 animation"
+									hoverstagger="text"
+								>
+									<span class="word" id="word2">
+										{{- 'templates.contact.form.submit' | t -}}
+									</span>
+								</span>
+							</span>
+						{% else %}
+							<span class="button-label">
+								{{- 'templates.contact.form.submit' | t -}}
+							</span>
+						{% endif %}
+					</button>
+
+					<div class="contact__add-text">
+						{{ section.settings.additional_text }}
+					</div>
+				</div>
+			{%- endform -%}
+		</div>
+		<a class="button small-font close_modal_element">
+			{{- 'products.facets.close' | t -}}
+		</a>
+	</div>
+	<div
+		id="contactModal-Overlay"
+		class="modal__overlay contact-modal__overlay"
+	></div>
+</div>

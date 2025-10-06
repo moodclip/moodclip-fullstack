@@ -1,0 +1,449 @@
+{% liquid
+	assign slide_effects = section.settings.slide_effects
+	assign slideshow_speed = section.settings.slideshow_speed
+	assign direction = section.settings.direction
+	assign slideshow_delay = section.settings.slideshow_delay
+	assign image_size = section.settings.image_size
+	assign autoplay = section.settings.is_autoplay
+	assign slideshow_type = section.settings.section_layout
+	assign content_alignment = section.settings.content_alignment
+	assign section_size1 = section.settings.section_size
+	assign ticker_speed = section.settings.ticker_speed
+
+	case image_size
+		when 'adapt'
+			assign section_size = 0
+		when 'small'
+			assign section_size = '51%'
+		when 'medium'
+			assign section_size = '60%'
+		when 'large'
+			assign section_size = '100%'
+		else
+			assign section_size = '100%'
+	endcase
+
+	assign count = 0
+	for block in section.blocks
+		assign count = count | plus: 1
+	endfor
+	if section.blocks.size < 2
+		assign banner = 'slideshow-banner'
+	else
+		assign banner = ''
+	endif
+%}
+{{ 'section-multi-slider.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'multi-slider.js' | asset_url }}" defer="defer"></script>
+{%- style -%}
+	#shopify-section-{{ section.id }} {
+		--image-height : {{ section_size }};
+		--delay : {{ slideshow_delay }}s;
+		--ticker-speed : {{ ticker_speed }}s;
+	}
+
+	{% render 'section-margin' %}
+{%- endstyle -%}
+
+<div
+	class="multi-slider"
+	data-id="shopify-section-{{ section.id }}"
+	data-direction="{{ direction }}"
+	data-autoplay="{{ autoplay }}"
+	data-delay="{{ slideshow_delay }}"
+>
+	<div class="container-wrapper">
+		<div class="multi-slider-wrapper {%if section_size1 == "container" %} container	{% endif %} {%if section.blocks.size <= 1 %} cursor_none	{% endif %} color-{{ section.settings.color_scheme }} background">
+			{%- if section.blocks.size > 1 -%}
+				<div class="cursor" id="cursor-box">
+					<span data-id="cursor-icon"> {% render 'icon-arrow' %}</span>
+				</div>
+			{% endif %}
+			<div class="slider slider--bg " data-glide-el="track">
+				{% for block in section.blocks %}
+					{% style %}
+
+
+					{% endstyle %}
+					<div
+						class="slider__item {% if forloop.index == 1 %}slider__item--current {% endif %}"
+						data-id="{{ block.id }}"
+					>
+						{% liquid
+							assign image_height = block.settings.image.width | divided_by: block.settings.image.aspect_ratio
+							assign adapt_height = 1 | divided_by: block.settings.image.aspect_ratio | times: 100 | append: '%'
+							if image_size == 'adapt'
+								assign section_height = adapt_height
+							endif
+						%}
+						<div class="slider__item-inner  have-overlay">
+							<div class="marquee ">
+								<div class="marquee-content">
+									{%- if block.settings.ticker_text != blank -%}
+										{% for i in (1..50) %}
+											<div class="marquee-tag">
+												<div class="ticker_title">
+													<h1 class="ticker_heading {{ block.settings.heading_size }}">
+														{{ block.settings.ticker_text }}
+													</h1>
+												</div>
+											</div>
+										{% endfor %}
+									{%- endif -%}
+								</div>
+							</div>
+							{% if block.settings.image != blank
+								and block.settings.video == blank
+							%}
+								{{
+									block.settings.image
+									| image_url: width: 3840
+									| image_tag:
+										loading: 'lazy',
+										width: block.settings.image.width,
+										height: image_height,
+										sizes: '200vw, (min-width: 1023px) 100vw',
+										widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+								}}
+							{%- elsif block.settings.video != blank -%}
+								{{
+									block.settings.video
+									| video_tag:
+										image_size: '1100x',
+										autoplay: true,
+										loop: true,
+										controls: false,
+										muted: true,
+										class: 'cards-grid__image data-alt'
+								}}
+							{% else %}
+								{{ 'image' | placeholder_svg_tag: 'placeholder' }}
+							{% endif %}
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+			<div class="slider slider--fg">
+				{% for block in section.blocks %}
+					<div class="slider__item {% if forloop.index == 1 %}slider__item--current {% endif %}">
+						{% liquid
+							assign image_height = block.settings.image.width | divided_by: block.settings.image.aspect_ratio
+							assign adapt_height = 1 | divided_by: block.settings.image.aspect_ratio | times: 100 | append: '%'
+							if image_size == 'adapt'
+								assign section_height = adapt_height
+							endif
+						%}
+						<div
+							class="slider__item-inner"
+							data-id="{{ block.id }}"
+						>
+							{% if block.settings.image != blank
+								and block.settings.video == blank
+							%}
+								{{
+									block.settings.image
+									| image_url: width: 3840
+									| image_tag:
+										loading: 'lazy',
+										width: block.settings.image.width,
+										height: image_height,
+										sizes: '200vw, (min-width: 1023px) 100vw',
+										widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+								}}
+							{%- else %}
+								{{
+									block.settings.video
+									| video_tag:
+										image_size: '1100x',
+										autoplay: true,
+										loop: true,
+										controls: false,
+										muted: true,
+										class: 'cards-grid__image data-alt'
+								}}
+							{% endif %}
+						</div>
+						<div class="multi-slider-slide__text">
+							{%- if block.settings.description != blank -%}
+								<div class="richtext__content multi-slider-slide_desc">
+									{{
+										block.settings.description
+										| strip_html
+										| truncatewords: 30
+									}}
+								</div>
+							{%- endif -%}
+							{% if block.settings.button_label != blank %}
+								<div class="multi-slider-slide_btn">
+									{% render 'button', layout: block %}
+								</div>
+							{% endif %}
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+			<div class="product-slider__buttons button-next">
+				<div class="swiper-button-prev  focus-inset"></div>
+				<div class="swiper-button-next focus-inset"></div>
+			</div>
+		</div>
+		{%- if section.blocks.size > 1 -%}
+			{% if section.settings.show_bullets %}
+				<ol id="bullets-bg" class="bullets"></ol>
+			{% endif %}
+		{% endif %}
+	</div>
+</div>
+
+{% schema %}
+{
+	"name": "t:sections.multi-slider.name",
+	"tag": "section",
+	"class": "multi-slider-section spaced-section",
+	"enabled_on": {
+		"templates": ["*"]
+	},
+	"settings": [
+		{
+			"type": "color_scheme",
+			"id": "color_scheme",
+			"default": "background-2",
+			"label": "t:sections.all.color_scheme.label"
+		},
+		{
+			"type": "select",
+			"id": "direction",
+			"default": "true",
+			"label": "t:sections.multi-slider.settings.style.label",
+			"options": [
+				{
+					"value": "true",
+					"label": "t:sections.multi-slider.settings.style.options__1.label"
+				},
+				{
+					"value": "false",
+					"label": "t:sections.multi-slider.settings.style.options__2.label"
+				}
+			]
+		},
+		{
+			"type": "select",
+			"id": "image_size",
+			"options": [
+				{
+					"value": "adapt",
+					"label": "t:sections.all.image.size.options__1.label"
+				},
+				{
+					"value": "small",
+					"label": "t:sections.all.image.size.options__2.label"
+				},
+				{
+					"value": "medium",
+					"label": "t:sections.all.image.size.options__3.label"
+				},
+				{
+					"value": "large",
+					"label": "t:sections.all.image.size.options__4.label"
+				}
+			],
+			"default": "medium",
+			"label": "t:sections.all.image.size.full_label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.slider_options.header.content"
+		},
+		{
+			"type": "checkbox",
+			"id": "is_autoplay",
+			"default": true,
+			"label": "t:sections.all.slider_options.slider_is_autoplay.label"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_bullets",
+			"default": true,
+			"label": "t:sections.all.slider_options.pagination.label"
+		},
+		{
+			"type": "range",
+			"id": "slideshow_delay",
+			"min": 0,
+			"max": 8,
+			"step": 0.1,
+			"default": 3,
+			"unit": "s",
+			"label": "t:sections.all.slider_options.delay.label"
+		},
+		{
+			"type": "range",
+			"id": "ticker_speed",
+			"min": 1,
+			"max": 10,
+			"step": 0.1,
+			"default": 5,
+			"unit": "s",
+			"label": "t:sections.all.ticker.settings.ticker_speed.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.section-margin.header.content"
+		},
+		{
+			"type": "select",
+			"id": "margin_top",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "no-indent",
+			"label": "t:sections.all.section-margin.margin_top.label"
+		},
+		{
+			"type": "select",
+			"id": "margin_bottom",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "xs",
+			"label": "t:sections.all.section-margin.margin_bottom.label"
+		}
+	],
+	"blocks": [
+		{
+			"type": "multi-slider_item",
+			"name": "t:sections.multi-slider.blocks.name",
+			"limit": 8,
+			"settings": [
+				{
+					"type": "inline_richtext",
+					"id": "ticker_text",
+					"default": "Some text",
+					"label": "t:sections.all.ticker.settings.ticker_text.label"
+				},
+				{
+					"type": "image_picker",
+					"id": "image",
+					"label": "t:sections.all.image.label"
+				},
+				{
+					"type": "video",
+					"id": "video",
+					"label": "t:sections.all.video.label"
+				},
+				{
+					"type": "range",
+					"id": "overlay_opacity",
+					"min": 0,
+					"max": 100,
+					"default": 30,
+					"unit": "%",
+					"label": "t:sections.all.overlay_opacity.label"
+				},
+				{
+					"type": "richtext",
+					"id": "description",
+					"default": "<p>Description</p>",
+					"label": "t:sections.all.description.label"
+				},
+				{
+					"type": "header",
+					"content": "t:sections.all.button.header.content"
+				},
+				{
+					"type": "text",
+					"id": "button_label",
+					"default": "Button label",
+					"label": "t:sections.all.button.label.label",
+					"info": "t:sections.all.button.label.info"
+				},
+				{
+					"type": "url",
+					"id": "button_link",
+					"label": "t:sections.all.button.link.label"
+				},
+				{
+					"type": "select",
+					"id": "button_style",
+					"options": [
+						{
+							"value": "primary",
+							"label": "t:sections.all.button.style.options__1.label"
+						},
+						{
+							"value": "secondary",
+							"label": "t:sections.all.button.style.options__2.label"
+						},
+						{
+							"value": "tertiary",
+							"label": "t:sections.all.button.style.options__3.label"
+						}
+					],
+					"default": "tertiary",
+					"label": "t:sections.all.button.style.label"
+				},
+				{
+					"type": "checkbox",
+					"id": "button_arrow",
+					"default": true,
+					"label": "t:sections.all.button.arrow.label"
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "t:sections.multi-slider.presets.name",
+			"blocks": [
+				{
+					"type": "multi-slider_item"
+				},
+				{
+					"type": "multi-slider_item"
+				},
+				{
+					"type": "multi-slider_item"
+				}
+			]
+		}
+	]
+}
+{% endschema %}

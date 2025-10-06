@@ -1,0 +1,256 @@
+<style>
+  /* ================================== */
+  /* Pop-up Modal Styles - START      */
+  /* ================================== */
+
+  /* New styles for the centered price section */
+  .modal-price-section {
+    text-align: center;
+    margin-top: 0rem;
+    margin-bottom: 0rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem 0;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-price-section p {
+    margin: 0;
+    color: #ccc;
+    font-size: 0.9rem;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-price-section .price {
+    font-size: 4.5rem;
+    font-weight: bold;
+    margin: 0.5rem 0;
+    color: #ffffff;
+    justify-content: center;
+    align-items: center;
+  }
+  #discovery-modal-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  #discovery-modal-container.modal-hidden {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  .modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+  }
+
+  .modal-content {
+    position: relative;
+    background: #101021;
+    color: #ffffff;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 550px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  .modal-close:hover {
+    color: #ffffff;
+  }
+
+  .modal-content h3 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.8rem;
+  }
+
+  .modal-subheadline {
+    text-align: center;
+    color: #ccc;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+  }
+
+  .modal-body ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  .modal-body li {
+    margin-bottom: 0.8rem;
+    line-height: 1.5;
+  }
+
+  .modal-footer {
+    text-align: center;
+    margin-top: 2rem;
+  }
+
+  .modal-footer p {
+    margin: 0;
+    color: #ccc;
+    font-size: 0.9rem;
+  }
+
+  .modal-footer .price {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 0.5rem 0;
+  }
+
+  .cta-button {
+    background: linear-gradient(90deg, #5e5ce6, #7a52f4);
+    color: white;
+    border: none;
+    /* CHANGED: Increased padding for a taller and wider button */
+    padding: 1.4rem 2.5rem;
+    border-radius: 8px;
+    /* CHANGED: Increased font size for larger text */
+    font-size: 1.25rem;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(94, 92, 230, 0.4);
+  }
+
+  @media (max-width: 600px) {
+    .modal-content {
+      padding: 1.5rem;
+    }
+    .modal-content h3 {
+      font-size: 1.5rem;
+    }
+    .modal-footer .price {
+      font-size: 2rem;
+    }
+    .cta-button {
+      /* CHANGED: Adjusted padding for smaller screens */
+      padding: 1.2rem 1.8rem;
+      /* CHANGED: Adjusted font size for smaller screens */
+      font-size: 1.1rem;
+    }
+  }
+
+  /* ================================== */
+  /* Pop-up Modal Styles - END        */
+  /* ================================== */
+</style>
+
+<div id="discovery-modal-container" class="modal-hidden">
+  <div class="modal-overlay"></div>
+  <div class="modal-content">
+    <span class="modal-close">&times;</span>
+    <h3>One-Time Discovery Package</h3>
+    <p class="modal-subheadline">Your commitment-free access to a world-class standard of video editing. 
+      This is the perfect first step into the next level. </p>
+    <div class="modal-body">
+      <strong>WHAT YOU'LL RECEIVE</strong>
+      <ul>
+        <li><strong>✓ </strong>Short Form Video x 3</li>
+        <li><strong>✓ </strong>Branded Thumbnail x3</li>
+        <li><strong>✓ </strong>Optimized Caption x 3</li>
+        <li><strong>✓ </strong>Unlimited Revisions</li>
+        <li><strong>✓ </strong>Crystal Clear Audio</li>
+      </ul>
+    </div>
+<div class="modal-price-section">
+  <p>One-Time Purchase</p>
+  <div class="price">$397</div>
+</div>
+
+<div class="modal-footer">
+  <a href="/cart/46400732692708:1" class="cta-button" style="text-decoration: none;">Get Started Now</a>
+</div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const modalContainer = document.getElementById('discovery-modal-container');
+    // If the modal doesn't exist on this page, do nothing.
+    if (!modalContainer) {
+      return;
+    }
+
+    const closeModalBtn = modalContainer.querySelector('.modal-close');
+    const modalOverlay = modalContainer.querySelector('.modal-overlay');
+
+    // --- Standard Functions to Open/Close the Modal ---
+    const openModal = () => {
+      modalContainer.classList.remove('modal-hidden');
+    };
+
+    const closeModal = () => {
+      modalContainer.classList.add('modal-hidden');
+    };
+
+    // --- NEW: Logic for the "Magic URL" ---
+    // Find all links on the page pointing to our magic URL
+    const magicUrlTriggers = document.querySelectorAll('a[href="#open_discovery_modal"]');
+
+    // Add a click listener to each one
+    magicUrlTriggers.forEach(trigger => {
+      trigger.addEventListener('click', (event) => {
+        event.preventDefault(); // Stop the link from trying to jump on the page
+        openModal();
+      });
+    });
+
+    // --- OLD: Logic for any element with the ID (we can keep this as a fallback) ---
+    const idTrigger = document.getElementById('open-discovery-modal');
+    if (idTrigger) {
+        idTrigger.addEventListener('click', (event) => {
+            event.preventDefault();
+            openModal();
+        });
+    }
+
+
+    // --- Event listeners to close the modal ---
+    if (closeModalBtn) {
+      closeModalBtn.addEventListener('click', closeModal);
+    }
+    if (modalOverlay) {
+      modalOverlay.addEventListener('click', closeModal);
+    }
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !modalContainer.classList.contains('modal-hidden')) {
+        closeModal();
+      }
+    });
+  });
+</script>

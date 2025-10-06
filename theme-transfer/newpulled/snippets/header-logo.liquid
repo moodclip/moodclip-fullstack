@@ -1,0 +1,40 @@
+<div class="header-top__logo">
+	{%- if request.page_type == 'index' -%}
+		<h1 class="header__heading">
+			{%- endif -%}
+			<style>
+				:root {
+					--header-logo-width: {{ section.settings.logo_width }}px;
+				}
+			</style>
+			<a href="{{ routes.root_url }}" class="header__heading-link focus-inset">
+				{%- if section.settings.logo != blank -%}
+					{%- assign logo_height = section.settings.logo_width | divided_by: section.settings.logo.aspect_ratio -%}
+					{%- assign logo_alt = section.settings.logo.alt | default: shop.name | escape -%}
+					{%- assign image_size_2x = section.settings.logo_width | times: 2 -%}
+					{% capture srcset %}
+						{{ section.settings.logo | image_url: width: section.settings.logo_width }}, {{ section.settings.logo | image_url: width: image_size_2x }} 2x
+					{% endcapture %}
+					{{ section.settings.logo | image_url: width: section.settings.logo_width | image_tag:
+						class: 'header__heading-logo',
+						srcset: srcset,
+						alt: logo_alt
+					}}
+					{%- if section.settings.logo_2 != blank -%}
+						{% capture srcset %}
+							{{ section.settings.logo_2 | image_url: width: section.settings.logo_width }}, {{ section.settings.logo_2 | image_url: width: image_size_2x }} 2x
+						{% endcapture %}
+						{{ section.settings.logo_2 | image_url: width: section.settings.logo_width | image_tag:
+							class: 'header__heading-logo header__heading-logo--overlay',
+							srcset: srcset,
+							alt: logo_alt
+						}}
+					{%- endif -%}
+				{%- else -%}
+					<span class="h3" style="max-width:{{ section.settings.logo_width }}px">{{ shop.name }}</span>
+				{%- endif -%}
+			</a>
+			{%- if request.page_type == 'index' -%}
+		</h1>
+	{%- endif -%}
+</div>

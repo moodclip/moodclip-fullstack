@@ -1,0 +1,1475 @@
+
+{%- liquid 
+  assign padding_horizontal = section.settings.padding_horizontal
+  assign padding_horizontal_mobile = section.settings.padding_horizontal_mobile
+  assign padding_top = section.settings.padding_top
+  assign padding_bottom = section.settings.padding_bottom
+  assign border_color = section.settings.border_color
+  assign border_thickness = section.settings.border_thickness
+  assign margin_top = section.settings.margin_top
+  assign margin_bottom = section.settings.margin_bottom
+  assign margin_horizontal_mobile = section.settings.margin_horizontal_mobile
+  assign margin_horizontal = section.settings.margin_horizontal
+  assign background_color = section.settings.background_color
+  assign background_gradient = section.settings.background_gradient
+  assign full_width = section.settings.full_width
+  assign content_width = section.settings.content_width
+  assign section_radius = section.settings.section_radius
+
+  assign heading = section.settings.heading
+  assign heading_size = section.settings.heading_size
+  assign heading_size_mobile = section.settings.heading_size_mobile
+  assign heading_color = section.settings.heading_color
+  assign heading_custom = section.settings.heading_custom
+  assign heading_font = section.settings.heading_font
+  assign heading_height = section.settings.heading_height
+  assign heading_align_mobile = section.settings.heading_align_mobile
+  assign heading_align = section.settings.heading_align
+
+  assign row_padding_vertical = section.settings.row_padding_vertical
+  assign row_padding_vertical_mobile = section.settings.row_padding_vertical_mobile
+  assign row_border_thickness = section.settings.row_border_thickness
+  assign row_border_style = section.settings.row_border_style
+  assign border_thickness_between_product = section.settings.border_thickness_between_product
+  assign border_color_between_product = section.settings.border_color_between_product
+  assign row_border_color = section.settings.row_border_color
+
+  assign product_title_size = section.settings.product_title_size
+  assign product_title_size_mobile = section.settings.product_title_size_mobile
+  assign product_title_first_color = section.settings.product_title_first_color
+  assign product_title_second_color = section.settings.product_title_second_color
+  assign product_title_first_hover_color = section.settings.product_title_first_hover_color
+  assign product_title_second_hover_color = section.settings.product_title_second_hover_color
+  assign product_title_custom = section.settings.product_title_custom
+  assign product_title_font = section.settings.product_title_font
+  assign product_title_height = section.settings.product_title_height
+  assign product_title_padding_horizontal = section.settings.product_title_padding_horizontal
+  assign product_title_padding_horizontal_mobile = section.settings.product_title_padding_horizontal_mobile
+  assign product_title_padding_vertical = section.settings.product_title_padding_vertical
+  assign product_title_padding_vertical_mobile = section.settings.product_title_padding_vertical_mobile
+  assign product_title_radius = section.settings.product_title_radius
+  assign product_title_first_bg_color = section.settings.product_title_first_bg_color
+  assign product_title_first_bg_gradient = section.settings.product_title_first_bg_gradient
+  assign product_second_title_bg_color = section.settings.product_second_title_bg_color
+  assign product_second_title_bg_gradient = section.settings.product_second_title_bg_gradient
+
+  assign image_width = section.settings.image_width
+  assign image_width_mobile = section.settings.image_width_mobile
+  assign image_ratio = section.settings.image_ratio
+  assign image_ratio_mobile = section.settings.image_ratio_mobile
+  assign image_radius = section.settings.image_radius
+  assign image_mt = section.settings.image_mt
+  assign image_mt_mobile = section.settings.image_mt_mobile
+
+  assign value_size = section.settings.value_size
+  assign value_size_mobile = section.settings.value_size_mobile
+  assign value_color = section.settings.value_color
+  assign value_custom = section.settings.value_custom
+  assign value_font = section.settings.value_font
+  assign value_height = section.settings.value_height
+
+  assign value_heading_custom = section.settings.value_heading_custom
+  assign value_heading_font = section.settings.value_heading_font
+  assign value_heading_size = section.settings.value_heading_size
+  assign value_heading_size_mobile = section.settings.value_heading_size_mobile
+  assign value_heading_color = section.settings.value_heading_color
+  assign value_heading_height = section.settings.value_heading_height
+
+  assign true_icon = section.settings.true_icon
+  assign false_icon = section.settings.false_icon
+  assign icon_size = section.settings.icon_size
+  assign icon_size_mobile = section.settings.icon_size_mobile
+-%}
+
+{%- style -%}
+  {{  heading_font | font_face: font_display: 'swap' }}
+  {{  value_font | font_face: font_display: 'swap' }}
+  {{  value_heading_font | font_face: font_display: 'swap' }}  
+  {{  product_title_font | font_face: font_display: 'swap' }}
+
+  .section-{{ section.id }} {
+    border-top: solid {{ border_color }} {{ border_thickness }}px;
+    border-bottom: solid {{ border_color }} {{ border_thickness }}px;
+    margin-top: {{ margin_top | times: 0.75 | round: 0 }}px;
+    margin-bottom: {{ margin_bottom | times: 0.75 | round: 0 }}px;
+    margin-left: {{ margin_horizontal_mobile }}rem;
+    margin-right: {{ margin_horizontal_mobile }}rem;
+    border-radius: {{ section_radius | times: 0.6 | round: 0 }}px;
+    overflow: hidden;
+  }
+  
+  .section-{{ section.id }}-settings {
+    margin: 0 auto;
+    padding-top: {{ padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ padding_bottom | times: 0.75 | round: 0 }}px;
+    padding-left: {{ padding_horizontal_mobile }}rem;
+    padding-right: {{ padding_horizontal_mobile }}rem;
+  }
+
+  .comparison-heading-{{ section.id }} {
+    text-align: {{ heading_align_mobile }};
+  }
+
+  .comparison-heading-{{ section.id }} * {
+    margin: 0 0 10px 0;
+    font-size: {{ heading_size_mobile }}px;
+    font-weight: 700;
+    color: {{ heading_color }};
+    line-height: {{ heading_height }}%;
+    text-transform: unset;
+  }
+
+  .comparison-row-{{ section.id }} {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: {{ row_padding_vertical_mobile }}px 0px;
+  }
+
+  .comparison-row-{{ section.id }}:not(:first-child) {
+    border-bottom: {{ row_border_thickness }}px {{ row_border_style }} {{ row_border_color }};
+  }
+
+  .comparison-row-products-{{ section.id }} {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .comparison-row-products-{{ section.id }} .comparison-item-{{ section.id }}:not(:last-child)  {
+    border-right: {{ border_thickness_between_product }}px solid {{ border_color_between_product }};
+  }
+
+  .comparison-item-{{ section.id }} {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .comparison-row-products-{{ section.id }} .comparison-item-{{ section.id }} {
+    padding: 0px 16px;
+  }
+
+  .comparison-item-product-image-{{ section.id }} {
+    text-decoration: none;
+    overflow: hidden;
+    box-sizing: border-box !important;
+    border-radius: {{ image_radius }}px;
+    margin-top: {{ image_mt_mobile }}px;
+    width: 100%;
+    max-width: {{ image_width_mobile }}px;
+  }
+
+  .comparison-item-product-image-{{ section.id }} img,
+  .comparison-item-product-image-{{ section.id }} svg {  
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    margin: 0; 
+  }
+
+  .comparison-item-product-image-{{ section.id }} svg {
+    background: #cecece;
+  }
+
+  .comparison-item-{{ section.id }} {
+    text-align: center;
+  }
+
+  .comparison-body-item-{{ section.id }} {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  .comparison-body-item-{{ section.id }}:first-child {
+    align-items: start;
+  }
+  
+  .comparison-body-item-{{ section.id }}:last-child {
+    align-items: end;
+  }
+
+  .comparison-item-product-title-{{ section.id }} {
+    display: inline-block;
+    margin: 0px;
+    font-size: {{ product_title_size_mobile }}px;
+    line-height: {{ product_title_height }}%;
+    text-transform: unset;
+    transition: all 0.25s ease 0s;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+  }   
+
+  .comparison-item-product-title-{{ section.id }}:hover {
+    transition: all 0.25s ease 0s;
+    color: {{ product_title_hover_color }};
+  }
+  
+  .comparison-row-products-{{ section.id }} .comparison-item-product-title-{{ section.id }} {
+    padding: {{ product_title_padding_vertical_mobile }}px {{ product_title_padding_horizontal_mobile }}px;
+    border-radius: {{ product_title_radius }}px;
+  }
+
+  .comparison-row-products-{{ section.id }} .comparison-item-{{ section.id }}:first-child .comparison-item-product-title-{{ section.id }} {
+    color: {{ product_title_first_color }};
+    background-color: {{ product_title_first_bg_color }};
+    background-image: {{ product_title_first_bg_gradient }};
+  }
+
+  .comparison-row-products-{{ section.id }} .comparison-item-{{ section.id }}:last-child .comparison-item-product-title-{{ section.id }}  {
+    color: {{ product_title_second_color }};
+    background-color: {{ product_second_title_bg_color }};
+    background-image: {{ product_second_title_bg_gradient }};
+  }
+
+  .comparison-row-products-{{ section.id }} .comparison-item-{{ section.id }}:first-child .comparison-item-product-title-{{ section.id }}:hover {
+    color: {{ product_title_first_hover_color }};
+  }
+
+  .comparison-row-products-{{ section.id }} .comparison-item-{{ section.id }}:last-child .comparison-item-product-title-{{ section.id }}:hover {
+    color: {{ product_title_second_hover_color }};
+  }  
+
+  .comparison-value-icon-{{ section.id }} {
+    width: {{ icon_size_mobile }}px;
+    height: {{ icon_size_mobile }}px;
+  }
+
+  .comparison-value-icon-{{ section.id }} img,
+  .comparison-value-icon-{{ section.id }} svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .comparison-value-{{ section.id }} {
+    margin: 0px;
+    font-size: {{ value_size_mobile }}px;
+    color: {{ value_color }};
+    line-height: {{ value_height }}%;
+    text-transform: unset;
+    transition: all 0.25s ease 0s;
+    text-align: center;
+  }
+
+  .comparison-value-heading-{{ section.id }} {
+    margin: 0px;
+    font-size: {{ value_heading_size_mobile }}px;
+    color: {{ value_heading_color }};
+    line-height: {{ value_heading_height }}%;
+    text-transform: unset;
+    transition: all 0.25s ease 0s;
+    text-align: center;
+    font-weight: 700;
+  }
+  
+  @media(min-width: 1024px) {
+
+    .section-{{ section.id }} {
+      margin-top: {{ margin_top }}px;
+      margin-bottom: {{ margin_bottom }}px;
+      margin-left: {{ margin_horizontal }}rem;
+      margin-right: {{ margin_horizontal }}rem;
+      border-radius: {{ section_radius }}px;
+    }
+    
+    .section-{{ section.id }}-settings {
+      padding: 0 5rem;
+      padding-top: {{ padding_top }}px;
+      padding-bottom: {{ padding_bottom }}px;
+      padding-left: {{ padding_horizontal }}rem;
+      padding-right: {{ padding_horizontal }}rem;
+    }
+
+    .comparison-heading-{{ section.id }} {
+      text-align: {{ heading_align }};
+    }
+  
+    .comparison-heading-{{ section.id }} * {
+      font-size: {{ heading_size }}px;
+    }
+
+    .comparison-row-{{ section.id }} {
+      padding: {{ row_padding_vertical }}px 0px;
+    }
+
+    .comparison-value-icon-{{ section.id }} {
+      width: {{ icon_size }}px;
+      height: {{ icon_size }}px;
+    }
+
+    
+    .comparison-value-{{ section.id }} {
+      font-size: {{ value_size }}px;
+    }
+
+    .comparison-value-heading-{{ section.id }} {
+      font-size: {{ value_heading_size }}px;
+    }
+    
+    .comparison-row-products-{{ section.id }} .comparison-item-product-title-{{ section.id }} {
+      padding: {{ product_title_padding_vertical }}px {{ product_title_padding_horizontal }}px;
+    }
+
+    .comparison-item-product-title-{{ section.id }} {
+      font-size: {{ product_title_size }}px;
+    }
+
+    .comparison-item-product-image-{{ section.id }} {
+      margin-top: {{ image_mt }}px;
+      max-width: {{ image_width }}px;
+    }
+  }
+  
+{%- endstyle -%}
+
+{% unless full_width %}
+  <style>
+    .section-{{ section.id }}-settings {
+      max-width: {{ content_width }}px;
+    }
+  </style>
+{% endunless %}
+
+{% if margin_horizontal_mobile > 0 %}
+  <style>
+    .section-{{ section.id }} {
+      border-left: solid {{ border_color }} {{ border_thickness }}px;
+      border-right: solid {{ border_color }} {{ border_thickness }}px;
+    }
+    
+    @media(min-width: 1024px) {
+      .section-{{ section.id }} {
+        border-left: 0px;
+        border-right: 0px;
+      }
+    }
+  </style>
+{% endif %}
+
+{% if margin_horizontal > 0 %}
+  <style>
+    @media(min-width: 1024px) {
+      .section-{{ section.id }} {
+        border-left: solid {{ border_color }} {{ border_thickness }}px;
+        border-right: solid {{ border_color }} {{ border_thickness }}px;
+      }
+    }
+  </style>
+{% endif %}
+
+{% if heading_custom %}
+  <style>
+    .comparison-heading-{{ section.id }} * {
+      font-family: {{ heading_font.family }}, {{ heading_font.fallback_families }};
+      font-weight: {{ heading_font.weight }};
+      font-style: {{ heading_font.style }};
+    }
+  </style>
+{% endif %}
+
+{% if product_title_custom %}
+  <style>
+    .comparison-item-product-title-{{ section.id }} {
+      font-family: {{ product_title_font.family }}, {{ product_title_font.fallback_families }};
+      font-weight: {{ product_title_font.weight }};
+      font-style: {{ product_title_font.style }};
+    }
+  </style>
+{% endif %}
+
+{% if value_custom %}
+  <style>
+    .comparison-value-{{ section.id }} {
+      font-family: {{ value_font.family }}, {{ value_font.fallback_families }};
+      font-weight: {{ value_font.weight }};
+      font-style: {{ value_font.style }};
+    }
+  </style>
+{% endif %}
+
+
+{% if value_heading_custom %}
+  <style>
+    .comparison-value-heading-{{ section.id }} {
+      font-family: {{ value_heading_font.family }}, {{ value_heading_font.fallback_families }};
+      font-weight: {{ value_heading_font.weight }};
+      font-style: {{ value_heading_font.style }};
+    }
+  </style>
+{% endif %}
+
+{% if image_ratio == "portrait" %}
+  <style>
+    @media (min-width: 1024px) {
+      .comparison-item-product-image-{{ section.id }} {
+        aspect-ratio: 9.6/13 !important;
+      }
+    }
+  </style>
+{% elsif image_ratio == "landscape" %}
+  <style>
+    @media (min-width: 1024px) {
+      .comparison-item-product-image-{{ section.id }} {
+        aspect-ratio: 12/8 !important;
+      }
+    }  
+  </style>
+{% elsif image_ratio == "square" %}
+  <style>
+    @media (min-width: 1024px) {
+      .comparison-item-product-image-{{ section.id }} {
+        aspect-ratio: 12/12 !important; 
+      }
+    }
+
+  </style>
+{% else %}
+  <style>
+    @media (min-width: 1024px) {
+      .comparison-item-product-image-{{ section.id }} {
+        aspect-ratio: auto !important;
+      }
+    }
+  </style>
+{% endif %} 
+
+
+{% if image_ratio_mobile == "portrait" %}
+  <style>
+    .comparison-item-product-image-{{ section.id }} {
+      aspect-ratio: 9.6/13;
+    }
+  </style>
+{% elsif image_ratio_mobile == "landscape" %}
+  <style>
+  .comparison-item-product-image-{{ section.id }} {
+    aspect-ratio: 12/8;
+  }
+  </style>
+{% elsif image_ratio_mobile == "square" %}
+  <style>
+    .comparison-item-product-image-{{ section.id }} {
+      aspect-ratio: 12/12;
+    }
+  </style>
+{% else %}
+  <style>
+    .comparison-item-product-image-{{ section.id }} {
+      aspect-ratio: auto;
+    }
+  </style>
+{% endif %} 
+
+<div class="section-{{ section.id }} comparison-{{ section.id }}" style="background-color:{{ background_color }}; background-image: {{ background_gradient }};">
+    <div class="section-{{ section.id }}-settings">
+      {% if heading != blank %}
+        <div class="comparison-heading-{{ section.id }}">
+          {{ heading }}
+        </div>
+      {% endif %}
+      <div class="comparsion-table-{{ section.id }}">
+        {% for block in section.blocks %}
+          {% case block.type %}
+            {% when 'products' %}
+              <div class="comparison-row-{{ section.id }} comparison-row-products-{{ section.id }}">
+                <div class="comparison-item-{{ section.id }}">
+                  <{% if block.settings.first_product != blank %}a href="{{ block.settings.first_product.url }}"{% else %}p{% endif %} class="comparison-item-product-title-{{ section.id }}">
+                    {% if block.settings.first_title != blank %}
+                      {{ block.settings.first_title }}
+                    {% elsif block.settings.first_product.title != blank %}
+                      {{ block.settings.first_product.title }}
+                    {% endif %}
+                  </{% if block.settings.first_product != blank %}a{% else %}p{% endif %}>
+                  <div class="comparison-item-product-image-{{ section.id }}">
+                    {% if block.settings.custom_first_image != blank %}
+                      <img src="{{ block.settings.custom_first_image | image_url }}" alt="{{  block.settings.custom_first_image.alt }}" {% if lazy %}loading="lazy"{% endif %}>
+                    {% elsif block.settings.first_product.featured_image != blank %}
+                      <img src="{{ block.settings.first_product.featured_image | image_url }}" alt="{{ block.settings.first_product.featured_image.alt }}" {% if lazy %}loading="lazy"{% endif %}>
+                    {% else %}
+                      {{ 'image' | placeholder_svg_tag }}
+                    {% endif %}   
+                  </div>                     
+                </div>               
+                <div class="comparison-item-{{ section.id }}">
+                  <{% if block.settings.second_product != blank %}a href="{{ block.settings.second_product.url }}"{% else %}p{% endif %} class="comparison-item-product-title-{{ section.id }}">
+                    {% if block.settings.second_title != blank %}
+                      {{ block.settings.second_title }}
+                    {% elsif block.settings.second_product.title != blank %}
+                      {{ block.settings.second_product.title }}
+                    {% endif %}
+                  </{% if block.settings.second_product != blank %}a{% else %}p{% endif %}>
+                  <div class="comparison-item-product-image-{{ section.id }}">
+                    {% if block.settings.custom_second_image != blank %}
+                      <img src="{{  block.settings.custom_second_image | image_url }}" alt="{{  block.settings.custom_second_image.alt }}" {% if lazy %}loading="lazy"{% endif %}>
+                    {% elsif block.settings.second_product.featured_image != blank %}
+                      <img src="{{ block.settings.second_product.featured_image | image_url }}" alt="{{  block.settings.second_product.featured_image.alt }}" {% if lazy %}loading="lazy"{% endif %}>
+                    {% else %}
+                      {{ 'image' | placeholder_svg_tag }}
+                    {% endif %}   
+                  </div>  
+                </div>
+              </div>
+            
+            {%  when 'values' %}
+              <div class="comparison-row-{{ section.id }} comparison-row-body-{{ section.id }} {% if block.settings.hidden %}hidden-{{ section.id }}{% endif %}">
+                <div class="comparison-item-{{ section.id }} comparison-body-item-{{ section.id }}">
+                  {% if block.settings.first_icon != "none" %}
+                    <div class="comparison-value-icon-{{ section.id }}">
+                      {% if block.settings.first_icon == "yes" %}
+                        {% if true_icon != blank %}
+                          <img src="{{ true_icon | image_url }}" alt="{{ true_icon.alt }}" {% if lazy %}loading="lazy"{% endif %}>
+                        {% else %}
+                          <svg fill="#428f34" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+                            viewBox="0 0 512 512" xml:space="preserve">
+                            <g>
+                              <g>
+                                <path d="M497.02,306.152c0-10.83-3.313-20.9-8.979-29.253C502.442,267.586,512,251.399,512,233.01
+                                  c0-28.808-23.437-52.245-52.245-52.245h-99.093c17.343-35.287,26.412-76.656,26.412-121.197c0-28.812-23.44-52.251-52.252-52.251
+                                  c-28.811,0-52.251,23.44-52.251,52.251c0,67.96-52.064,121.195-118.53,121.195H0v323.92h414.817
+                                  c28.808,0,52.245-23.437,52.245-52.245c0-10.83-3.314-20.9-8.979-29.253c14.401-9.313,23.958-25.501,23.958-43.89
+                                  c0-10.83-3.314-20.901-8.979-29.253C487.463,340.728,497.02,324.541,497.02,306.152z M85.674,473.336H31.347V212.11h54.327
+                                  V473.336z M148.368,473.336h-31.347V212.11h31.347V473.336z M459.755,253.908h-55.387v31.347h40.407
+                                  c11.523,0,20.898,9.375,20.898,20.898c0,11.523-9.375,20.898-20.898,20.898h-40.407v31.347h25.429
+                                  c11.523,0,20.898,9.375,20.898,20.898c0,11.523-9.375,20.898-20.898,20.898h-25.429v31.347h10.449
+                                  c11.523,0,20.898,9.375,20.898,20.898c0,11.523-9.375,20.898-20.898,20.898H179.715v-262.03
+                                  c34.656-3.553,66.527-18.869,91.008-44.027c27.855-28.626,43.196-66.878,43.196-107.711c0-11.526,9.378-20.904,20.904-20.904
+                                  c11.527,0,20.905,9.378,20.905,20.904c0,48.618-11.927,92.628-34.493,127.271l-2.541,3.9v21.373h141.061
+                                  c11.523,0,20.898,9.375,20.898,20.898C480.653,244.533,471.278,253.908,459.755,253.908z"/>
+                              </g>
+                            </g>
+                          </svg>      
+                        {% endif %}                        
+                      {% elsif block.settings.first_icon == "no" %}
+                        {% if false_icon != blank %}
+                          <img src="{{ false_icon | image_url }}" alt="{{ false_icon.alt }}" {% if lazy %}loading="lazy"{% endif %}>
+                        {% else %}
+                          <svg fill="#ff4d4d" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+                            viewBox="0 0 512 512" xml:space="preserve">
+                            <g>
+                              <g>
+                                <path d="M488.042,235.1c5.665-8.352,8.979-18.423,8.979-29.253c0-18.389-9.558-34.577-23.957-43.89
+                                  c5.665-8.352,8.979-18.423,8.979-29.253c0-18.389-9.558-34.577-23.958-43.89c5.665-8.352,8.979-18.423,8.979-29.253
+                                  c0-28.808-23.437-52.245-52.245-52.245H0v323.92h164.042c66.465,0,118.53,53.234,118.53,121.195
+                                  c0,28.812,23.44,52.251,52.251,52.251c28.812,0,52.252-23.44,52.252-52.251c0-44.541-9.07-85.908-26.412-121.197h99.092
+                                  c28.808,0,52.245-23.437,52.245-52.245C512,260.601,502.442,244.414,488.042,235.1z M85.674,299.89H31.347V38.664h54.327V299.89z
+                                  M148.368,299.89h-31.347V38.664h31.347V299.89z M459.755,299.888H318.694v21.373l2.541,3.9
+                                  c22.566,34.643,34.493,78.652,34.493,127.271c0,11.526-9.378,20.904-20.905,20.904c-11.526,0-20.904-9.378-20.904-20.904
+                                  c0-40.834-15.341-79.086-43.196-107.711c-24.481-25.158-56.35-40.473-91.007-44.027V38.664h235.102
+                                  c11.523,0,20.898,9.375,20.898,20.898S426.34,80.46,414.817,80.46h-10.449v31.347h25.429c11.523,0,20.898,9.375,20.898,20.898
+                                  s-9.375,20.898-20.898,20.898h-25.429v31.347h40.407c11.523,0,20.898,9.375,20.898,20.898s-9.375,20.898-20.898,20.898h-40.407
+                                  v31.347h55.387c11.523,0,20.898,9.375,20.898,20.898S471.278,299.888,459.755,299.888z"/>
+                              </g>
+                            </g>
+                          </svg>    
+                        {% endif %}                        
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                  {% if block.settings.first_value != blank %}
+                    <p class="comparison-value-{{ section.id }}">{{ block.settings.first_value }}</p>
+                  {% endif %}
+                </div>    
+                <div class="comparison-item-{{ section.id }}">
+                  <p class="comparison-value-heading-{{ section.id }}">{{ block.settings.heading }}</p>
+                </div>    
+                <div class="comparison-item-{{ section.id }} comparison-body-item-{{ section.id }}">
+                  {% if block.settings.second_icon != "none" %}
+                    <div class="comparison-value-icon-{{ section.id }}">
+                      {% if block.settings.second_icon == "yes" %}
+                        {% if true_icon != blank %}
+                          <img src="{{ true_icon | image_url }}" alt="{{ true_icon.alt }}" {% if lazy %}loading="lazy"{% endif %}>
+                        {% else %}
+                          <svg fill="#428f34" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+                            viewBox="0 0 512 512" xml:space="preserve">
+                            <g>
+                              <g>
+                                <path d="M497.02,306.152c0-10.83-3.313-20.9-8.979-29.253C502.442,267.586,512,251.399,512,233.01
+                                  c0-28.808-23.437-52.245-52.245-52.245h-99.093c17.343-35.287,26.412-76.656,26.412-121.197c0-28.812-23.44-52.251-52.252-52.251
+                                  c-28.811,0-52.251,23.44-52.251,52.251c0,67.96-52.064,121.195-118.53,121.195H0v323.92h414.817
+                                  c28.808,0,52.245-23.437,52.245-52.245c0-10.83-3.314-20.9-8.979-29.253c14.401-9.313,23.958-25.501,23.958-43.89
+                                  c0-10.83-3.314-20.901-8.979-29.253C487.463,340.728,497.02,324.541,497.02,306.152z M85.674,473.336H31.347V212.11h54.327
+                                  V473.336z M148.368,473.336h-31.347V212.11h31.347V473.336z M459.755,253.908h-55.387v31.347h40.407
+                                  c11.523,0,20.898,9.375,20.898,20.898c0,11.523-9.375,20.898-20.898,20.898h-40.407v31.347h25.429
+                                  c11.523,0,20.898,9.375,20.898,20.898c0,11.523-9.375,20.898-20.898,20.898h-25.429v31.347h10.449
+                                  c11.523,0,20.898,9.375,20.898,20.898c0,11.523-9.375,20.898-20.898,20.898H179.715v-262.03
+                                  c34.656-3.553,66.527-18.869,91.008-44.027c27.855-28.626,43.196-66.878,43.196-107.711c0-11.526,9.378-20.904,20.904-20.904
+                                  c11.527,0,20.905,9.378,20.905,20.904c0,48.618-11.927,92.628-34.493,127.271l-2.541,3.9v21.373h141.061
+                                  c11.523,0,20.898,9.375,20.898,20.898C480.653,244.533,471.278,253.908,459.755,253.908z"/>
+                              </g>
+                            </g>
+                          </svg>      
+                        {% endif %}                        
+                      {% elsif block.settings.second_icon == "no" %}
+                        {% if false_icon != blank %}
+                          <img src="{{ false_icon | image_url }}" alt="{{ false_icon.alt }}" {% if lazy %}loading="lazy"{% endif %}>
+                        {% else %}
+                          <svg fill="#ff4d4d" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+                            viewBox="0 0 512 512" xml:space="preserve">
+                            <g>
+                              <g>
+                                <path d="M488.042,235.1c5.665-8.352,8.979-18.423,8.979-29.253c0-18.389-9.558-34.577-23.957-43.89
+                                  c5.665-8.352,8.979-18.423,8.979-29.253c0-18.389-9.558-34.577-23.958-43.89c5.665-8.352,8.979-18.423,8.979-29.253
+                                  c0-28.808-23.437-52.245-52.245-52.245H0v323.92h164.042c66.465,0,118.53,53.234,118.53,121.195
+                                  c0,28.812,23.44,52.251,52.251,52.251c28.812,0,52.252-23.44,52.252-52.251c0-44.541-9.07-85.908-26.412-121.197h99.092
+                                  c28.808,0,52.245-23.437,52.245-52.245C512,260.601,502.442,244.414,488.042,235.1z M85.674,299.89H31.347V38.664h54.327V299.89z
+                                  M148.368,299.89h-31.347V38.664h31.347V299.89z M459.755,299.888H318.694v21.373l2.541,3.9
+                                  c22.566,34.643,34.493,78.652,34.493,127.271c0,11.526-9.378,20.904-20.905,20.904c-11.526,0-20.904-9.378-20.904-20.904
+                                  c0-40.834-15.341-79.086-43.196-107.711c-24.481-25.158-56.35-40.473-91.007-44.027V38.664h235.102
+                                  c11.523,0,20.898,9.375,20.898,20.898S426.34,80.46,414.817,80.46h-10.449v31.347h25.429c11.523,0,20.898,9.375,20.898,20.898
+                                  s-9.375,20.898-20.898,20.898h-25.429v31.347h40.407c11.523,0,20.898,9.375,20.898,20.898s-9.375,20.898-20.898,20.898h-40.407
+                                  v31.347h55.387c11.523,0,20.898,9.375,20.898,20.898S471.278,299.888,459.755,299.888z"/>
+                              </g>
+                            </g>
+                          </svg>    
+                        {% endif %}                        
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                  {% if block.settings.second_value != blank %}
+                    <p class="comparison-value-{{ section.id }}">{{ block.settings.second_value }}</p>
+                  {% endif %}
+                </div>
+              </div>
+
+          {% endcase %}
+        {% endfor %}        
+      </div>
+    </div>
+</div>
+
+{% schema %}
+  {
+    "name": "SC-Comparisontable11",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Heading settings"
+      },
+      {
+        "type": "richtext",
+        "id": "heading",
+        "label": "Heading",
+        "default": "<h2>Heading</h2>"
+      },
+      {
+        "type": "checkbox",
+        "id": "heading_custom",
+        "label": "Use custom font",
+        "default": false
+      },
+      {
+        "type": "font_picker",
+        "id": "heading_font",
+        "label": "Font family",
+        "default": "josefin_sans_n4"
+      },
+      {
+        "type": "range",
+        "id": "heading_size",
+        "min": 0,
+        "max": 72,
+        "step": 2,
+        "unit": "px",
+        "label": "Font size",
+        "default": 44
+      },
+      {
+        "type": "range",
+        "id": "heading_size_mobile",
+        "min": 0,
+        "max": 72,
+        "step": 2,
+        "unit": "px",
+        "label": "Font size - mobile",
+        "default": 28
+      },
+      {
+        "type": "range",
+        "id": "heading_height",
+        "min": 50,
+        "max": 200,
+        "step": 10,
+        "unit": "%",
+        "label": "Line height",
+        "default": 130
+      },
+      {
+        "type": "text_alignment",
+        "id": "heading_align",
+        "label": "Alignment",
+        "default": "center"
+      },
+      {
+        "type": "text_alignment",
+        "id": "heading_align_mobile",
+        "label": "Alignment - mobile",
+        "default": "center"
+      },
+      {
+        "type": "header",
+        "content": "Row settings"
+      },
+      {
+        "type": "range",
+        "id": "row_padding_vertical",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Padding vertical",
+        "default": 24
+      },
+      {
+        "type": "range",
+        "id": "row_padding_vertical_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Padding vertical - mobile",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "row_border_thickness",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "unit": "px",
+        "label": "Border thickness",
+        "default": 1
+      },      
+      {
+        "type": "select",
+        "id": "row_border_style",
+        "label": "Border style",
+        "default": "dashed",
+        "options": [
+          {
+            "label": "Solid",
+            "value": "solid"
+          },
+          {
+            "label": "Dotted",
+            "value": "dotted"
+          },
+          {
+            "label": "Dashed",
+            "value": "dashed"
+          }
+        ]
+      },
+      {
+        "type": "range",
+        "id": "border_thickness_between_product",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "unit": "px",
+        "label": "Border thickness between products",
+        "default": 1
+      },       
+      {
+        "type": "header",
+        "content": "Product title settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "product_title_custom",
+        "label": "Use custom font",
+        "default": false
+      },
+      {
+        "type": "font_picker",
+        "id": "product_title_font",
+        "label": "Font family",
+        "default": "josefin_sans_n4"
+      },
+      {
+        "type": "range",
+        "id": "product_title_size",
+        "min": 0,
+        "max": 72,
+        "step": 2,
+        "unit": "px",
+        "label": "Font size",
+        "default": 20
+      },
+      {
+        "type": "range",
+        "id": "product_title_size_mobile",
+        "min": 0,
+        "max": 72,
+        "step": 2,
+        "unit": "px",
+        "label": "Font size - mobile",
+        "default": 14
+      },
+      {
+        "type": "range",
+        "id": "product_title_height",
+        "min": 50,
+        "max": 200,
+        "step": 10,
+        "unit": "%",
+        "label": "Line height",
+        "default": 130
+      },
+      {
+        "type": "range",
+        "id": "product_title_padding_horizontal",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Padding horizontal",
+        "default": 24
+      },
+      {
+        "type": "range",
+        "id": "product_title_padding_horizontal_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Padding horizontal - mobile",
+        "default": 12
+      },
+      {
+        "type": "range",
+        "id": "product_title_padding_vertical",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Padding vertical",
+        "default": 12
+      },
+      {
+        "type": "range",
+        "id": "product_title_padding_vertical_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Padding vertical - mobile",
+        "default": 8
+      },
+      {
+        "type": "range",
+        "id": "product_title_radius",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Roundness",
+        "default": 100
+      },
+      {
+        "type": "header",
+        "content": "Product image settings"
+      },
+      {
+        "type": "range",
+        "id": "image_width",
+        "min": 5,
+        "max": 400,
+        "step": 5,
+        "unit": "px",
+        "label": "Width",
+        "default": 250
+      }, 
+      {
+        "type": "range",
+        "id": "image_width_mobile",
+        "min": 50,
+        "max": 150,
+        "step": 5,
+        "unit": "px",
+        "label": "Width - mobile",
+        "default": 150
+      },  
+      {
+        "type": "select",
+        "id": "image_ratio",
+        "label": "Aspect ratio",
+        "default": "square",
+        "options": [
+          {
+            "label": "Portrait",
+            "value": "portrait"
+          },
+          {
+            "label": "Square",
+            "value": "square"
+          },
+          {
+            "label": "Landscape",
+            "value": "landscape"
+          },
+          {
+            "label": "Original",
+            "value": "original"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "id": "image_ratio_mobile",
+        "label": "Aspect ratio - mobile",
+        "default": "square",
+        "options": [
+          {
+            "label": "Portrait",
+            "value": "portrait"
+          },
+          {
+            "label": "Square",
+            "value": "square"
+          },
+          {
+            "label": "Landscape",
+            "value": "landscape"
+          },
+          {
+            "label": "Original",
+            "value": "original"
+          }
+        ]
+      },
+      {
+        "type": "range",
+        "id": "image_radius",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Roundness",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "image_mt",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Margin top",
+        "default": 40
+      },
+      {
+        "type": "range",
+        "id": "image_mt_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Margin top - mobile",
+        "default": 20
+      },
+      {
+        "type": "header",
+        "content": "Value icon settings"
+      },
+      {
+        "type": "image_picker",
+        "id": "true_icon",
+        "label": "Custom true icon"        
+      },
+      {
+        "type": "image_picker",
+        "id": "false_icon",
+        "label": "Custom false icon"        
+      },
+      {
+        "type": "range",
+        "id": "icon_size",
+        "min": 10,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Size",
+        "default": 24
+      },
+      {
+        "type": "range",
+        "id": "icon_size_mobile",
+        "min": 10,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Size - mobile",
+        "default": 24
+      }, 
+      {
+        "type": "header",
+        "content": "Value settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "value_custom",
+        "label": "Use custom font",
+        "default": false
+      },
+      {
+        "type": "font_picker",
+        "id": "value_font",
+        "label": "Font family",
+        "default": "josefin_sans_n4"
+      },
+      {
+        "type": "range",
+        "id": "value_size",
+        "min": 0,
+        "max": 72,
+        "step": 2,
+        "unit": "px",
+        "label": "Font size",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "value_size_mobile",
+        "min": 0,
+        "max": 72,
+        "step": 2,
+        "unit": "px",
+        "label": "Font size - mobile",
+        "default": 14
+      },
+      {
+        "type": "range",
+        "id": "value_height",
+        "min": 50,
+        "max": 200,
+        "step": 10,
+        "unit": "%",
+        "label": "Line height",
+        "default": 150
+      },
+      {
+        "type": "header",
+        "content": "Row heading settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "value_heading_custom",
+        "label": "Use custom font",
+        "default": false
+      },
+      {
+        "type": "font_picker",
+        "id": "value_heading_font",
+        "label": "Font family",
+        "default": "josefin_sans_n4"
+      },
+      {
+        "type": "range",
+        "id": "value_heading_size",
+        "min": 0,
+        "max": 72,
+        "step": 2,
+        "unit": "px",
+        "label": "Font size",
+        "default": 20
+      },
+      {
+        "type": "range",
+        "id": "value_heading_size_mobile",
+        "min": 0,
+        "max": 72,
+        "step": 2,
+        "unit": "px",
+        "label": "Font size - mobile",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "value_heading_height",
+        "min": 50,
+        "max": 200,
+        "step": 10,
+        "unit": "%",
+        "label": "Line height",
+        "default": 150
+      },
+      {
+        "type": "header",
+        "content": "First title colors"
+      },
+      {
+        "type": "color",
+        "label": "Title",
+        "id": "product_title_first_color",
+        "default": "#000000"
+      },   
+      {
+        "type": "color",
+        "label": "Title hover",
+        "id": "product_title_first_hover_color",
+        "default": "#000000"
+      },
+      {
+        "type": "color",
+        "label": "Background",
+        "id": "product_title_first_bg_color",
+        "default": "#F4F4F4"
+      },   
+      {
+        "type": "color_background",
+        "label": "Background gradient",
+        "id": "product_title_first_bg_gradient",
+        "default": "linear-gradient(180deg, rgba(249,253,224,1) 0%, rgba(231,254,218,1) 100%)",
+        "info": "Remove gradient to replace with solid colors"
+      },  
+      {
+        "type": "header",
+        "content": "Second title colors"
+      },
+      {
+        "type": "color",
+        "label": "Title",
+        "id": "product_title_second_color",
+        "default": "#000000"
+      },   
+      {
+        "type": "color",
+        "label": "Title hover",
+        "id": "product_title_second_hover_color",
+        "default": "#000000"
+      },
+      {
+        "type": "color",
+        "label": "Background",
+        "id": "product_second_title_bg_color",
+        "default": "#F4F4F4"
+      },   
+      {
+        "type": "color_background",
+        "label": "Background gradient",
+        "id": "product_second_title_bg_gradient"
+      },
+      {
+        "type": "header",
+        "content": "Row colors"
+      },
+      {
+        "type": "color",
+        "label": "Heading",
+        "id": "value_heading_color",
+        "default": "#000000"
+      },
+      {
+        "type": "color",
+        "label": "Value",
+        "id": "value_color",
+        "default": "#000000"
+      },
+      {
+        "type": "color",
+        "label": "Border",
+        "id": "row_border_color",
+        "default": "#DBDBDB"
+      },
+      {
+        "type": "color",
+        "label": "Border between products",
+        "id": "border_color_between_product",
+        "default": "#DBDBDB"
+      },
+      {
+        "type": "header",
+        "content": "Section colors"
+      },
+      {
+        "type": "color",
+        "label": "Heading",
+        "id": "heading_color",
+        "default": "#000000"
+      },
+      {
+        "type": "color",
+        "label": "Section background",
+        "id": "background_color",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color_background",
+        "id": "background_gradient",
+        "label": "Section background gradient"
+      },
+      {
+        "type": "color",
+        "label": "Border",
+        "id": "border_color",
+        "default": "#000000"
+      },
+      {
+        "type": "header",
+        "content": "Section margin (outside)"
+      },
+      {
+        "type": "range",
+        "id": "margin_top",
+        "min": 0,
+        "max": 100,
+        "step": 4,
+        "unit": "px",
+        "label": "Margin top",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "margin_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 4,
+        "unit": "px",
+        "label": "Margin bottom",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "margin_horizontal",
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "unit": "rem",
+        "label": "Margin sides",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "margin_horizontal_mobile",
+        "min": 0,
+        "max": 15,
+        "step": 0.5,
+        "unit": "rem",
+        "label": "Margin sides mobile",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Section padding (inside)"
+      },
+      {
+        "type": "range",
+        "id": "padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 4,
+        "unit": "px",
+        "label": "Padding top",
+        "default": 36
+      },
+      {
+         "type": "range",
+         "id": "padding_bottom",
+         "min": 0,
+         "max": 100,
+         "step": 4,
+         "unit": "px",
+         "label": "Padding bottom",
+         "default": 36
+      },
+      {
+        "type": "range",
+        "id": "padding_horizontal",
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "unit": "rem",
+        "label": "Padding sides",
+        "default": 5
+      },
+      {
+        "type": "range",
+        "id": "padding_horizontal_mobile",
+        "min": 0,
+        "max": 15,
+        "step": 0.5,
+        "unit": "rem",
+        "label": "Padding sides mobile",
+        "default": 1.5
+      },
+      {
+        "type": "header",
+        "content": "Section settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "full_width",
+        "label": "Full width",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "content_width",
+        "min": 800,
+        "max": 2000,
+        "step": 100,
+        "unit": "px",
+        "label": "Section content width",
+        "default": 800
+      },
+      {
+        "type": "range",
+        "id": "border_thickness",
+        "min": 0,
+        "max": 50,
+        "step": 1,
+        "unit": "px",
+        "label": "Border thickness",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_radius",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Section roundness",
+        "default": 0
+      }
+    ],
+    "blocks": [
+      {
+        "type": "products",
+        "name": "Products",
+        "settings": [
+          {
+            "type": "product",
+            "id": "first_product",
+            "label": "First product"
+          },
+          {
+            "type": "text",
+            "id": "first_title",
+            "label": "First title",
+            "default": "First product",
+            "info": "Leave blank to use product title"
+          },
+          {
+            "type": "image_picker",
+            "id": "custom_first_image",
+            "label": "Custom first image",
+            "info": "Leave blank to use product image"
+          },          
+          {
+            "type": "product",
+            "id": "second_product",
+            "label": "Second product"
+          },
+          {
+            "type": "text",
+            "id": "second_title",
+            "label": "Second title",
+            "default": "Second product",
+            "info": "Leave blank to use product title"
+          },
+          {
+            "type": "image_picker",
+            "id": "custom_second_image",
+            "label": "Custom second image",
+            "info": "Leave blank to use product image"
+          }
+        ]
+      },
+      {
+        "type": "values",
+        "name": "Values",
+        "settings": [
+          {
+            "type": "select",
+            "id": "first_icon",
+            "label": "First value icon",
+            "default": "yes",
+            "options": [
+              {
+                "label": "Yes",
+                "value": "yes"
+              },
+              {
+                "label": "No",
+                "value": "no"
+              },
+              {
+                "label": "None",
+                "value": "none"
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "id": "first_value",
+            "label": "First value"
+          },
+          {
+            "type": "text",
+            "id": "heading",
+            "label": "Heading",
+            "default": "Row heading"
+          },
+          {
+            "type": "select",
+            "id": "second_icon",
+            "label": "Second value icon",
+            "default": "no",
+            "options": [
+              {
+                "label": "Yes",
+                "value": "yes"
+              },
+              {
+                "label": "No",
+                "value": "no"
+              },
+              {
+                "label": "None",
+                "value": "none"
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "id": "second_value",
+            "label": "Second value"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "SC-Comparisontable11",
+        "blocks": [
+          {
+            "type": "products"
+          },
+          {
+            "type": "values",
+            "settings": {
+              "heading": "Value 1"
+            }
+          },
+          {
+            "type": "values",
+            "settings": {
+              "heading": "Value 2"
+            }
+          },
+          {
+            "type": "values",
+            "settings": {
+              "heading": "Value 3"
+            }
+          },
+        ]
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,84 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "custom.overlay",
+  "name": "t:sections.overlay-group.name",
+  "sections": {
+    "popup_i9rtN7": {
+      "type": "popup",
+      "blocks": {
+        "popup_heading_8ngMyp": {
+          "type": "popup_heading",
+          "settings": {
+            "heading": "Almost There!"
+          }
+        },
+        "popup_text_riKq4M": {
+          "type": "popup_text",
+          "settings": {
+            "text": ""
+          }
+        },
+        "subscribe_form_rLH6Dj": {
+          "type": "subscribe_form",
+          "settings": {
+            "placeholder_input": "E-mail",
+            "show_email": true,
+            "button_label": "Subscribe",
+            "button_action": "accept",
+            "button_link": "",
+            "button_style": "primary",
+            "additional_text": ""
+          }
+        }
+      },
+      "block_order": [
+        "popup_heading_8ngMyp",
+        "popup_text_riKq4M",
+        "subscribe_form_rLH6Dj"
+      ],
+      "disabled": true,
+      "settings": {
+        "color_scheme": "",
+        "image_layout": "top",
+        "image_fit": "contain",
+        "ticker_text": "Some text",
+        "ticker_speed": 5,
+        "alignment": "left",
+        "limit-display": 1,
+        "limit-cache": 30,
+        "position": "center",
+        "full-height": false,
+        "popup-id": "",
+        "trigger-open": "delay",
+        "trigger-open-delay": 4,
+        "open-scroll-type": "%",
+        "open-scroll-position": 50,
+        "manual-selector": "",
+        "trigger-close": "none",
+        "trigger-close-delay": 30,
+        "close-scroll-type": "%",
+        "close-scroll-position": 50,
+        "width": 460,
+        "open-animation": "Slide",
+        "exit-animation": "Slide",
+        "show-overlay": true,
+        "mobile": false,
+        "scrolling": false,
+        "overlay-close": false,
+        "esc-close": false,
+        "f4-close": false
+      }
+    }
+  },
+  "order": [
+    "popup_i9rtN7"
+  ]
+}

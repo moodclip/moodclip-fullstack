@@ -1,0 +1,1 @@
+.list-social{display:flex}.list-social a{padding:.4rem}@media screen and (min-width: 990px){.list-social{justify-content:flex-start}}.list-social__item .icon{height:2.4rem;width:2.4rem;color:rgba(var(--color-social));transition:var(--duration-default)}.list-social__item:hover .icon{opacity:.5}.list-social__link{align-items:center;display:flex}

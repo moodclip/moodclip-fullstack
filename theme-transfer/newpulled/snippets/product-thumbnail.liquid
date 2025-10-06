@@ -1,0 +1,161 @@
+{% comment %}
+    Renders a product thumbnail with a modal-opener
+
+    Accepts:
+    - media: {Object} Product Media object
+    - position: {String} Position of the media. Used for accessible label.
+    - modal_id: {String} The product modal that will be shown by clicking the thumbnail
+
+    Usage:
+    {% render 'product-thumbnail',
+      media: media,
+      position: forloop.index,
+      modal_id: section.id
+    %}
+{% endcomment %}
+
+<noscript>
+  {%- if media.media_type == 'video' or media.media_type == 'external_video' -%}
+    <a href="{% if media.media_type == 'video' %}{{ media.sources[1].url }}{% else %}{{ media | external_video_url }}{% endif %}" aria-label="{{ 'products.product.video_exit_message' | t: title: product.title | escape }}">
+      <span class="product__media-icon motion-reduce">{% render 'icon-play' %}</span>
+      <div class="product__media media" style="padding-top: {{ 1 | divided_by: media.preview_image.aspect_ratio | times: 100 }}%;">
+        {% assign image_height = 1
+					| divided_by: media.preview_image.aspect_ratio
+				%}
+				{{
+					media.preview_image
+					| image_url: width: 3840
+					| image_tag:
+						loading: 'lazy',
+						width: media.preview_image.width,
+						height: image_height,
+						sizes: '100vw, (min-width: 1023px) 50vw',
+						widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+				}}
+      </div>
+    </a>
+  {%- else -%}
+    <div class="product__media media" style="padding-top: {{ 1 | divided_by: media.preview_image.aspect_ratio | times: 100 }}%;">
+      {% assign image_height = 1 | divided_by: media.preview_image.aspect_ratio %}
+			{{
+				media.preview_image
+				| image_url: width: 3840
+				| image_tag:
+					loading: 'lazy',
+					width: media.preview_image.width,
+					height: image_height,
+					sizes: '100vw, (min-width: 1023px) 50vw',
+					widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+			}}
+    </div>
+  {%- endif -%}
+</noscript>
+
+<modal-opener class="product__modal-opener product__modal-opener--{{ media.media_type }} no-js-hidden" data-modal="#ProductModal-{{ modal_id }}">
+  <span class="product__media-icon motion-reduce" aria-hidden="true">
+    {%- liquid
+      case media.media_type
+        when 'video' or 'external_video'
+          render 'icon-play'
+        when 'model'
+          render 'icon-3d-model'
+        else
+          render 'icon-plus'
+      endcase
+    -%}
+  </span>
+
+  <div class="product__media">
+    {% assign image_height = media.preview_image.width
+			| divided_by: media.preview_image.aspect_ratio
+		%}
+		{{
+		media.preview_image
+		| image_url: width: 3840
+		| image_tag:
+		loading: 'lazy',
+		width: media.preview_image.width,
+		height: image_height,
+		sizes: '100vw, (min-width: 1023px) 50vw',
+		widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+		}}
+  </div>
+  <button class="product__media-toggle" type="button" aria-haspopup="dialog" data-media-id="{{ media.id }}">
+  <span class="visually-hidden">
+    {%- if position == 'featured' %}
+      {{ 'products.product.media.open_featured_media' | t }}
+    {%- else -%}
+      {{ 'products.product.media.open_media' | t: index: position }}
+    {%- endif -%}
+  </span>
+  </button>
+</modal-opener>
+
+{%- if media.media_type != 'image' -%}
+	<div class="product__media product__media-deferred" style="padding-bottom: 0;" data-media-id="{{ media.id }}">
+  {%- if media.media_type == 'model' -%}
+    <product-model class="deferred-media media no-js-hidden" style="padding-bottom: {{ 1 | divided_by: media.preview_image.aspect_ratio | times: 100 }}%;" data-media-id="{{ media.id }}">
+  {%- else -%}
+    <deferred-media class="deferred-media media no-js-hidden" style="padding-bottom: {{ 1 | divided_by: media.preview_image.aspect_ratio | times: 100 }}%;" data-media-id="{{ media.id }}">
+  {%- endif -%}
+  <button id="Deferred-Poster-Modal-{{ media.id }}" class="deferred-media__poster" type="button">
+    <span class="deferred-media__poster-button motion-reduce">
+      {%- if media.media_type == 'model' -%}
+        <span class="visually-hidden">{{ 'products.product.media.play_model' | t }}</span>
+        {%- render 'icon-3d-model' -%}
+      {%- else -%}
+        <span class="visually-hidden">{{ 'products.product.media.play_video' | t }}</span>
+        {%- render 'icon-play' -%}
+      {%- endif -%}
+    </span>
+		{% assign image_height = media.preview_image
+			| divided_by: media.preview_image.aspect_ratio
+		%}
+		{{
+			media.preview_image
+			| image_url: width: 3840
+			| image_tag:
+				loading: 'lazy',
+				width: media.preview_image.width,
+				height: image_height,
+				sizes: '100vw, (min-width: 1023px) 50vw',
+				widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+		}}
+  </button>
+  <template>
+    {%- liquid
+      case media.media_type
+        when 'external_video'
+          assign video_class = 'js-' | append: media.host
+          if media.host == 'youtube'
+            echo media | external_video_url: autoplay: true, playlist: media.external_id | external_video_tag: class: video_class, loading: "lazy"
+          else
+            echo media | external_video_url: autoplay: true, loop: loop | external_video_tag: class: video_class, loading: "lazy"
+          endif
+        when 'video'
+          echo media | media_tag: image_size: "2048x", autoplay: true, controls: true, preload: "none", autoplay: true, muted: false
+        when 'model'
+          echo media | media_tag: image_size: "2048x", toggleable: true
+      endcase
+    -%}
+  </template>
+
+  {%- if media.media_type == 'model' -%}
+    </product-model>
+    <button
+      class="button button--full-width product__xr-button"
+      type="button"
+      aria-label="{{ 'products.product.xr_button_label' | t }}"
+      data-shopify-xr
+      data-shopify-model3d-id="{{ media.id }}"
+      data-shopify-title="title"
+      data-shopify-xr-hidden
+    >
+      {% render 'icon-3d-model' %}
+      {{ 'products.product.xr_button' | t }}
+    </button>
+  {%- else -%}
+    </deferred-media>
+  {%- endif -%}
+</div>
+{%- endif -%}

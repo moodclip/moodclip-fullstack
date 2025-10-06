@@ -1,0 +1,305 @@
+{% layout none %}
+
+<!doctype html>
+<html
+	lang="{{ request.locale.iso_code }}"
+	data-scheme="{{ settings.color_scheme }}"
+	class="no-js"
+>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<meta name="theme-color" content="">
+		<link rel="canonical" href="{{ canonical_url }}">
+		<link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+		<script src="{{ 'vendor/qrcode.js' | shopify_asset_url }}" defer></script>
+
+		{%- if settings.favicon != blank -%}
+			<link
+				rel="icon"
+				type="image/png"
+				href="{{ settings.favicon | img_url: '32x32' }}"
+			>
+		{%- endif -%}
+
+		{%- unless settings.type_header_font.system? -%}
+			<link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+		{%- endunless -%}
+
+		<title>{{ page_title }}</title>
+
+		{% if page_description %}
+			<meta name="description" content="{{ page_description | escape }}">
+		{% endif %}
+
+		{% render 'meta-tags' %}
+
+		<script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
+
+		{{ content_for_header }}
+
+		{% render 'vars' %}
+
+		{{ 'swiper-bundle.min.css' | asset_url | stylesheet_tag }}
+		{{ 'template-giftcard.css' | asset_url | stylesheet_tag }}
+		{{ 'base.css' | asset_url | stylesheet_tag }}
+
+		{%- unless settings.type_body_font.system? -%}
+			<link
+				rel="preload"
+				as="font"
+				href="{{ settings.type_body_font | font_url }}"
+				type="font/woff2"
+				crossorigin
+			>
+		{%- endunless -%}
+		{%- unless settings.type_header_font.system? -%}
+			<link
+				rel="preload"
+				as="font"
+				href="{{ settings.type_header_font | font_url }}"
+				type="font/woff2"
+				crossorigin
+			>
+		{%- endunless -%}
+		<script>
+			let cscoDarkMode = {};
+
+			(function () {
+				const body = document.querySelector('html[data-scheme]');
+
+				cscoDarkMode = {
+					init: function (e) {
+						this.initMode(e);
+						window
+							.matchMedia('(prefers-color-scheme: dark)')
+							.addListener((e) => {
+								this.initMode(e);
+							});
+
+						window.addEventListener('load', () => {
+							document
+								.querySelectorAll('.header__toggle-scheme')
+								.forEach((el) => {
+									el.addEventListener('click', (e) => {
+										e.preventDefault();
+										if ('auto' === body.getAttribute('data-scheme')) {
+											if (
+												window.matchMedia('(prefers-color-scheme: dark)')
+													.matches
+											) {
+												cscoDarkMode.changeScheme('light', true);
+											} else if (
+												window.matchMedia('(prefers-color-scheme: light)')
+													.matches
+											) {
+												cscoDarkMode.changeScheme('dark', true);
+											}
+										} else {
+											if ('dark' === body.getAttribute('data-scheme')) {
+												cscoDarkMode.changeScheme('light', true);
+											} else {
+												cscoDarkMode.changeScheme('dark', true);
+											}
+										}
+									});
+								});
+						});
+					},
+					initMode: function (e) {
+						let siteScheme = false;
+						switch (
+							'{{ settings.color_scheme }}' // Field. User’s system preference.
+						) {
+							case 'dark':
+								siteScheme = 'dark';
+								break;
+							case 'light':
+								siteScheme = 'light';
+								break;
+							case 'system':
+								siteScheme = 'auto';
+								break;
+						}
+						if (siteScheme && siteScheme !== body.getAttribute('data-scheme')) {
+							this.changeScheme(siteScheme, false);
+						}
+					},
+					changeScheme: function (siteScheme, cookie) {
+						body.classList.add('scheme-toggled');
+						body.setAttribute('data-scheme', siteScheme);
+						if (cookie) {
+							localStorage.setItem('_color_schema', siteScheme);
+						}
+						setTimeout(() => {
+							body.classList.remove('scheme-toggled');
+						}, 100);
+					},
+				};
+			})();
+
+			cscoDarkMode.init();
+
+			document.addEventListener('shopify:section:load', function () {
+				setTimeout(() => {
+					cscoDarkMode.init();
+				}, 100);
+			});
+		</script>
+	</head>
+
+	<body>
+		{% section 'gift-card-header' %}
+		<main class="main" id="MainContent">
+			<section class="shopify-section gift-card">
+				<h1 class="gift-card__heading">
+					{{ 'gift_cards.issued.subtext' | t }}
+				</h1>
+				<div class="gift-card__price">
+					<p>
+						{% if settings.currency_code_enabled %}
+							{{ gift_card.initial_value | money_with_currency }}
+						{% else %}
+							{{ gift_card.initial_value | money }}
+						{% endif %}
+					</p>
+					{%- if gift_card.enabled == false or gift_card.expired -%}
+						<p class="gift-card__label badge">
+							{{ 'gift_cards.issued.expired' | t }}
+						</p>
+					{%- endif -%}
+				</div>
+
+				{% if settings.currency_code_enabled %}
+					{%- assign gift_card_balance = gift_card.balance
+						| money_with_currency
+					-%}
+				{% else %}
+					{%- assign gift_card_balance = gift_card.balance | money -%}
+				{% endif %}
+				{%- if gift_card.balance != gift_card.initial_value -%}
+					<p class="gift-card__label caption-large">
+						{{
+							'gift_cards.issued.remaining_html'
+							| t: balance: gift_card_balance
+						}}
+					</p>
+				{%- endif -%}
+				<div class="gift-card__image-wrapper">
+					<img
+						src="{{ 'gift-card/card.svg' | shopify_asset_url }}"
+						alt=""
+						class="gift-card__image"
+						height="{{ 400 | divided_by: 1.5 }}"
+						width="400"
+						loading="lazy"
+					>
+				</div>
+				<div
+					class="gift-card__qr-code"
+					data-identifier="{{ gift_card.qr_identifier }}"
+				></div>
+				<div class="gift-card__information">
+					<div class="field gift-card__field">
+						<input
+							type="text"
+							class="gift-card__number"
+							value="{{ gift_card.code | format_code }}"
+							aria-label="{{ 'gift_cards.issued.gift_card_code' | t }}"
+							readonly
+						>
+					</div>
+					<div class="gift-card__copy-code">
+						<button
+							class="link gift-card__copy-link button button--simple"
+							id="copy_code"
+						>
+							<span class="button-label">
+								{{- 'gift_cards.issued.copy_code' | t -}}
+							</span>
+						</button>
+						<span
+							class="gift-card__copy-success form__message"
+							role="status"
+						></span>
+						<template>
+							{%- render 'icon-success' -%}
+							{{ 'gift_cards.issued.copy_code_success' | t }}
+						</template>
+					</div>
+					{%- if gift_card.pass_url -%}
+						<a href="{{ gift_card.pass_url }}" class="gift_card__apple-wallet">
+							<img
+								src="{{ 'gift-card/add-to-apple-wallet.svg' | shopify_asset_url }}"
+								width="120"
+								height="40"
+								alt="{{ 'gift_cards.issued.add_to_apple_wallet' | t }}"
+								loading="lazy"
+							>
+						</a>
+					{%- endif -%}
+					<div class="gift-card__buttons no-print">
+						<a
+							href="{{ request.origin }}"
+							class="button button--full-width button--primary"
+							target="_blank"
+							rel="noopener"
+							aria-describedby="a11y-new-window-message"
+						>
+							{{- 'gift_cards.issued.shop_link' | t -}}
+						</a>
+						<button
+							class="button button--tertiary"
+							onclick="window.print();"
+						>
+							{{- 'gift_cards.issued.print_gift_card' | t -}}
+						</button>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<div hidden>
+			<span id="a11y-new-window-message">
+				{{- 'accessibility.link_messages.new_window' | t -}}
+			</span>
+		</div>
+	</body>
+</html>
+
+<script>
+	const string = {qrImageAlt: {{ 'gift_cards.issued.qr_image_alt' | t | json }} };
+	document.addEventListener('DOMContentLoaded', function () {
+		QRCodeContainer = document.querySelector('.gift-card__qr-code');
+		if (QRCodeContainer) {
+			new QRCode(QRCodeContainer, {
+				text: QRCodeContainer.dataset.identifier,
+				width: 120,
+				height: 120,
+				imageAltText: string.qrImageAlt
+			});
+		}
+	});
+
+	const template = document.getElementsByTagName("template")[0];
+	const clonedTemplate = template.content.cloneNode(true);
+	const copyCode = document.querySelector("#copy_code");
+	const copyText = document.querySelector('.gift-card__number').value;
+	let isMessageDisplayed = false;
+	copyCode.onclick = function() {
+		copy(this)
+	}
+	function copy(that){
+		let inp = document.createElement('input');
+		document.body.appendChild(inp);
+		inp.value = copyText
+		inp.select();
+		document.execCommand('copy',false);
+		inp.remove();
+		if (!isMessageDisplayed) {
+			document.querySelector('.gift-card__copy-success').appendChild(clonedTemplate);
+			isMessageDisplayed = true
+		}
+	}
+</script>

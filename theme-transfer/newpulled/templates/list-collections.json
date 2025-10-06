@@ -1,0 +1,37 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-list-collections",
+      "settings": {
+        "collection_per_page": 9,
+        "per_row": 2,
+        "sort": "alphabetical",
+        "image_ratio": "portrait",
+        "card_type": "overlay",
+        "hover_effect": "zoom",
+        "text_horizontal": "center",
+        "overlay_opacity": 20,
+        "heading_size": "h2",
+        "desc_size": "medium-font",
+        "text_animation": true,
+        "show_collection_desc": true,
+        "show_collection_button": true,
+        "button_arrow": true,
+        "margin_top": "no-indent",
+        "margin_bottom": "m"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

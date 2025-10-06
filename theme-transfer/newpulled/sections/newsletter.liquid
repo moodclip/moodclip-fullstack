@@ -1,0 +1,309 @@
+{{ 'component-newsletter.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+	{% render 'section-padding' %}
+	{% render 'section-margin' %}
+{%- endstyle -%}
+
+<div class="newsletter section-{{ section.id }}-padding color-{{ section.settings.color_scheme }} background">
+	<div class="container">
+		<div class="newsletter__form content_position-{{ section.settings.position }}">
+			<h3 class="newsletter__title h3 title--section title--section-m-none">
+				{{ section.settings.heading }}
+			</h3>
+			{%- if section.settings.text != blank -%}
+				<div class="newsletter__information richtext__content large-font">
+					{{ section.settings.text }}
+				</div>
+			{%- endif -%}
+			{% form 'customer', class: 'newsletter-form' %}
+				<div class="newsletter-form__inner">
+					<input type="hidden" name="contact[tags]" value="newsletter">
+					<div class="newsletter-form__field-wrapper">
+						<div class="field">
+							<input
+								id="NewsletterForm--{{ section.id }}"
+								type="email"
+								name="contact[email]"
+								class="field__input field"
+								value="{{ form.email }}"
+								aria-required="true"
+								autocorrect="off"
+								autocapitalize="off"
+								autocomplete="email"
+								{% if form.errors %}
+									autofocus
+									aria-invalid="true"
+									aria-describedby="Newsletter-error--{{ section.id }}"
+								{% elsif form.posted_successfully? %}
+									aria-describedby="Newsletter-success--{{ section.id }}"
+								{% endif %}
+								placeholder=" "
+								required
+							>
+							<label
+								class="field__label"
+								for="NewsletterForm--{{ section.id }}"
+								type="hidden"
+							>
+								{{- 'newsletter.label' | t -}}
+							</label>
+						</div>
+						{%- if form.errors -%}
+							<small
+								class="newsletter-form__message form__message"
+								id="Newsletter-error--{{ section.id }}"
+							>
+								{%- render 'icon-error' -%}
+								{{- form.errors.translated_fields.email | capitalize }}
+								{{ form.errors.messages.email -}}
+							</small>
+						{%- endif -%}
+					</div>
+					<button
+						type="submit"
+						class="newsletter__button button button--{{ section.settings.button_style }}"
+						name="commit"
+					>
+						{% if settings.button_animation %}
+							<span class="animation-wrapper" hoverstagger="link">
+								<span class="button-label animation" hoverstagger="text">
+									<span class="word" id="word1">{{- 'newsletter.button_label' | t -}}</span>
+								</span>
+								<span class="button-label is-2 animation" hoverstagger="text">
+									<span class="word" id="word2">{{- 'newsletter.button_label' | t -}}</span>
+								</span>
+							</span>
+						{% else %}
+							<span class="button-label">{{- 'newsletter.button_label' | t -}}</span>
+						{% endif %}
+					</button>
+				</div>
+				{%- if form.posted_successfully? -%}
+					<h3
+						class="newsletter-form__message newsletter-form__message--success form__message"
+						id="Newsletter-success--{{ section.id }}"
+						tabindex="-1"
+						autofocus
+					>
+						{% render 'icon-success' -%}
+						{{- 'newsletter.success' | t }}
+					</h3>
+				{%- endif -%}
+			{% endform %}
+			<div class="newsletter__text">
+				{{ section.settings.newsletter_text }}
+			</div>
+		</div>
+	</div>
+</div>
+
+{% schema %}
+{
+	"name": "t:sections.newsletter.name",
+	"tag": "section",
+	"class": "spaced-section",
+	"enabled_on": {
+		"templates": ["*"]
+	},
+	"settings": [
+		{
+			"type": "color_scheme",
+			"id": "color_scheme",
+			"default": "background-1",
+			"label": "t:sections.all.color_scheme.label"
+		},
+		{
+			"type": "select",
+			"id": "position",
+			"options": [
+				{
+					"value": "left",
+					"label": "t:sections.all.content_position.left.label"
+				},
+				{
+					"value": "center",
+					"label": "t:sections.all.content_position.center.label"
+				},
+				{
+					"value": "right",
+					"label": "t:sections.all.content_position.right.label"
+				}
+			],
+			"default": "left",
+			"label": "t:sections.all.content_position.label"
+		},
+		{
+			"type": "inline_richtext",
+			"id": "heading",
+			"default": "Some heading",
+			"label": "t:sections.all.heading.label"
+		},
+		{
+			"type": "richtext",
+			"id": "text",
+			"default": "<p>Some text</p>",
+			"label": "t:sections.all.text.label"
+		},
+		{
+			"type": "richtext",
+			"id": "newsletter_text",
+			"default": "<p>Additional text</p>",
+			"label": "t:sections.all.additional_text.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.button.header.content"
+		},
+		{
+			"type": "select",
+			"id": "button_style",
+			"options": [
+				{
+					"value": "primary",
+					"label": "t:sections.all.button.style.options__1.label"
+				},
+				{
+					"value": "secondary",
+					"label": "t:sections.all.button.style.options__2.label"
+				},
+				{
+					"value": "tertiary",
+					"label": "t:sections.all.button.style.options__3.label"
+				}
+			],
+			"default": "primary",
+			"label": "t:sections.all.button.style.label"
+		},
+		{
+			"type": "paragraph",
+			"content": "t:sections.newsletter.settings.paragraph.content"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.section-margin.header.content"
+		},
+		{
+			"type": "select",
+			"id": "margin_top",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "no-indent",
+			"label": "t:sections.all.section-margin.margin_top.label"
+		},
+		{
+			"type": "select",
+			"id": "margin_bottom",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "l",
+			"label": "t:sections.all.section-margin.margin_bottom.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.section-padding.header.content"
+		},
+		{
+			"type": "select",
+			"id": "padding_top",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-padding.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-padding.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-padding.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-padding.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-padding.options__5.label"
+				}
+			],
+			"default": "no-indent",
+			"label": "t:sections.all.section-padding.padding_top.label"
+		},
+		{
+			"type": "select",
+			"id": "padding_bottom",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-padding.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-padding.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-padding.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-padding.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-padding.options__5.label"
+				}
+			],
+			"default": "no-indent",
+			"label": "t:sections.all.section-padding.padding_bottom.label"
+		}
+	],
+	"presets": [
+		{
+			"name": "Newsletter"
+		}
+	]
+}
+{% endschema %}

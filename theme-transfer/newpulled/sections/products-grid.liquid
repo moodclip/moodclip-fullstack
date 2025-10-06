@@ -1,0 +1,337 @@
+{{ 'template-collection.css' | asset_url | stylesheet_tag }}
+{{ 'section-products-grid.css' | asset_url | stylesheet_tag }}
+
+<link
+	rel="preload"
+	href="{{ 'component-card.css' | asset_url }}"
+	as="style"
+	onload="this.onload=null;this.rel='stylesheet'"
+>
+
+<link
+	rel="preload"
+	href="{{ 'component-price.css' | asset_url }}"
+	as="style"
+	onload="this.onload=null;this.rel='stylesheet'"
+>
+
+<link
+	rel="preload"
+	href="{{ 'component-rte.css' | asset_url }}"
+	as="style"
+	onload="this.onload=null;this.rel='stylesheet'"
+>
+
+<noscript>{{ 'component-card.css' | asset_url | stylesheet_tag }}</noscript>
+<noscript>{{ 'component-price.css' | asset_url | stylesheet_tag }}</noscript>
+<noscript>{{ 'component-rte.css' | asset_url | stylesheet_tag }}</noscript>
+
+{%- if settings.quickview_show -%}
+	<link
+		rel="preload"
+		href="{{ 'section-main-product.css' | asset_url }}"
+		as="style"
+		onload="this.onload=null;this.rel='stylesheet'"
+	>
+	<link
+		rel="stylesheet"
+		href="{{ 'component-deferred-media.css' | asset_url }}"
+		media="all"
+	>
+	<link
+		rel="preload"
+		href="{{ 'quick-add.css' | asset_url }}"
+		as="style"
+		onload="this.onload=null;this.rel='stylesheet'"
+	>
+
+	<script src="{{ 'quick-add.js' | asset_url }}" defer="defer"></script>
+	<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+
+{%- if settings.quickview_show == false -%}
+	{{ 'section-main-product.css' | asset_url | stylesheet_tag }}
+{% endif %}
+
+{%- style -%}
+	{% render 'section-padding' %}
+{%- endstyle -%}
+
+{% liquid
+	assign grid_products = collections.all.products
+	case section.settings.sort
+		when 'products_high', 'products_low'
+			assign grid_products = grid_products | sort: 'price_min'
+		when 'date', 'date_reversed'
+			assign grid_products = grid_products | sort: 'published_at'
+	endcase
+
+	if section.settings.sort == 'products_high' or section.settings.sort == 'date_reversed' or section.settings.sort == 'alphabetical_reversed'
+		assign grid_products = grid_products | reverse
+	endif
+%}
+
+<div class="products-grid section-{{ section.id }}-padding">
+	<div class="container">
+		<div class="section-grid">
+			{% render 'section-header', text_size: 'large' %}
+
+			<div class="products-grid full-width content">
+				<ul
+					id="products-grid"
+					data-id="{{ section.id }}"
+					class="collection-product-list {% if section.settings.show_two_cards %} collection-product-list--2-mobile{% endif %}"
+				>
+					{% if grid_products.size > 0 %}
+						{%- for product in grid_products
+							limit: section.settings.products_per_page
+						-%}
+							<li class="collection-product-card {% if settings.on_hover == "hover"  %}quickview--hover{% endif %}">
+								{% render 'product-card',
+									product_card_product: product,
+									media_size: section.settings.image_ratio,
+									media_fit: section.settings.image_fit,
+									show_secondary_image: section.settings.show_secondary_image,
+									show_vendor: section.settings.show_vendor,
+									show_color_swatch: section.settings.show_color_swatch,
+									show_desc: section.settings.show_desc,
+									section_id: section.id,
+									add_id: forloop.index,
+									show_sku: section.settings.show_sku,
+									text_alignment: settings.card_text_alignment
+								%}
+							</li>
+						{%- endfor -%}
+					{% else %}
+						{%- for i in (1..4) -%}
+							<div class="popular-products__item_placeholder collection-popular-card collection-popular-card--placeholder">
+								{% render 'product-card-placeholder',
+									media_ratio: section.settings.image_ratio,
+									show_vendor: section.settings.show_vendor
+								%}
+							</div>
+						{%- endfor -%}
+					{% endif %}
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% schema %}
+{
+	"name": "t:sections.products-grid.name",
+	"tag": "section",
+	"class": "products-grid-section",
+	"disabled_on": {
+		"templates": ["password"],
+		"groups": ["*"]
+	},
+	"settings": [
+		{
+			"type": "inline_richtext",
+			"id": "heading",
+			"default": "Heading",
+			"label": "t:sections.all.heading.label"
+		},
+		{
+			"type": "richtext",
+			"id": "description",
+			"default": "<p>Description</p>",
+			"label": "t:sections.all.text.label"
+		},
+		{
+			"type": "text_alignment",
+			"id": "alignment",
+			"label": "t:sections.all.content_alignment.label",
+			"default": "center"
+		},
+		{
+			"type": "range",
+			"id": "products_per_page",
+			"min": 4,
+			"max": 50,
+			"step": 1,
+			"default": 8,
+			"label": "t:sections.products-grid.settings.products_per_page.label"
+		},
+		{
+			"type": "select",
+			"id": "sort",
+			"options": [
+				{
+					"value": "alphabetical",
+					"label": "t:sections.products-grid.settings.sort.options__1.label"
+				},
+				{
+					"value": "alphabetical_reversed",
+					"label": "t:sections.products-grid.settings.sort.options__2.label"
+				},
+				{
+					"value": "date_reversed",
+					"label": "t:sections.products-grid.settings.sort.options__3.label"
+				},
+				{
+					"value": "date",
+					"label": "t:sections.products-grid.settings.sort.options__4.label"
+				},
+				{
+					"value": "products_high",
+					"label": "t:sections.products-grid.settings.sort.options__5.label"
+				},
+				{
+					"value": "products_low",
+					"label": "t:sections.products-grid.settings.sort.options__6.label"
+				}
+			],
+			"default": "alphabetical",
+			"label": "t:sections.products-grid.settings.sort.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.product_card.header.content"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_two_cards",
+			"default": false,
+			"label": "t:sections.all.product_card.mobile_card_count.label"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_secondary_image",
+			"default": true,
+			"label": "t:sections.all.product_card.show_secondary_image.label"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_sku",
+			"default": false,
+			"label": "t:sections.all.sku.show_sku"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_vendor",
+			"default": true,
+			"label": "t:sections.all.product_card.show_vendor.label"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_desc",
+			"default": false,
+			"label": "t:sections.all.product_card.show_description.label"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_color_swatch",
+			"default": false,
+			"label": "t:sections.all.product_card.show_color.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.image.header.content"
+		},
+		{
+			"type": "select",
+			"id": "image_ratio",
+			"options": [
+				{
+					"value": "landscape",
+					"label": "t:sections.all.image.ratio.options__1.label"
+				},
+				{
+					"value": "portrait",
+					"label": "t:sections.all.image.ratio.options__2.label"
+				},
+				{
+					"value": "square",
+					"label": "t:sections.all.image.ratio.options__3.label"
+				}
+			],
+			"default": "portrait",
+			"label": "t:sections.all.image.ratio.label"
+		},
+		{
+			"type": "select",
+			"id": "image_fit",
+			"label": "t:sections.all.image.fit.label",
+			"options": [
+				{
+					"value": "contain",
+					"label": "t:sections.all.image.fit.options__1.label"
+				},
+				{
+					"value": "cover",
+					"label": "t:sections.all.image.fit.options__2.label"
+				}
+			],
+			"default": "cover"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.section-padding.header.content"
+		},
+		{
+			"type": "select",
+			"id": "padding_top",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-padding.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-padding.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-padding.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-padding.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-padding.options__5.label"
+				}
+			],
+			"default": "m",
+			"label": "t:sections.all.section-padding.padding_top.label"
+		},
+		{
+			"type": "select",
+			"id": "padding_bottom",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-padding.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-padding.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-padding.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-padding.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-padding.options__5.label"
+				}
+			],
+			"default": "m",
+			"label": "t:sections.all.section-padding.padding_bottom.label"
+		}
+	],
+	"presets": [
+		{
+			"name": "t:sections.products-grid.name"
+		}
+	]
+}
+{% endschema %}

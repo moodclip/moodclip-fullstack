@@ -1,0 +1,357 @@
+{% liquid
+	comment
+		case block.type
+		when 'mega_menu_collection'
+		assign menu_link = '##'
+		assign menu_link_class = 'cursor-default'
+		when 'mega_menu_collection'
+		assign menu_link = link.url
+		assign menu_link_class = ''
+		else
+		assign menu_link = '##'
+		assign menu_link_class = 'cursor-default'
+		endcase
+	endcomment
+	assign menu_link = link.url
+	assign menu_link_class = ''
+
+	assign first_promo_trigger = block.settings.first_promo_trigger | handle | strip
+	assign second_promo_trigger = block.settings.second_promo_trigger | handle | strip
+	assign third_promo_trigger = block.settings.third_promo_trigger | handle | strip
+	assign fourth_promo_trigger = block.settings.fourth_promo_trigger | handle | strip
+	assign fifth_promo_trigger = block.settings.fifth_promo_trigger | handle | strip
+	assign sixth_promo_trigger = block.settings.sixth_promo_trigger | handle | strip
+	assign seventh_promo_trigger = block.settings.seventh_promo_trigger | handle | strip
+	assign eighth_promo_trigger = block.settings.eighth_promo_trigger | handle | strip
+	assign ninth_promo_trigger = block.settings.ninth_promo_trigger | handle | strip
+	assign tenth_promo_trigger = block.settings.tenth_promo_trigger | handle | strip
+%}
+<a
+	href="{{ menu_link }}"
+	class="unstyled-link header__menu-item button-animation {{ menu_link_class }}{% if link.current %} current-link{% endif %}"
+	{% if link.current %}
+		aria-current="page"
+	{% endif %}
+>
+	{% if settings.header_links_animation %}
+		<span class="animation-wrapper" hoverstagger="link">
+			<span class="animation" hoverstagger="text">
+				<span class="word" id="word1">{{ link.title | escape }}</span>
+			</span>
+			<span class="is-2 animation" hoverstagger="text">
+				<span class="word" id="word2">{{ link.title | escape }}</span>
+			</span>
+		</span>
+	{% else %}
+		{{ link.title | escape }}
+	{% endif %}
+</a>
+{% comment %}
+	{% liquid
+		assign grandchildlink = ''
+		for childlink in links
+			for grandchildlink in childlink.links
+				if grandchildlink.size == 0
+					assign grandchildlink = 'header-mega-menu-container-childlink'
+					assign grandchildlinkSize = grandchildlink.size
+				endif
+			endfor
+		endfor
+	%}
+
+	{{ grandchildlinkSize }}
+{% endcomment %}
+
+<div class="header-mega-menu{% if section.settings.full_width == false %} container small-container{% else %} color-{{ section.settings.color_scheme_bg }} {% endif %}">
+	<div class="header-mega-menu-container color-{{ section.settings.color_scheme_bg }}">
+		<div class="container">
+			<div class="header-mega-menu__wrapper">
+				<div class="burger-menu__items">
+					{% comment %}{%- for childlink in link.links -%}{% endcomment %}
+					{% comment %}{% if childlink.handle == first_promo_trigger %}{% endcomment %}
+					{% if block.settings.image_1 != blank %}
+						<div class="burger-menu__item opacity-1">
+							{{
+								block.settings.image_1
+								| image_url: width: block.settings.image_1.width
+								| image_tag:
+									loading: 'lazy',
+									sizes: '100vw',
+									widths: '360, 550, 710',
+									width: block.settings.image_1.width,
+									class: 'burger-menu__item-image'
+							}}
+						</div>
+					{%- endif -%}
+					{% comment %}{% endif %}{% endcomment %}
+					{% comment %}{% if childlink.handle == second_promo_trigger %}{% endcomment %}
+					{% if block.settings.image_2 != blank %}
+						<div class="burger-menu__item opacity-2">
+							{{
+								block.settings.image_2
+								| image_url: width: block.settings.image_2.width
+								| image_tag:
+									loading: 'lazy',
+									sizes: '100vw',
+									widths: '360, 550, 710',
+									width: block.settings.image_2.width,
+									class: 'burger-menu__item-image'
+							}}
+						</div>
+					{%- endif -%}
+					{% comment %}{% endif %}{% endcomment %}
+					{% comment %}{% if childlink.handle == third_promo_trigger %}{% endcomment %}
+					{% if block.settings.image_3 != blank %}
+						<div class="burger-menu__item opacity-3">
+							{{
+								block.settings.image_3
+								| image_url: width: block.settings.image_3.width
+								| image_tag:
+									loading: 'lazy',
+									sizes: '100vw',
+									widths: '360, 550, 710',
+									width: block.settings.image_3.width,
+									class: 'burger-menu__item-image'
+							}}
+						</div>
+					{%- endif -%}
+					{% comment %}{% endif %}{% endcomment %}
+					{% comment %}{% if childlink.handle == fourth_promo_trigger %}{% endcomment %}
+					{% if block.settings.image_4 != blank %}
+						<div class="burger-menu__item opacity-4">
+							{{
+								block.settings.image_4
+								| image_url: width: block.settings.image_4.width
+								| image_tag:
+									loading: 'lazy',
+									sizes: '100vw',
+									widths: '360, 550, 710',
+									width: block.settings.image_4.width,
+									class: 'burger-menu__item-image'
+							}}
+						</div>
+					{%- endif -%}
+					{% comment %}{% endif %}{% endcomment %}
+					{% comment %}{% if childlink.handle == fifth_promo_trigger %}{% endcomment %}
+					{% if block.settings.image_5 != blank %}
+						<div class="burger-menu__item opacity-5">
+							{{
+								block.settings.image_5
+								| image_url: width: block.settings.image_5.width
+								| image_tag:
+									loading: 'lazy',
+									sizes: '100vw',
+									widths: '360, 550, 710',
+									width: block.settings.image_5.width,
+									class: 'burger-menu__item-image'
+							}}
+						</div>
+					{%- endif -%}
+					{% comment %}{% endif %}{% endcomment %}
+					{% comment %}{%- endfor -%}{% endcomment %}
+					{% if block.settings.image_6 != blank %}
+						<div class="burger-menu__item opacity-6">
+							{{
+								block.settings.image_6
+								| image_url: width: block.settings.image_6.width
+								| image_tag:
+									loading: 'lazy',
+									sizes: '100vw',
+									widths: '360, 550, 710',
+									width: block.settings.image_6.width,
+									class: 'burger-menu__item-image'
+							}}
+						</div>
+					{%- endif -%}
+
+					{% if block.settings.image_7 != blank %}
+						<div class="burger-menu__item opacity-7">
+							{{
+								block.settings.image_7
+								| image_url: width: block.settings.image_7.width
+								| image_tag:
+									loading: 'lazy',
+									sizes: '100vw',
+									widths: '360, 550, 710',
+									width: block.settings.image_7.width,
+									class: 'burger-menu__item-image'
+							}}
+						</div>
+					{%- endif -%}
+
+					{% if block.settings.image_8 != blank %}
+						<div class="burger-menu__item opacity-8">
+							{{
+								block.settings.image_8
+								| image_url: width: block.settings.image_8.width
+								| image_tag:
+									loading: 'lazy',
+									sizes: '100vw',
+									widths: '360, 550, 710',
+									width: block.settings.image_8.width,
+									class: 'burger-menu__item-image'
+							}}
+						</div>
+					{%- endif -%}
+
+					{% if block.settings.image_9 != blank %}
+						<div class="burger-menu__item opacity-9">
+							{{
+								block.settings.image_9
+								| image_url: width: block.settings.image_9.width
+								| image_tag:
+									loading: 'lazy',
+									sizes: '100vw',
+									widths: '360, 550, 710',
+									width: block.settings.image_9.width,
+									class: 'burger-menu__item-image'
+							}}
+						</div>
+					{%- endif -%}
+
+					{% if block.settings.image_10 != blank %}
+						<div class="burger-menu__item opacity-10">
+							{{
+								block.settings.image_10
+								| image_url: width: block.settings.image_10.width
+								| image_tag:
+									loading: 'lazy',
+									sizes: '100vw',
+									widths: '360, 550, 710',
+									width: block.settings.image_10.width,
+									class: 'burger-menu__item-image'
+							}}
+						</div>
+					{%- endif -%}
+				</div>
+				<ul class="mega-menu-list list-unstyled">
+					{% for childlink in links %}
+						{% liquid
+							assign trigger = ''
+							if childlink.handle == first_promo_trigger
+								assign trigger = ' opacity-1'
+							elsif childlink.handle == second_promo_trigger
+								assign trigger = ' opacity-2'
+							elsif childlink.handle == third_promo_trigger
+								assign trigger = ' opacity-3'
+							elsif childlink.handle == fourth_promo_trigger
+								assign trigger = ' opacity-4'
+							elsif childlink.handle == fifth_promo_trigger
+								assign trigger = ' opacity-5'
+							elsif childlink.handle == sixth_promo_trigger
+								assign trigger = ' opacity-6'
+							elsif childlink.handle == seventh_promo_trigger
+								assign trigger = ' opacity-7'
+							elsif childlink.handle == eighth_promo_trigger
+								assign trigger = ' opacity-8'
+							elsif childlink.handle == ninth_promo_trigger
+								assign trigger = ' opacity-9'
+							elsif childlink.handle == tenth_promo_trigger
+								assign trigger = ' opacity-10'
+							endif
+						%}
+						<li>
+							{% if childlink.links == blank %}
+								<a
+									href="{{ childlink.url }}"
+									{% if childlink.current %}
+										aria-current="page"
+									{% endif %}
+									class="header-tabs{{ trigger }}"
+								>
+									{{ childlink.title | escape }}
+								</a>
+							{% else %}
+								<span class="subtitle">{{ childlink.title | escape }}</span>
+							{% endif %}
+
+							<ul
+								class="mega-menu__submenu list-menu--disclosure list-menu motion-reduce color-{{ section.settings.color_scheme_bg }} list-unstyled"
+								tabindex="-1"
+							>
+								{%- for grandchildlink in childlink.links -%}
+									{% liquid
+										assign trigger_grandchild = ''
+										if grandchildlink.handle == first_promo_trigger
+											assign trigger_grandchild = ' opacity-1'
+										elsif grandchildlink.handle == second_promo_trigger
+											assign trigger_grandchild = ' opacity-2'
+										elsif grandchildlink.handle == third_promo_trigger
+											assign trigger_grandchild = ' opacity-3'
+										elsif grandchildlink.handle == fourth_promo_trigger
+											assign trigger_grandchild = ' opacity-4'
+										elsif grandchildlink.handle == fifth_promo_trigger
+											assign trigger_grandchild = ' opacity-5'
+										elsif grandchildlink.handle == sixth_promo_trigger
+											assign trigger_grandchild = ' opacity-6'
+										elsif grandchildlink.handle == seventh_promo_trigger
+											assign trigger_grandchild = ' opacity-7'
+										elsif grandchildlink.handle == eighth_promo_trigger
+											assign trigger_grandchild = ' opacity-8'
+										elsif grandchildlink.handle == ninth_promo_trigger
+											assign trigger_grandchild = ' opacity-9'
+										elsif grandchildlink.handle == tenth_promo_trigger
+											assign trigger_grandchild = ' opacity-10'
+										endif
+									%}
+									<li>
+										<a
+											href="{{ grandchildlink.url }}"
+											{% if grandchildlink.type == 'http_link'
+												and settings.open_new_tab
+											%}
+												target="_blank"
+											{% endif %}
+											class="header__menu-item medium-font list-menu__item focus-inset{% if grandchildlink.current %} header__menu-item--active{% endif %}{{ trigger_grandchild }}"
+											{% if grandchildlink.current %}
+												aria-current="page"
+											{% endif %}
+										>
+											<span>
+												{{ grandchildlink.title | escape }}
+											</span>
+										</a>
+									</li>
+								{%- endfor -%}
+							</ul>
+						</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	document.querySelectorAll('.header-mega-menu').forEach((megaMenu) => {
+		megaMenu
+			.querySelectorAll(
+				'.mega-menu-list .list-menu__item, .mega-menu-list .header-tabs'
+			)
+			.forEach((item) => {
+				const opacityClass = Array.from(item.classList).find((cls) =>
+					cls.startsWith('opacity-')
+				);
+
+				if (opacityClass) {
+					item.addEventListener('mouseover', () => {
+						const menuItem = megaMenu.querySelector(
+							`.burger-menu__item.${opacityClass}`
+						);
+						if (menuItem) {
+							menuItem.style.opacity = '1';
+						}
+					});
+
+					item.addEventListener('mouseout', () => {
+						const menuItem = megaMenu.querySelector(
+							`.burger-menu__item.${opacityClass}`
+						);
+						if (menuItem) {
+							menuItem.style.opacity = '';
+						}
+					});
+				}
+			});
+	});
+</script>

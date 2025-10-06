@@ -1,0 +1,397 @@
+{{ 'section-banner.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  This CSS handles:
+  1. Video layout and preventing cropping ('object-fit: contain').
+  2. Styling for the default SVG play button and the custom uploaded image.
+  3. Hiding the play button when the video is playing.
+  4. The media query for switching to the mobile video.
+{%- endcomment -%}
+{%- style -%}
+  #shopify-section-{{ section.id }} .banner__video video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    cursor: pointer;
+  }
+  #shopify-section-{{ section.id }} .banner__video {
+    position: relative;
+    height: 100%;
+  }
+
+  /* Play Button Styling */
+  #shopify-section-{{ section.id }} .banner__play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+  }
+  #shopify-section-{{ section.id }} .banner__play-button:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  #shopify-section-{{ section.id }} .banner__play-button svg {
+    width: 40px;
+    height: 40px;
+    margin-left: 5px;
+    fill: #333;
+  }
+  /* Style for when a custom image is used */
+  #shopify-section-{{ section.id }} .banner__play-button--custom {
+    background-color: transparent;
+    width: 100px;
+    height: 100px;
+  }
+  #shopify-section-{{ section.id }} .banner__play-button--custom img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* Hide the play button when the video is playing */
+  #shopify-section-{{ section.id }} .is-playing .banner__play-button {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  /* Media Query for Mobile */
+  .banner__video--mobile { display: none; }
+  @media screen and (max-width: 749px) {
+    .banner__video--desktop { display: none; }
+    .banner__video--mobile { display: block; }
+  }
+{%- endstyle -%}
+
+{% style %}
+	{% render 'section-margin' %}
+	#shopify-section-{{ section.id }} .have-overlay {
+		--overlay-alpha : {{ section.settings.overlay_opacity }}%;
+	}
+{% endstyle %}
+
+{%- liquid
+  case section.settings.image_size
+    when 'small'
+      assign section_size = '63vh'
+    when 'medium'
+      assign section_size = '76vh'
+    when 'large'
+      assign section_size = '100vh'
+    else
+      assign section_size = 0
+  endcase
+
+  if section.settings.image_size == 'adapt'
+    assign adapt_media = section.settings.image
+    if adapt_media == blank
+      assign adapt_media = section.settings.video
+    endif
+
+    if adapt_media.aspect_ratio != nil
+      assign section_size = 1 | divided_by: adapt_media.aspect_ratio | times: 100 | append: 'vw'
+    endif
+  endif
+-%}
+
+{%- style -%}
+	#shopify-section-{{ section.id }} {
+		--image-height : {{ section_size }};
+	}
+{%- endstyle -%}
+
+<div class="banner">
+	<div class="{% if section.settings.full_width != true %}container{% endif %}">
+		<div class="banner-box section-{{ section.id }}-padding">
+			<div class="banner__img have-overlay" style="background-color: {{ section.settings.background_color }};">
+				{%- if section.settings.image != blank -%}
+					{{ section.settings.image | image_url: width: 3840 | image_tag: loading: 'lazy', sizes: '100vw', widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840' }}
+				{%- elsif section.settings.video != blank -%}
+          {%- liquid
+            assign play_button_custom_class = ''
+            if section.settings.play_button_image != blank
+              assign play_button_custom_class = ' banner__play-button--custom'
+            endif
+          -%}
+          <div class="banner__video banner__video--desktop">
+            <video
+              {% if section.settings.autoplay %}autoplay{% endif %}
+              loop
+              muted
+              playsinline
+              poster="{{ section.settings.video | image_url: width: 1920 }}"
+              aria-label="{{ section.settings.video.alt | default: 'Video' }}"
+            >
+              {%- for source in section.settings.video.sources -%}
+                <source src="{{ source.url }}" type="{{ source.mime_type }}">
+              {%- endfor -%}
+            </video>
+            {%- if section.settings.autoplay == false -%}
+              <button class="banner__play-button{{ play_button_custom_class }}" aria-label="Play video">
+                {%- if section.settings.play_button_image != blank -%}
+                  {{ section.settings.play_button_image | image_url: width: 200 | image_tag: loading: 'lazy', widths: '100, 200' }}
+                {%- else -%}
+                  <svg viewBox="0 0 100 100"><path d="M 30,20 L 70,50 L 30,80 Z"></path></svg>
+                {%- endif -%}
+              </button>
+            {%- endif -%}
+          </div>
+          {%- if section.settings.video_mobile != blank -%}
+            <div class="banner__video banner__video--mobile">
+              <video
+                {% if section.settings.autoplay %}autoplay{% endif %}
+                loop
+                muted
+                playsinline
+                poster="{{ section.settings.video_mobile | image_url: width: 1080 }}"
+                aria-label="{{ section.settings.video_mobile.alt | default: 'Mobile video' }}"
+              >
+                {%- for source in section.settings.video_mobile.sources -%}
+                  <source src="{{ source.url }}" type="{{ source.mime_type }}">
+                {%- endfor -%}
+              </video>
+              {%- if section.settings.autoplay == false -%}
+                <button class="banner__play-button{{ play_button_custom_class }}" aria-label="Play mobile video">
+                  {%- if section.settings.play_button_image != blank -%}
+                    {{ section.settings.play_button_image | image_url: width: 200 | image_tag: loading: 'lazy', widths: '100, 200' }}
+                  {%- else -%}
+                    <svg viewBox="0 0 100 100"><path d="M 30,20 L 70,50 L 30,80 Z"></path></svg>
+                  {%- endif -%}
+                </button>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+				{%- else -%}
+					{{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg placeholder' }}
+				{%- endif -%}
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const bannerSection = document.getElementById('shopify-section-{{ section.id }}');
+  if (!bannerSection) return;
+
+  const setupVideoPlayer = (videoWrapper) => {
+    if (!videoWrapper) return;
+
+    const video = videoWrapper.querySelector('video');
+    const playButton = videoWrapper.querySelector('.banner__play-button');
+
+    if (!video) return;
+
+    // This is the core function for play and pause
+    const togglePlay = () => {
+      if (video.paused || video.ended) {
+        // When user plays, unmute and play the video
+        video.muted = false;
+        video.play();
+      } else {
+        // When user pauses, just pause the video
+        video.pause();
+      }
+    };
+
+    // Sync the play button's visibility with the video's state
+    video.addEventListener('play', () => videoWrapper.classList.add('is-playing'));
+    video.addEventListener('pause', () => videoWrapper.classList.remove('is-playing'));
+    video.addEventListener('ended', () => videoWrapper.classList.remove('is-playing'));
+
+    // Add click listeners to the video and button
+    video.addEventListener('click', togglePlay);
+    if (playButton) {
+      playButton.addEventListener('click', togglePlay);
+    }
+
+    // Set the initial visual state for autoplaying videos
+    if (video.hasAttribute('autoplay')) {
+      // Check if the video is actually playing, as browsers can block autoplay
+      // A small delay helps ensure the browser has started playback
+      setTimeout(() => {
+        if (!video.paused) {
+          videoWrapper.classList.add('is-playing');
+        }
+      }, 200);
+    }
+  };
+
+  // Setup the logic for both desktop and mobile videos
+  setupVideoPlayer(bannerSection.querySelector('.banner__video--desktop'));
+  setupVideoPlayer(bannerSection.querySelector('.banner__video--mobile'));
+});
+</script>
+
+{% schema %}
+{
+	"name": "t:sections.banner.label",
+	"tag": "section",
+	"class": "banner-section spaced-section",
+	"enabled_on": {
+		"templates": ["*"]
+	},
+	"settings": [
+		{
+			"type": "checkbox",
+			"id": "full_width",
+			"default": false,
+			"label": "t:sections.all.image.width.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.image.header.content"
+		},
+		{
+			"type": "image_picker",
+			"id": "image",
+			"label": "t:sections.all.image.label"
+		},
+		{
+			"type": "header",
+			"content": "Video Settings"
+		},
+		{
+			"type": "video",
+			"id": "video",
+			"label": "Desktop Video"
+		},
+		{
+			"type": "video",
+			"id": "video_mobile",
+			"label": "Mobile Video",
+			"info": "Optional. If provided, this video will be shown on screens 749px wide and smaller."
+		},
+		{
+			"type": "checkbox",
+			"id": "autoplay",
+			"default": true,
+			"label": "Autoplay video"
+		},
+    {
+      "type": "image_picker",
+      "id": "play_button_image",
+      "label": "Custom Play Button Image",
+      "info": "Optional. Replaces the default play icon. Will only appear if autoplay is disabled."
+    },
+		{
+			"type": "header",
+			"content": "Section Styling"
+		},
+		{
+			"type": "select",
+			"id": "image_size",
+			"options": [
+				{
+					"value": "adapt",
+					"label": "Adapt to image/video"
+				},
+				{
+					"value": "small",
+					"label": "t:sections.all.image.size.options__2.label"
+				},
+				{
+					"value": "medium",
+					"label": "t:sections.all.image.size.options__3.label"
+				},
+				{
+					"value": "large",
+					"label": "t:sections.all.image.size.options__4.label"
+				}
+			],
+			"default": "small",
+			"label": "Section height"
+		},
+		{
+			"type": "range",
+			"id": "overlay_opacity",
+			"min": 0,
+			"max": 100,
+			"default": 20,
+			"unit": "%",
+			"label": "t:sections.all.overlay_opacity.label"
+		},
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "info": "Set a background for the video. Useful when the video doesn't fill the screen."
+    },
+		{
+			"type": "header",
+			"content": "t:sections.all.section-margin.header.content"
+		},
+		{
+			"type": "select",
+			"id": "margin_top",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "no-indent",
+			"label": "t:sections.all.section-margin.margin_top.label"
+		},
+		{
+			"type": "select",
+			"id": "margin_bottom",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "l",
+			"label": "t:sections.all.section-margin.margin_bottom.label"
+		}
+	],
+	"presets": [
+		{
+			"name": "t:sections.banner.label"
+		}
+	]
+}
+{% endschema %}

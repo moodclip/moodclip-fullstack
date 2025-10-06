@@ -1,0 +1,383 @@
+{{ 'customer.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'input.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'login.js' | asset_url }}" defer="defer"></script>
+{%- style -%}
+	{% render 'section-padding' %}
+	{% render 'section-margin' %}
+{%- endstyle -%}
+
+<div class="article-template color-{{ section.settings.color_scheme }} background section-{{ section.id }}-padding">
+	<div class="container">
+		<div class="login-wrapper">
+			<div class="customer login register">
+				<div class="login__form">
+					<div class="page-header">
+						<div class="page-header__inner">
+							<a
+								id="login"
+								tabindex="-1"
+								class="h3 title--page register_login_account"
+								href="{{ routes.account_login_url }}"
+							>
+								{{- 'customer.login_page.title' | t -}}
+							</a>
+
+							<h2 class="title--page h3">
+								{{ 'customer.register.title' | t }}
+							</h2>
+						</div>
+					</div>
+					<div class="customer-form__placeholder-block">
+						{%- form 'create_customer', novalidate: 'novalidate' -%}
+							<div class="create-account__inputs-box">
+								<div class="field">
+									<label
+										class="field__label medium-font"
+										for="RegisterForm-FirstName"
+									>
+										{{- 'customer.register.first_name' | t -}}
+										<span class="form-asterisk">*</span>
+									</label>
+									<input
+										type="text"
+										name="customer[first_name]"
+										id="RegisterForm-FirstName"
+										{% if form.first_name %}
+											value="{{ form.first_name }}"
+										{% endif %}
+										autocomplete="given-name"
+										placeholder=" 	{{- 'customer.register.first_name_person' | t -}}"
+									>
+								</div>
+								<div class="field">
+									<label
+										class="field__label medium-font"
+										for="RegisterForm-LastName"
+									>
+										{{- 'customer.register.last_name' | t -}}
+										<span class="form-asterisk">*</span>
+									</label>
+									<input
+										type="text"
+										name="customer[last_name]"
+										id="RegisterForm-LastName"
+										{% if form.last_name %}
+											value="{{ form.last_name }}"
+										{% endif %}
+										autocomplete="family-name"
+										aria-required="true"
+										placeholder=" {{- 'customer.register.last_name_person' | t -}}"
+									>
+								</div>
+								{%- if form.errors contains 'last_name' -%}
+									<span id="RegisterForm-email-error" class="form__message">
+										{{ form.errors.translated_fields.last_name | capitalize }}
+										{{ form.errors.messages.last_name }}.
+									</span>
+								{%- endif -%}
+								<div class="field">
+									<label
+										class="field__label medium-font"
+										for="RegisterForm-email"
+									>
+										{{- 'customer.register.email' | t -}}
+										<span class="form-asterisk">*</span>
+									</label>
+									<input
+										type="email"
+										name="customer[email]"
+										id="RegisterForm-email"
+										{% if form.email %}
+											value="{{ form.email }}"
+										{% endif %}
+										spellcheck="false"
+										autocapitalize="off"
+										autocomplete="email"
+										aria-required="true"
+										{% if form.errors contains 'email' %}
+											aria-invalid="true"
+											aria-describedby="RegisterForm-email-error"
+										{% endif %}
+										placeholder=" {{- 'customer.login_page.email_person' | t -}}"
+										required
+									>
+									{%- if form.errors contains 'email' -%}
+										<span id="RegisterForm-email-error" class="form__message">
+											{{ form.errors.translated_fields.email | capitalize }}
+											{{ form.errors.messages.email }}.
+										</span>
+									{%- endif -%}
+								</div>
+
+								<div class="field">
+									<label
+										class="field__label medium-font"
+										for="RegisterForm-password CustomerPassword"
+									>
+										{{- 'customer.register.password' | t -}}
+										<span class="form-asterisk">*</span>
+									</label>
+									<div class="field_password">
+										<input
+											type="password"
+											name="customer[password]"
+											id="CustomerPassword"
+											aria-required="true"
+											{% if form.errors contains 'password' %}
+												aria-invalid="true"
+												aria-describedby="RegisterForm-password-error"
+											{% endif %}
+											placeholder=" "
+											required
+										>
+										{% comment %}
+											<label for="RegisterForm-password">
+												{{- 'customer.register.password' | t -}}
+											</label>
+										{% endcomment %}
+										<div class="field__password-type">
+											<div class="field__password-type-show">
+												{{- 'customer.login_page.show' | t -}}
+											</div>
+											<div class="field__password-type-hide">
+												{{- 'customer.login_page.hide' | t -}}
+											</div>
+										</div>
+									</div>
+									{%- if form.errors contains 'password' -%}
+										<span
+											id="RegisterForm-password-error"
+											class="form__message"
+										>
+											{{ form.errors.translated_fields.password | capitalize }}
+											{{ form.errors.messages.password }}.
+										</span>
+									{%- endif -%}
+								</div>
+
+								{%- if form.errors contains 'form' -%}
+									<span id="RegisterForm-email-error" class="form__message">
+										{{ 'customer.login_page.customer_exist' | t }}
+									</span>
+								{%- endif -%}
+							</div>
+							<div class="field field--checkbox">
+								<input
+									type="checkbox"
+									name="terms"
+									value="true"
+									id="Terms"
+									required
+								>
+								<label for="Terms" class="register-checkbox">
+									<span
+										class="icon icon-checkmark"
+									>
+									</span>
+									<span class="text_checkmark">
+										{{ 'customer.register.terms' | t }}
+										<a href="{{ shop.terms_of_service.url }}" target="_blank">
+											{{- 'customer.register.terms_link' | t -}}
+										</a>
+										<span class="form-asterisk">*</span>
+									</span>
+								</label>
+							</div>
+							<button class="button button--primary button__create-account">
+								{% if settings.button_animation %}
+									<span class="animation-wrapper" hoverstagger="link">
+										<span class="button-label animation" hoverstagger="text">
+											<span class="word" id="word1">
+												{{- 'customer.register.submit' | t -}}
+											</span>
+										</span>
+										<span
+											class="button-label is-2 animation"
+											hoverstagger="text"
+										>
+											<span class="word" id="word2">
+												{{- 'customer.register.submit' | t -}}
+											</span>
+										</span>
+									</span>
+								{% else %}
+									<span class="button-label">
+										{{- 'customer.register.submit' | t -}}
+									</span>
+								{% endif %}
+							</button>
+
+							{% comment %}
+								<div class="login__page-link">
+									<span class="login__page-link_text small-font">
+										{{ 'customer.register.have_account' | t -}}
+									</span>
+								</div>
+							{% endcomment %}
+						{%- endform -%}
+					</div>
+				</div>
+			</div>
+			{%- if section.settings.image != blank -%}
+				<div class="login-wrapper__image">
+					<div class="login-wrapper__image-box">
+						{% assign image_height = section.settings.image.width
+							| divided_by: section.settings.image.aspect_ratio
+						%}
+						{{
+							section.settings.image
+							| image_url: width: 1296
+							| image_tag:
+								loading: 'lazy',
+								width: section.settings.image.width,
+								height: image_height,
+								sizes: '100vw,(min-width: 1200px) 50vw',
+								widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+						}}
+					</div>
+				</div>
+			{%- endif -%}
+		</div>
+	</div>
+</div>
+
+{% schema %}
+{
+	"name": "t:sections.main-register.name",
+	"tag": "section",
+	"class": "spaced-section login-section",
+	"settings": [
+		{
+			"type": "color_scheme",
+			"id": "color_scheme",
+			"default": "background-1",
+			"label": "t:sections.all.color_scheme.label"
+		},
+		{
+			"type": "image_picker",
+			"id": "image",
+			"label": "t:sections.all.image.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.section-margin.header.content"
+		},
+		{
+			"type": "select",
+			"id": "margin_top",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "no-indent",
+			"label": "t:sections.all.section-margin.margin_top.label"
+		},
+		{
+			"type": "select",
+			"id": "margin_bottom",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "no-indent",
+			"label": "t:sections.all.section-margin.margin_bottom.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.section-padding.header.content"
+		},
+		{
+			"type": "select",
+			"id": "padding_top",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-padding.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-padding.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-padding.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-padding.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-padding.options__5.label"
+				}
+			],
+			"default": "m",
+			"label": "t:sections.all.section-padding.padding_top.label"
+		},
+		{
+			"type": "select",
+			"id": "padding_bottom",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-padding.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-padding.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-padding.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-padding.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-padding.options__5.label"
+				}
+			],
+			"default": "m",
+			"label": "t:sections.all.section-padding.padding_bottom.label"
+		}
+	]
+}
+{% endschema %}

@@ -1,0 +1,59 @@
+{% if scheme.id == 'background-1' or forloop.index == 1 %}
+	--color-background: 30, 30, 30;
+	--color-background-secondary: 16, 16, 16;
+	--color-border-input: 44, 44, 44;
+	--color-border-input-hover: 48, 48, 48;
+	--color-background-input: 44, 44, 44;
+	--color-background-input-hover: 48, 48, 48;
+{% else %}
+	--color-background: 44, 44, 44;
+	--color-background-secondary: 31, 31, 31;
+	--color-border-input: 35, 35, 35;
+	--color-border-input-hover: 37, 37, 37;
+	--color-background-input: 35, 35, 35;
+	--color-background-input-hover:  37, 37, 37;
+{% endif %}
+{% if scheme.settings.background_gradient != empty %}
+	--gradient-background: linear-gradient(91.72deg, #8DB6E4 0%, #C9896E 100%);
+{% else %}
+	--gradient-background: rgb(var(--color-background));
+{% endif %}
+--color-overlay: 31, 31, 31;
+--color-foreground: 255, 255, 255;
+--color-foreground-secondary: 255, 255, 255;
+--color-foreground-title: 255, 255, 255;
+--color-border: 245, 245, 245;
+--color-link: 229, 229, 229;
+--alpha-link: 0.5;
+--color-button: 10, 10, 10;
+--color-button-hover: 15, 15, 15;
+--color-button-text: 255, 255, 255;
+--color-button-text-hover: 255, 255, 255;
+--color-button-secondary: 60, 60, 60;
+--color-button-secondary-hover: 65, 65, 65;
+--color-button-secondary-text: 255, 255, 255;
+--color-button-secondary-text-hover: 255, 255, 255;
+--color-button-tertiary: 15, 15, 15;
+--color-button-tertiary-hover: 20, 20, 20;
+--color-button-tertiary-text: 255, 255, 255;
+--color-button-tertiary-text-hover: 255, 255, 255;
+--alpha-button-background: 1;
+--alpha-button-border: 1;
+--color-social: 255, 255, 255;
+--color-placeholder-input: 255, 255, 255;
+--color-card-price-new: 229, 229, 229;
+--color-card-price-old: 169, 169, 169;
+--color-error-background: 0, 0, 0;
+--color-title-text: 255, 255, 255;
+--color-accent : 180, 180, 180;
+--menu-shadow-color: 0, 0, 0;
+--menu-shadow-alpha: 0.3;
+--swiper-navigation-color: rgb(var(--color-foreground));
+--swiper-pagination-color : rgb(var(--color-foreground));
+
+{% comment %}--color-pagination-text: {{ settings.colors_pagination_text.red }}, {{ settings.colors_pagination_text.green }}, {{ settings.colors_pagination_text.blue }};
+--color-pagination-background: {{ settings.colors_pagination_background.red }}, {{ settings.colors_pagination_background.green }}, {{ settings.colors_pagination_background.blue }};
+--color-pagination-border: {{ settings.colors_pagination_border.red }}, {{ settings.colors_pagination_border.green }}, {{ settings.colors_pagination_border.blue }};
+--color-pagination-active-text: {{ settings.colors_pagination_active_text.red }}, {{ settings.colors_pagination_active_text.green }}, {{ settings.colors_pagination_active_text.blue }};
+--color-pagination-active-background: {{ settings.colors_pagination_active_background.red }}, {{ settings.colors_pagination_active_background.green }}, {{ settings.colors_pagination_active_background.blue }};
+--color-pagination-active-border: {{ settings.colors_pagination_active_border.red }}, {{ settings.colors_pagination_active_border.green }}, {{ settings.colors_pagination_active_border.blue }};{% endcomment %}

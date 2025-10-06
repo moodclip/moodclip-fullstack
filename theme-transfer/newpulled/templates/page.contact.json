@@ -1,0 +1,66 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "padding_top": "no-indent",
+        "padding_bottom": "no-indent"
+      }
+    },
+    "form": {
+      "type": "contact-form",
+      "blocks": {
+        "contact-item-1": {
+          "type": "text-block",
+          "settings": {
+            "subheading": "Email",
+            "description": "<p>info@moodcreativestudios.com<\/p>"
+          }
+        },
+        "contact-item-2": {
+          "type": "text-block",
+          "settings": {
+            "subheading": "whatsapp",
+            "description": "<p><a href=\"https:\/\/wa.me\/306983367590\" target=\"_blank\" title=\"Start A WhatsApp Chat with Mood Creative Studios\">Start A Chat<\/a><\/p>"
+          }
+        },
+        "contact-item-3": {
+          "type": "text-block",
+          "settings": {
+            "subheading": "",
+            "description": "<h4><a href=\"https:\/\/calendar.google.com\/calendar\/appointments\/schedules\/AcZssZ0y3tDTVq7jxADawGwOtIlVgNmJdjfzwOIxjUgAgNWmdO9AWWcTyCf1Tt1bc0_AtjhzkFKH6Mvx?gv=true\" title=\"https:\/\/calendar.google.com\/calendar\/appointments\/schedules\/AcZssZ0y3tDTVq7jxADawGwOtIlVgNmJdjfzwOIxjUgAgNWmdO9AWWcTyCf1Tt1bc0_AtjhzkFKH6Mvx?gv=true\">Schedule A Call<\/a><\/h4>"
+          }
+        }
+      },
+      "block_order": [
+        "contact-item-1",
+        "contact-item-2",
+        "contact-item-3"
+      ],
+      "settings": {
+        "heading": "Contact Us",
+        "description": "",
+        "enable_border_top": true,
+        "form_heading": "Fill Out Form Below",
+        "form_desc": "",
+        "additional_text": "",
+        "margin_top": "s",
+        "margin_bottom": "l"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "form"
+  ]
+}

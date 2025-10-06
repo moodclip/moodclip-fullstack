@@ -1,0 +1,59 @@
+<ul
+	class="header__submenu header__submenu-first_level list-menu list-menu--disclosure  motion-reduce color-{{ section.settings.color_scheme_bg }} list-unstyled"
+	role="list"
+	tabindex="-1"
+>
+	{%- for childlink in link.links -%}
+		<li
+			tabindex="-1"
+			class="{%- if childlink.links != blank -%}list-menu-has-child{%- endif -%}"
+			data-hover-opacity="2"
+		>
+			{%- if childlink.links == blank -%}
+				<a
+					href="{{ childlink.url }}"
+					{% if childlink.type == 'http_link' and settings.open_new_tab %}
+						target="_blank"
+					{% endif %}
+					class="header__menu-item medium-font list-menu__item focus-inset {% if childlink.current %} header__menu-item--active{% endif %}"
+					{% if childlink.current %}
+						aria-current="page"
+					{% endif %}
+				>
+					<span>
+						{{ childlink.title | escape }}
+					</span>
+				</a>
+			{%- else -%}
+				<a href="##" class="header__menu-item medium-font list-menu__item focus-inset cursor-default">
+					<span>
+						{{ childlink.title | escape }}
+					</span>
+				</a>
+				<ul
+					class="header__submenu list-menu--disclosure list-menu motion-reduce color-{{ section.settings.color_scheme_bg }} list-unstyled"
+					tabindex="-1"
+				>
+					{%- for grandchildlink in childlink.links -%}
+						<li data-hover-opacity="3">
+							<a
+								href="{{ grandchildlink.url }}"
+								{% if grandchildlink.type == 'http_link' and settings.open_new_tab %}
+									target="_blank"
+								{% endif %}
+								class="header__menu-item medium-font list-menu__item focus-inset{% if grandchildlink.current %} header__menu-item--active{% endif %}"
+								{% if grandchildlink.current %}
+									aria-current="page"
+								{% endif %}
+							>
+								<span>
+									{{ grandchildlink.title | escape }}
+								</span>
+							</a>
+						</li>
+					{%- endfor -%}
+				</ul>
+			{%- endif -%}
+		</li>
+	{%- endfor -%}
+</ul>

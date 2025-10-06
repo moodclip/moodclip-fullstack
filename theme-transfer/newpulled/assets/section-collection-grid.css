@@ -1,0 +1,1 @@
+.collection-grid__wrapper{display:grid;overflow:hidden;align-items:flex-start;gap:var(--gap)}.collection-grid .collection-grid__cards::-webkit-scrollbar{width:3px;height:3px}.collection-grid .collection-grid__cards::-webkit-scrollbar-thumb{background-color:rgba(var(--color-foreground), 0.7);border-radius:100px}.collection-grid svg{height:auto;width:100%}

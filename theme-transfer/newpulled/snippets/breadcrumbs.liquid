@@ -1,0 +1,178 @@
+{% comment %}
+	{% assign template_base = template | split: '.' | first %}
+
+	{% unless template_base == 'index'
+		or template_base == 'article'
+		or template_base == 'page.contact'
+		or template_base == 'product'
+		or template_base == 'customers/login'
+	%}
+		{% assign curent_url = request.path | lstrip | truncate: 12 %}
+		{% if curent_url == '/policies...' %}
+			{% assign container = 'shopify-policy__container' %}
+		{% else %}
+			{% assign container = 'container' %}
+		{% endif %}
+
+		<div class="{{ container }}">
+			<nav
+				class="breadcrumb breadcrumb_margin"
+				role="navigation"
+				aria-label="breadcrumbs"
+			>
+				<a
+					href="{{ routes.root_url }}"
+					title="{{ 'general.breadcrumbs.home' | t }}"
+					class="breadcrumb__link"
+				>
+					<span>{{ 'general.breadcrumbs.home' | t }} </span>
+				</a>
+				{% if template contains 'page' %}
+					<div class="breadcrumb__delimiter"></div>
+					<div>{{ page.title }}</div>
+				{% elsif template contains 'product' %}
+					<div class="breadcrumb__delimiter"></div>
+					{% if product.collections[0] %}
+						<span
+							><a href="{{ product.collections[0].url }}">
+								{{- product.collections[0].title }}
+							</a></span
+						>
+						<div class="breadcrumb__delimiter"></div>
+					{% endif %}
+					<div>{{ product.title }}</div>
+				{% elsif template contains 'collection' and collection.handle %}
+					<div class="breadcrumb__delimiter"></div>
+					{% if current_tags %}
+						{% capture url %}/collections/{{ collection.handle }}
+	          {% endcapture %}
+						{{ collection.title | link_to: url }}
+						<div class="breadcrumb__delimiter"></div>
+						<span>{{ current_tags | join: ' + ' }} </span>
+					{% endif %}
+					<div>{{ collection.title }}</div>
+				{% elsif template == 'blog' %}
+					<div class="breadcrumb__delimiter"></div>
+					{% if current_tags %}
+						<span>{{ blog.title | link_to: blog.url }}</span>
+						<div class="breadcrumb__delimiter"></div>
+						<div>{{ current_tags | join: ' + ' }}</div>
+					{% else %}
+						<div>{{ blog.title }}</div>
+					{% endif %}
+				{% elsif template == 'customers/order' %}
+					<div class="breadcrumb__delimiter"></div>
+					<span
+						><a href="{{ routes.account_url }}">
+							{{- 'customer.account.title' | t }}
+						</a></span
+					>
+					<div class="breadcrumb__delimiter"></div>
+					<div>{{ order.name }}</div>
+				{% elsif template == 'customers/addresses' %}
+					<div class="breadcrumb__delimiter"></div>
+					<span
+						><a href="{{ routes.account_url }}">
+							{{- 'customer.account.title' | t }}
+						</a></span
+					>
+					<div class="breadcrumb__delimiter"></div>
+					<div>{{ 'customer.addresses.title' | t }}</div>
+				{% else %}
+					<div class="breadcrumb__delimiter"></div>
+					<div>{{ page_title }}</div>
+				{% endif %}
+			</nav>
+		</div>
+	{% endunless %}
+{% endcomment %}
+{% assign template_base = template | split: '.' | first %}
+
+{% unless template_base == 'index'
+	or template_base == 'article'
+	or template_base == 'customers/login'
+	or template_base == 'customers/register'
+	or template_base == 'product'
+	or template_base == 'page.contact'
+%}
+	{% assign curent_url = request.path | lstrip | truncate: 12 %}
+	{% if curent_url == '/policies...' %}
+		{% assign container = 'container' %}
+	{% elsif container == false %}
+		{% assign container = '' %}
+	{% else %}
+		{% assign container = 'container' %}
+	{% endif %}
+	<div class="breadcrumb_margin">
+		<div class="{{ container }}">
+			<nav
+				class="breadcrumb small-font"
+				role="navigation"
+				aria-label="breadcrumbs"
+			>
+				<a
+					href="{{ routes.root_url }}"
+					title="{{ 'general.breadcrumbs.home' | t }}"
+					class="breadcrumb__link"
+				>
+					<span>{{ 'general.breadcrumbs.home' | t }} </span>
+				</a>
+				{% if template contains 'page' %}
+					{% comment %}<div class="breadcrumb__delimiter"></div>{% endcomment %}
+					<div>{{ page.title }}</div>
+				{% elsif template contains 'product' %}
+					{% comment %}<div class="breadcrumb__delimiter"></div>{% endcomment %}
+					{% if product.collections[0] %}
+						<span
+							><a href="{{ product.collections[0].url }}">
+								{{- product.collections[0].title }}
+							</a></span
+						>
+						{% comment %}<div class="breadcrumb__delimiter"></div>{% endcomment %}
+					{% endif %}
+					<div>{{ product.title }}</div>
+				{% elsif template contains 'collection' and collection.handle %}
+					{% comment %}<div class="breadcrumb__delimiter"></div>{% endcomment %}
+					{% if current_tags %}
+						{% capture url %}/collections/{{ collection.handle }}
+						{% endcapture %}
+						{{ collection.title | link_to: url }}
+						{% comment %}<div class="breadcrumb__delimiter"></div>{% endcomment %}
+						<span>{{ current_tags | join: ' + ' }} </span>
+					{% endif %}
+					<div>{{ collection.title }}</div>
+				{% elsif template == 'blog' %}
+					{% comment %}<div class="breadcrumb__delimiter"></div>{% endcomment %}
+					{% if current_tags %}
+						<span>{{ blog.title | link_to: blog.url }}</span>
+						{% comment %}<div class="breadcrumb__delimiter"></div>{% endcomment %}
+						<div>{{ current_tags | join: ' + ' }}</div>
+					{% else %}
+						<div>{{ blog.title }}</div>
+					{% endif %}
+				{% elsif template == 'customers/order' %}
+					{% comment %}<div class="breadcrumb__delimiter"></div>{% endcomment %}
+					<span
+						><a href="{{ routes.account_url }}">
+							{{- 'customer.account.title' | t }}
+						</a></span
+					>
+					{% comment %}<div class="breadcrumb__delimiter"></div>{% endcomment %}
+					<div>{{ order.name }}</div>
+				{% elsif template == 'customers/addresses' %}
+					{% comment %}<div class="breadcrumb__delimiter"></div>{% endcomment %}
+					<span
+						><a href="{{ routes.account_url }}">
+							{{- 'customer.account.title' | t }}
+						</a></span
+					>
+					{% comment %}<div class="breadcrumb__delimiter"></div>{% endcomment %}
+					<div>{{ 'customer.addresses.title' | t }}</div>
+				{% else %}
+					{% comment %}<div class="breadcrumb__delimiter"></div>{% endcomment %}
+					<div>{{ page_title }}</div>
+				{% endif %}
+			</nav>
+		</div>
+	</div>
+{% endunless %}

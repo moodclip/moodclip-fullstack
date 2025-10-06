@@ -1,0 +1,375 @@
+{% comment %}
+  Shopify settings and existing announcement bar structure
+{% endcomment %}
+<script src="{{ 'announcement.js' | asset_url }}" defer="defer"></script>
+
+{% assign show_type = section.settings.show_type %}
+{% assign announcement_link = section.settings.announcement_link %}
+{% assign scroll_fade_in_percentage = section.settings.scroll_fade_in_percentage | default: 10 %}
+
+
+{% if section.settings.height < 70 %}
+	<style>
+		:root {
+			--announcement-height: 52px;
+		}
+		@media screen and (min-width: 750px) {
+			:root {
+				--announcement-height: {{ section.settings.height }}px;
+			}
+		}
+	</style>
+{% else %}
+	<style>
+		:root {
+			--announcement-height: {{ section.settings.height }}px;
+		}
+	</style>
+{% endif %}
+
+<style>
+  .announcement-bar {
+    position: relative;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  .announcement-bar.fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 999;
+  }
+
+  .announcement-bar.fade-in {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .announcement-bar.fade-in.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .announcement-bar.scroll-up-hide {
+    transform: translateY(-150%);
+    transition: transform 0.25s ease;
+  }
+
+  .announcement-bar.scroll-up-show {
+    transform: translateY(0);
+    transition: transform 0.25s ease;
+  }
+
+  .announcement-bar__link--overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .announcement-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    position: relative;
+  }
+
+  .announcement-wrapper > div:first-child {
+      display: none;
+  }
+
+  .announcement-bar__lottie {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+  }
+
+  /* --- CSS for Google Calendar Modal --- */
+  .gcal-popup-modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6);
+    -webkit-animation: gcal-fade-in 0.5s;
+    animation: gcal-fade-in 0.5s;
+  }
+
+  .gcal-popup-modal__content {
+    position: relative;
+    margin: 5vh auto;
+    width: 90%;
+    max-width: 900px;
+    height: 90vh;
+    background-color: #fefefe;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+  }
+
+  .gcal-popup-modal__iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .gcal-popup-modal__close {
+    color: #000;
+    background: #fff;
+    border-radius: 50%;
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    font-size: 30px;
+    line-height: 30px;
+    width: 35px;
+    height: 35px;
+    text-align: center;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    border: 1px solid #ccc;
+    z-index: 10;
+  }
+   .gcal-popup-modal__close:hover {
+    color: #555;
+   }
+
+  @-webkit-keyframes gcal-fade-in {
+    from {opacity: 0}
+    to {opacity: 1}
+  }
+
+  @keyframes gcal-fade-in {
+    from {opacity: 0}
+    to {opacity: 1}
+  }
+</style>
+
+<div
+	class="announcement-bar color-{{ section.settings.color_scheme }} background {% if show_type == 'always' %}fixed fade-in{% elsif show_type == 'scroll_up' %}fixed scroll-up-hide{% endif %}"
+	role="region"
+	aria-label="{{ 'sections.header.announcement' | t }}"
+	{{ block.shopify_attributes }}
+	data-id="shopify-section-{{ section.id }}"
+  data-scroll-fade-in-percentage="{{ scroll_fade_in_percentage }}"
+>
+	<div class="announcement-bar__container" data-announcement-id="{{ section.id }}">
+		<div class="announcement-wrapper">
+			<div></div>
+			<div class="announcement-js-{{ section.id }}">
+				<div class="announcement-bar__box">
+					{%- if section.settings.text != blank or section.settings.image != blank or section.settings.lottie_url != blank -%}
+						<div class="announcement-bar__message">
+              {%- if section.settings.lottie_url != blank -%}
+                <lord-icon src="{{ section.settings.lottie_url }}" trigger="loop" class="announcement-bar__lottie"></lord-icon>
+              {%- elsif section.settings.image != blank -%}
+								<figure class="announcement-bar__image">
+									{{ section.settings.image | image_url: width: 375 | image_tag: loading: 'lazy', widths: '25, 75, 150, 275, 375' }}
+								</figure>
+							{%- endif -%}
+							<div class="announcement-bar__text small-font">{{ section.settings.text }}</div>
+						</div>
+					{%- endif -%}
+				</div>
+			</div>
+		</div>
+	</div>
+  {% if announcement_link != blank and announcement_link contains "calendar.google.com" %}
+      <a href="{{ announcement_link }}" class="announcement-bar__link--overlay" data-gcal-popup-trigger>
+          <span class="visually-hidden">Book an appointment</span>
+      </a>
+  {% elsif announcement_link != blank %}
+      <a href="{{ announcement_link }}" class="announcement-bar__link--overlay">
+          <span class="visually-hidden">Link to {{ announcement_link }}</span>
+      </a>
+  {% endif %}
+</div>
+
+{% comment %}
+  --- HTML for Google Calendar Modal ---
+  This is the structure of the pop-up. It's placed here but will be hidden
+  until it is triggered by the JavaScript.
+{% endcomment %}
+<div id="gcal-popup-{{ section.id }}" class="gcal-popup-modal">
+  <div class="gcal-popup-modal__content">
+    <span class="gcal-popup-modal__close" data-gcal-popup-close>&times;</span>
+    <iframe class="gcal-popup-modal__iframe" src="" data-gcal-popup-iframe></iframe>
+  </div>
+</div>
+
+
+<script>
+  function initAnnouncementBar() {
+    const announcementBar = document.querySelector('.announcement-bar[data-id="shopify-section-{{ section.id }}"]');
+    if (!announcementBar) return;
+
+    // --- Original scroll/sticky logic ---
+    const showType = "{{ section.settings.show_type }}";
+    let lastScrollTop = 0;
+
+    if (showType === 'scroll_up') {
+      window.addEventListener('scroll', () => {
+        const currentScrollTop = window.scrollY || document.documentElement.scrollTop;
+        if (currentScrollTop === 0 || currentScrollTop < lastScrollTop) {
+          announcementBar.classList.remove('scroll-up-hide');
+          announcementBar.classList.add('scroll-up-show');
+        } else if (currentScrollTop > lastScrollTop) {
+          announcementBar.classList.remove('scroll-up-show');
+          announcementBar.classList.add('scroll-up-hide');
+        }
+        lastScrollTop = currentScrollTop;
+      });
+    } else if (showType === 'always') {
+      const scrollFadeInPercentage = parseFloat(announcementBar.dataset.scrollFadeInPercentage || '10');
+      window.addEventListener('scroll', () => {
+        const documentHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const currentScrollTop = window.scrollY || document.documentElement.scrollTop;
+        const scrollPercentage = (currentScrollTop / documentHeight) * 100;
+        announcementBar.classList.toggle('is-visible', scrollPercentage >= scrollFadeInPercentage);
+      });
+    }
+
+    // --- New Google Calendar Modal Popup Logic ---
+    const popupTrigger = announcementBar.querySelector('[data-gcal-popup-trigger]');
+    const popupModal = document.querySelector('#gcal-popup-{{ section.id }}');
+
+    if (popupTrigger && popupModal) {
+      const popupIframe = popupModal.querySelector('[data-gcal-popup-iframe]');
+      const closeButton = popupModal.querySelector('[data-gcal-popup-close]');
+
+      // When the announcement bar link is clicked
+      popupTrigger.addEventListener('click', function(event) {
+        event.preventDefault();
+        const calendarUrl = this.href;
+        popupIframe.setAttribute('src', calendarUrl);
+        popupModal.style.display = 'block';
+        document.body.style.overflow = 'hidden'; // Prevents background scrolling
+      });
+
+      // Function to close the modal
+      const closeModal = () => {
+        popupModal.style.display = 'none';
+        popupIframe.setAttribute('src', ''); // Stop loading to save resources
+        document.body.style.overflow = ''; // Restore background scrolling
+      };
+
+      // Close when clicking the 'x' button
+      closeButton.addEventListener('click', closeModal);
+
+      // Close when clicking on the background overlay
+      window.addEventListener('click', function(event) {
+        if (event.target === popupModal) {
+          closeModal();
+        }
+      });
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', initAnnouncementBar);
+
+  if (Shopify.designMode) {
+    document.addEventListener('shopify:section:unload', initAnnouncementBar);
+    document.addEventListener('shopify:section:load', initAnnouncementBar);
+  }
+</script>
+
+{% schema %}
+{
+	"name": "t:sections.announcement-bar.name",
+	"class": "section-announcement",
+	"enabled_on": {
+		"groups": ["header"],
+		"templates": ["*"]
+	},
+	"settings": [
+		{
+			"type": "select",
+			"id": "show_type",
+			"label": "Reveal announcement bar",
+			"default": "top",
+			"options": [
+			  {
+				"label": "Scroll up",
+				"value": "scroll_up"
+			  },
+			  {
+				"label": "Always/sticky",
+				"value": "always"
+			  },
+			  {
+				"label": "Only top",
+				"value": "top"
+			  }
+			]
+		},
+		{
+			"type": "url",
+			"id": "announcement_link",
+			"label": "Announcement bar link",
+			"info": "For a popup, use your full Google Calendar appointment URL. For a regular link, use any other URL."
+		},
+		{
+			"type": "range",
+			"id": "height",
+			"min": 40,
+			"max": 100,
+			"step": 5,
+			"default": 40,
+			"label": "t:sections.announcement-bar.settings.height.label",
+			"info": "t:sections.announcement-bar.settings.height.info"
+		},
+		{
+			"type": "range",
+			"id": "scroll_fade_in_percentage",
+			"min": 0,
+			"max": 100,
+			"step": 1,
+			"default": 10,
+			"label": "Scroll percentage to fade in (Always/Sticky)",
+			"info": "The percentage of the page scrolled down before the announcement bar fades in."
+		},
+		{
+			"type": "color_scheme",
+			"id": "color_scheme",
+			"default": "background-2",
+			"label": "t:sections.all.color_scheme.label"
+		},
+    {
+      "type": "url",
+      "id": "lottie_url",
+      "label": "Lottie animation URL",
+      "info": "Paste the URL of your Lottie JSON file here. If a Lottie URL is provided, it will override the image."
+    },
+		{
+			"type": "image_picker",
+			"id": "image",
+			"label": "t:sections.announcement-bar.blocks.slide.settings.image.label",
+			"info": "t:sections.announcement-bar.blocks.slide.settings.image.info"
+		},
+		{
+			"type": "richtext",
+			"id": "text",
+			"default": "<p>For example, a test of the announcement of some news</p>",
+			"label": "t:sections.announcement-bar.blocks.slide.settings.text.label"
+		}
+	],
+	"presets": [
+		{
+			"name": "t:sections.announcement-bar.name"
+		}
+	]
+}
+{% endschema %}

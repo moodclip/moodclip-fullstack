@@ -1,0 +1,200 @@
+{{ 'component-collection-card.css' | asset_url | stylesheet_tag }}
+
+{% liquid
+	case media_size
+		when 'landscape'
+			assign section_size = '56.25%'
+		when 'portrait'
+			assign section_size = '125%'
+		when 'square'
+			assign section_size = '100%'
+		else
+			assign section_size = '100%'
+	endcase
+%}
+
+{% if card_type == 'overlay' %}
+	<div
+		class="collection-card color-inverse collection-card-overlay"
+		style="--image-size: {{ section_size }};"
+	>
+		<div class="collection-card__img-wrapper">
+			<a
+				class="collection-card__img have-overlay {{ hover_effect }}"
+				{% if block_collection != blank %}
+					href="{{ url }}"
+				{% endif %}
+			>
+				{% if block_image != blank
+					or collection_image != blank
+					or block_collection.featured_image
+				%}
+					{% liquid
+						if block_image != blank
+							assign collectionImg = block_image
+						elsif collection_image != blank
+							assign collectionImg = collection_image
+						elsif block_collection.featured_image != blank
+							assign collectionImg = block_collection.featured_image
+						endif
+						assign image_height = collectionImg.width | divided_by: collectionImg.aspect_ratio
+						assign image_width = collectionImg.width
+						assign sizes = '(min-width: 750px) 50vw, 100vw'
+					%}
+					{{
+						collectionImg
+						| image_url: width: 3840
+						| image_tag:
+							loading: 'lazy',
+							width: image_width,
+							height: image_height,
+							sizes: sizes,
+							widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+					}}
+				{%- else -%}
+					{{
+						'collection-1'
+						| placeholder_svg_tag: 'placeholder-svg placeholder'
+					}}
+				{% endif %}
+			</a>
+		</div>
+		<h3
+			class="collection-card__title {{ heading_size }}"
+			style="text-align: {{ text_align }}"
+			{% if text_animation %}
+				data-animation-text="true"
+			{% endif %}
+		>
+			<a
+				class="full-unstyled-link"
+				{% if block_collection != blank %}
+					href="{{ url }}"
+				{% endif %}
+			>
+				{% if block_collection != blank %}
+					{{ collection_title }}
+				{% else %}
+					{{- 'general.card.collection_name' | t -}}
+				{% endif %}
+			</a>
+		</h3>
+		{% if show_collection_desc or show_collection_button %}
+			<div
+				class="collection-card__content collection-card__content-{{ text_align }}"
+				style="text-align: {{ text_align }}"
+			>
+				<div class="collection-card__content-wrapper">
+					<div class="collection-card__content-box{% if show_collection_button and btn_label != blank %}-hover{% endif %}">
+						{% if show_collection_desc %}
+							<div class="collection-card__desc richtext__content {{ desc_size }}">
+								{%- if collection_desc != blank -%}
+									{{ collection_desc }}
+								{% else %}
+									{{ 'collection.collection_desc' | t }}
+								{%- endif -%}
+							</div>
+						{% endif %}
+						{%- if show_collection_button -%}
+							{% render 'button',
+								btn_style: 'simple',
+								btn_label: btn_label,
+								btn_link: btn_link,
+								enable_arrow: enable_arrow,
+								btn_animation: settings.button_animation
+							%}
+						{%- endif -%}
+					</div>
+				</div>
+			</div>
+		{% endif %}
+	</div>
+{% else %}
+	<div
+		class="collection-card"
+		style="--image-size: {{ section_size }};"
+	>
+		<div class="collection-card__img-wrapper">
+			<a
+				class="collection-card__img {{ hover_effect }}"
+				{% if block_collection != blank %}
+					href="{{ url }}"
+				{% endif %}
+			>
+				{% if block_image != blank
+					or collection_image != blank
+					or block_collection.featured_image
+				%}
+					{% liquid
+						if block_image != blank
+							assign collectionImg = block_image
+						elsif collection_image != blank
+							assign collectionImg = collection_image
+						elsif block_collection.featured_image != blank
+							assign collectionImg = block_collection.featured_image
+						endif
+						assign image_height = collectionImg.width | divided_by: collectionImg.aspect_ratio
+						assign image_width = collectionImg.width
+						assign sizes = '(min-width: 750px) 50vw, 100vw'
+					%}
+					{{
+						collectionImg
+						| image_url: width: 3840
+						| image_tag:
+							loading: 'lazy',
+							width: image_width,
+							height: image_height,
+							sizes: sizes,
+							widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+					}}
+				{%- else -%}
+					{{
+						'collection-1'
+						| placeholder_svg_tag: 'placeholder-svg placeholder'
+					}}
+				{% endif %}
+			</a>
+		</div>
+		<div
+			class="collection-card__content collection-card__content-{{ text_align }}"
+			style="text-align: {{ text_align }}"
+		>
+			<h3 class="collection-card__title {{ heading_size }}"
+				{% if text_animation %}
+					data-animation-text="true"
+				{% endif %}
+			>
+				<a
+					class="full-unstyled-link"
+					{% if block_collection != blank %}
+						href="{{ url }}"
+					{% endif %}
+				>
+					{% if block_collection != blank %}
+						{{ collection_title }}
+					{% else %}
+						{{- 'general.card.collection_name' | t -}}
+					{% endif %}
+				</a>
+			</h3>
+			{% if show_collection_desc %}
+				<div class="collection-card__desc richtext__content {{ desc_size }}">
+					{%- if collection_desc != blank -%}
+						{{ collection_desc }}
+					{% else %}
+						{{ 'collection.collection_desc' | t }}
+					{%- endif -%}
+				</div>
+			{% endif %}
+			{%- if show_collection_button -%}
+				{% render 'button',
+					btn_style: 'simple',
+					btn_label: btn_label,
+					btn_link: btn_link,
+					enable_arrow: enable_arrow,
+					btn_animation: settings.button_animation
+				%}
+			{%- endif -%}
+		</div>
+	</div>
+{% endif %}

@@ -1,0 +1,270 @@
+{{ 'img-comparison.css' | asset_url | stylesheet_tag }}
+{{ 'section-compare.css' | asset_url | stylesheet_tag }}
+{{ 'component-card-horizontal.css' | asset_url | stylesheet_tag }}
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'img-comparison.js' | asset_url }}" defer="defer"></script>
+
+<noscript>
+	<style>
+		img-comparison-slider {
+			visibility: visible;
+			display: flex;
+			width: 100%;
+			height: 100%;
+			position: relative;
+		}
+
+		img-comparison-slider [slot='second'] {
+			display: block;
+			@media (max-width: 1200px) {
+				display: block;
+			}
+		}
+
+		.icon-handle {
+			position: absolute;
+			left: 48%;
+			top: 48%;
+		}
+		.compare__figure {
+			width: 50%;
+			order: 1;
+			@media (max-width: 1200px) {
+				height: auto;
+			}
+		}
+		img:first-child {
+		}
+		img:last-child {
+		}
+	</style>
+</noscript>
+
+{% style %}
+	{% render 'section-margin' %}
+{% endstyle %}
+
+<section class="compare compare--full">
+	<div class="container">
+		{%- if section.settings.product != blank -%}
+			<div class="compare__content-card">
+				<div class="collection-tabs_card">
+					{% render 'product-card-horizontal',
+						product_card_product: section.settings.product,
+						media_size: section.settings.image_ratio,
+						product_primary-add-btn: true,
+						heading_size: 'medium-font'
+					%}
+				</div>
+			</div>
+		{%- endif -%}
+		<div class="compare__box">
+			<div class="compare__slide">
+				{%- if section.settings.image_before != blank
+					and section.settings.image_after != blank
+				-%}
+					<img-comparison-slider>
+						<figure class="compare__figure" slot="first">
+							{{
+								section.settings.image_before
+								| image_url: width: section.settings.image_before.width
+								| image_tag:
+									loading: 'lazy',
+									widths: '575, 750, 990, 1200, 1360, 1500, 1632, 1900, 2200, 2500, 2800, 3100, 3264, 3400, 3700, 3900',
+									sizes: '100vw'
+							}}
+
+							<figcaption class="compare__figure_text compare__figure_text--left">
+								{%- if section.settings.before_heading != blank -%}
+									<div class="badge">
+										{{ section.settings.before_heading }}
+									</div>
+								{%- endif -%}
+							</figcaption>
+						</figure>
+						<figure class="compare__figure" slot="second">
+							{{
+								section.settings.image_after
+								| image_url: width: section.settings.image_after.width
+								| image_tag:
+									loading: 'lazy',
+									widths: '575, 750, 990, 1200, 1360, 1500, 1632, 1900, 2200, 2500, 2800, 3100, 3264, 3400, 3700, 3900',
+									sizes: '100vw'
+							}}
+							{%- if section.settings.product != blank -%}
+								<div class="compare__content-bottom">
+									<div class="collection-tabs_card">
+										{% render 'product-card-horizontal',
+											product_card_product: section.settings.product,
+											media_size: section.settings.image_ratio,
+											product_primary-add-btn: true,
+											heading_size: 'medium-font'
+										%}
+									</div>
+								</div>
+							{%- endif -%}
+							<figcaption class="compare__figure_text compare__figure_text--right">
+								{%- if section.settings.after_heading != blank -%}
+									<div class="badge">
+										{{ section.settings.after_heading }}
+									</div>
+								{%- endif -%}
+							</figcaption>
+						</figure>
+						{% comment %}{% render 'icon-handle' %}{% endcomment %}
+					</img-comparison-slider>
+				{%- else -%}
+					<div class="compare__default">
+						{{
+							'product-1'
+							| placeholder_svg_tag: 'placeholder-svg placeholder'
+						}}
+						{{
+							'product-2'
+							| placeholder_svg_tag: 'placeholder-svg placeholder'
+						}}
+					</div>
+				{%- endif -%}
+			</div>
+		</div>
+	</div>
+</section>
+{% schema %}
+{
+	"name": "t:sections.compare-block.name",
+	"tag": "section",
+	"class": "section-compare",
+	"enabled_on": {
+		"templates": ["*"]
+	},
+	"settings": [
+		{
+			"type": "header",
+			"content": "t:sections.compare-block.settings.before.content"
+		},
+		{
+			"type": "image_picker",
+			"id": "image_before",
+			"label": "t:sections.compare-block.settings.image_before.label",
+			"info": "t:sections.compare-block.settings.image_before.info"
+		},
+		{
+			"type": "text",
+			"id": "before_heading",
+			"default": "Before",
+			"label": "t:sections.compare-block.settings.title.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.compare-block.settings.after.content"
+		},
+		{
+			"type": "image_picker",
+			"id": "image_after",
+			"label": "t:sections.compare-block.settings.image_after.label",
+			"info": "t:sections.compare-block.settings.image_before.info"
+		},
+		{
+			"type": "text",
+			"id": "after_heading",
+			"default": "After",
+			"label": "t:sections.compare-block.settings.title.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.product_card.header.content"
+		},
+		{
+			"type": "product",
+			"id": "product",
+			"label": "t:sections.all.product_card.product.label"
+		},
+		{
+			"type": "select",
+			"id": "image_ratio",
+			"options": [
+				{
+					"value": "landscape",
+					"label": "t:sections.all.image.ratio.options__1.label"
+				},
+				{
+					"value": "portrait",
+					"label": "t:sections.all.image.ratio.options__2.label"
+				},
+				{
+					"value": "square",
+					"label": "t:sections.all.image.ratio.options__3.label"
+				}
+			],
+			"default": "portrait",
+			"label": "t:sections.all.image.ratio.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.section-margin.header.content"
+		},
+		{
+			"type": "select",
+			"id": "margin_top",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "no-indent",
+			"label": "t:sections.all.section-margin.margin_top.label"
+		},
+		{
+			"type": "select",
+			"id": "margin_bottom",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "l",
+			"label": "t:sections.all.section-margin.margin_bottom.label"
+		}
+	],
+	"presets": [
+		{
+			"name": "t:sections.compare-block.presets.name"
+		}
+	]
+}
+{% endschema %}

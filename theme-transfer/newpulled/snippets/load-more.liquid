@@ -1,0 +1,20 @@
+<input type="hidden" value="{{ next_url }}" data-next-url>
+<input type="hidden" value="{{ count_pages }}" data-total-pages>
+<input type="hidden" value="{{ current_page }}" data-current-page>
+<div class="button-wrapper no-js-hidden">
+	<button class="button button--{{- settings.button_style }} js-load-more">
+		{% if settings.button_animation %}
+			<span class="animation-wrapper" hoverstagger="link">
+				<span class="button-label animation" hoverstagger="text">
+					<span class="word" id="word1">{{ 'products.load_more.label' | t }}</span>
+				</span>
+				<span class="button-label is-2 animation" hoverstagger="text">
+					<span class="word" id="word2">{{ 'products.load_more.label' | t }}</span>
+				</span>
+			</span>
+		{% else %}
+			<span class="button-label">{{ 'products.load_more.label' | t }}</span>
+		{% endif %}
+		{%- render 'icon-loading' -%}
+	</button>
+</div>

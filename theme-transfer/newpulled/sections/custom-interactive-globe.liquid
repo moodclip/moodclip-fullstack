@@ -1,0 +1,779 @@
+{% comment %}
+  This is the schema for the Shopify theme editor.
+  It allows full customization of colors, fonts, and locations.
+{% endcomment %}
+{% schema %}
+{
+  "name": "Globe - Alt Layout",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content Settings"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Our Global Presence"
+    },
+    {
+      "type": "header",
+      "content": "Color Settings"
+    },
+    {
+      "type": "color",
+      "id": "pin_color",
+      "label": "Pin & Highlight Color",
+      "default": "#ff9900"
+    },
+    {
+      "type": "color",
+      "id": "inactive_pin_color",
+      "label": "Inactive Pin Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "active_pin_color",
+      "label": "Active Pin Color",
+      "default": "#0000ff"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "list_text_color",
+      "label": "Location List Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Typography (Desktop)"
+    },
+    {
+      "type": "range",
+      "id": "heading_fs_desktop",
+      "label": "Heading Font Size (Desktop)",
+      "min": 20,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "country_fs_desktop",
+      "label": "Country Name Font Size (Desktop)",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "desc_fs_desktop",
+      "label": "Description Font Size (Desktop)",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Typography (Mobile)"
+    },
+    {
+      "type": "range",
+      "id": "heading_fs_mobile",
+      "label": "Heading Font Size (Mobile)",
+      "min": 18,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "country_fs_mobile",
+      "label": "Country Name Font Size (Mobile)",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "desc_fs_mobile",
+      "label": "Description Font Size (Mobile)",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    }
+  ],
+  "blocks": [
+    {
+      "type": "location",
+      "name": "Location",
+      "settings": [
+        {
+          "type": "text",
+          "id": "country",
+          "label": "Country",
+          "default": "New Country"
+        },
+        {
+          "type": "richtext",
+          "id": "description",
+          "label": "Description / Roles",
+          "default": "<p>New Role</p>"
+        },
+        {
+          "type": "text",
+          "id": "lat",
+          "label": "Latitude",
+          "default": "0.0",
+          "info": "Find coordinates online, e.g., 'new york latitude longitude'"
+        },
+        {
+          "type": "text",
+          "id": "lon",
+          "label": "Longitude",
+          "default": "0.0"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Globe - Alt Layout",
+      "blocks": [
+        {
+          "type": "location",
+          "settings": {
+            "country": "USA", 
+            "lat": "39.8283", "lon": "-98.5795",
+            "description": "<p>Mood Creative Studios HQ</p><p>Creative Direction</p><p>Audio Engineering</p>"
+          }
+        },
+        {
+          "type": "location",
+          "settings": {
+            "country": "Canada", 
+            "lat": "43.6532", "lon": "-79.3832",
+            "description": "<p>Project Management</p><p>Quality Control</p>"
+          }
+        },
+        {
+          "type": "location",
+          "settings": {
+            "country": "Australia", 
+            "lat": "-25.2744", "lon": "133.7751",
+            "description": "<p>Senior Editing</p>"
+          }
+        },
+        {
+          "type": "location",
+          "settings": {
+            "country": "United Kingdom", 
+            "lat": "55.3781", "lon": "-3.4360",
+            "description": "<p>Marketing Department</p>"
+          }
+        },
+        {
+          "type": "location",
+          "settings": {
+            "country": "South Korea", 
+            "lat": "35.9078", "lon": "127.7669",
+            "description": "<p>Marketing Department</p>"
+          }
+        },
+        {
+          "type": "location",
+          "settings": {
+            "country": "Brazil", 
+            "lat": "-14.2350", "lon": "-51.9253",
+            "description": "<p>Thumbnail Design</p><p>Shortform Video Cutting</p>"
+          }
+        },
+        {
+          "type": "location",
+          "settings": {
+            "country": "Philippines", 
+            "lat": "12.8797", "lon": "121.7740",
+            "description": "<p>Content Publishing</p><p>Asset Management</p><p>Thumbnail Design</p>"
+          }
+        },
+        {
+          "type": "location",
+          "settings": {
+            "country": "Singapore", 
+            "lat": "1.3521", "lon": "103.8198",
+            "description": "<p>Workflow Optimization</p><p>System Operations</p><p>Data-Informed Editing Strategy</p>"
+          }
+        },
+        {
+          "type": "location",
+          "settings": {
+            "country": "Turkey", 
+            "lat": "38.9637", "lon": "35.2433",
+            "description": "<p>Video Editing</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+  .globe-alt-wrapper {
+    padding: 50px 20px;
+    background-color: #000000;
+    color: #ffffff;
+    overflow: hidden;
+    position: relative;
+    --pin-highlight-color: {{ section.settings.pin_color }};
+    --inactive-pin-color: {{ section.settings.inactive_pin_color }};
+    --active-pin-color: {{ section.settings.active_pin_color }};
+    --heading-color: {{ section.settings.heading_color }};
+    --list-text-color: {{ section.settings.list_text_color }};
+    --heading-fs-desktop: {{ section.settings.heading_fs_desktop }}px;
+    --country-fs-desktop: {{ section.settings.country_fs_desktop }}px;
+    --desc-fs-desktop: {{ section.settings.desc_fs_desktop }}px;
+    --heading-fs-mobile: {{ section.settings.heading_fs_mobile }}px;
+    --country-fs-mobile: {{ section.settings.country_fs_mobile }}px;
+    --desc-fs-mobile: {{ section.settings.desc_fs_mobile }}px;
+  }
+  .globe-alt-wrapper h2 {
+    text-align: center;
+    font-size: var(--heading-fs-desktop);
+    color: var(--heading-color);
+    margin-bottom: 30px;
+  }
+  .globe-alt-layout {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 40px;
+  }
+  .globe-alt-container {
+    flex: 2;
+    height: 60vh;
+    min-height: 400px;
+    cursor: grab;
+    touch-action: none;
+    position: relative;
+    z-index: 1;
+  }
+  .globe-alt-container:active {
+    cursor: grabbing;
+  }
+  .location-list-alt {
+    flex: 1;
+    height: 60vh;
+    min-height: 400px;
+    overflow-y: auto;
+    text-align: left;
+    padding-right: 15px;
+  }
+  .location-list-item {
+    padding: 15px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .location-list-item:hover, .location-list-item.active {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+  .location-list-item .country {
+    font-size: var(--country-fs-desktop);
+    font-weight: bold;
+    color: var(--list-text-color);
+    margin-bottom: 8px;
+    transition: color 0.3s ease;
+  }
+  .location-list-item.active .country {
+    color: var(--pin-highlight-color);
+  }
+  .location-list-item .description {
+    font-size: var(--desc-fs-desktop);
+    color: var(--list-text-color);
+    opacity: 0.7;
+    line-height: 1.5;
+  }
+  .location-list-item .description p {
+    margin: 0 0 4px 0;
+    display: block;
+  }
+  .location-list-item .description p:not(:last-child){
+    margin-bottom: 4px;
+  }
+
+  @media (max-width: 768px) {
+    .globe-alt-wrapper {
+        padding: 25px 20px;
+    }
+    .globe-alt-wrapper h2 {
+      font-size: var(--heading-fs-mobile);
+      margin-bottom: 20px;
+    }
+    .globe-alt-layout {
+      flex-direction: column;
+    }
+    .globe-alt-container {
+      width: 100%;
+      height: 40vh;
+      min-height: 300px;
+    }
+    .location-list-alt {
+      width: 100%;
+      height: auto;
+      max-height: 40vh;
+    }
+    .location-list-item .country {
+      font-size: var(--country-fs-mobile);
+    }
+    .location-list-item .description {
+      font-size: var(--desc-fs-mobile);
+    }
+  }
+</style>
+
+<div class="globe-alt-wrapper">
+  <h2>{{ section.settings.heading }}</h2>
+  <div class="globe-alt-layout">
+    <div 
+      id="interactive-globe-container-alt" 
+      class="globe-alt-container"
+      data-inactive-pin-color="{{ section.settings.inactive_pin_color }}"
+      data-active-pin-color="{{ section.settings.active_pin_color }}"
+    >
+    </div>
+    <div id="location-list-alt" class="location-list-alt"></div>
+  </div>
+</div>
+
+<script id="globe-locations-data-alt" type="application/json">
+  {{ section.blocks | map: "settings" | json }}
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('interactive-globe-container-alt');
+  if (!container) return; 
+
+  const locationListEl = document.getElementById('location-list-alt');
+  const locationsJsonEl = document.getElementById('globe-locations-data-alt');
+  const locationsData = JSON.parse(locationsJsonEl.textContent || '[]');
+  
+  const INACTIVE_PIN_COLOR_VALUE = container.dataset.inactivePinColor || '#ffffff';
+  const ACTIVE_PIN_COLOR_VALUE = container.dataset.activePinColor || '#0000ff';
+
+  const TEAM_MEMBERS = locationsData.map(settings => ({
+    lat: parseFloat(settings.lat) || 0,
+    lon: parseFloat(settings.lon) || 0,
+    description: settings.description || "",
+    country: settings.country || ""
+  }));
+  
+  const INACTIVE_PIN_COLOR = new THREE.Color(INACTIVE_PIN_COLOR_VALUE);
+  const ACTIVE_PIN_COLOR = new THREE.Color(ACTIVE_PIN_COLOR_VALUE);
+  const GLOBE_RADIUS = 10;
+
+  let scene, camera, renderer, globe, group, pins = [], hitboxes = [];
+  let starField, pinGlows = [];
+  let isDragging = false, isAnimating = false;
+  let startQuaternion = new THREE.Quaternion();
+  let targetQuaternion = new THREE.Quaternion();
+  let animationProgress = 0;
+  let activePin = null;
+  let previousTouchPosition = { x: 0, y: 0 };
+  let mouse = new THREE.Vector2();
+  let raycaster = new THREE.Raycaster();
+  
+  // --- New: Array to manage animated communication lines ---
+  let animatedLines = [];
+
+  function init() {
+    scene = new THREE.Scene();
+    group = new THREE.Group();
+    scene.add(group);
+
+    const isMobile = window.innerWidth <= 768;
+    camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
+    camera.position.z = isMobile ? 30 : 25;
+
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setClearColor(0x000000, 0);
+    container.appendChild(renderer.domElement);
+
+    createStarfield();
+    addLighting();
+    createGlobe();
+
+    if (TEAM_MEMBERS.length > 0) {
+      createPins();
+      createLocationList();
+      // --- New: Start the line animations ---
+      initLineAnimations();
+    }
+    
+    addEventListeners();
+    animate();
+  }
+  
+  function createStarfield() {
+    const starVertices = [];
+    for (let i = 0; i < 10000; i++) {
+        const x = (Math.random() - 0.5) * 2000;
+        const y = (Math.random() - 0.5) * 2000;
+        const z = (Math.random() - 0.5) * 2000;
+        starVertices.push(x, y, z);
+    }
+
+    const starGeometry = new THREE.BufferGeometry();
+    starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+    const starMaterial = new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 0.7,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        sizeAttenuation: true
+    });
+
+    starField = new THREE.Points(starGeometry, starMaterial);
+    scene.add(starField);
+  }
+
+  function addLighting() {
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+    scene.add(ambientLight);
+    const pointLight = new THREE.PointLight(0xffffff, 0.8);
+    camera.add(pointLight);
+    scene.add(camera);
+  }
+
+  function createGlobe() {
+    const textureLoader = new THREE.TextureLoader();
+    const globeMaterial = new THREE.MeshStandardMaterial({
+      map: textureLoader.load("https://cdn.shopify.com/s/files/1/0732/9421/7444/files/Night_Flat_Worldmap_2_Bright.jpg?v=1749979536"),
+      bumpMap: textureLoader.load("https://cdn.shopify.com/s/files/1/0732/9421/7444/files/Grey_Flat_Worldmap_2.jpg?v=1749978846"),
+      bumpScale: 0.05
+    });
+    const globeGeometry = new THREE.SphereGeometry(GLOBE_RADIUS, 64, 64);
+    globe = new THREE.Mesh(globeGeometry, globeMaterial);
+    group.add(globe);
+  }
+
+  function createPins() {
+    TEAM_MEMBERS.forEach(member => {
+      const position = latLonToVector3(member.lat, member.lon, GLOBE_RADIUS);
+      
+      const pinGeometry = new THREE.SphereGeometry(0.15, 32, 32);
+      const pinMaterial = new THREE.MeshBasicMaterial({ color: INACTIVE_PIN_COLOR });
+      const pin = new THREE.Mesh(pinGeometry, pinMaterial);
+      pin.position.copy(position);
+      pin.userData = { ...member };
+      group.add(pin);
+      pins.push(pin);
+      
+      const hitboxGeometry = new THREE.SphereGeometry(0.8, 16, 16);
+      const hitboxMaterial = new THREE.MeshBasicMaterial({ visible: false });
+      const hitbox = new THREE.Mesh(hitboxGeometry, hitboxMaterial);
+      hitbox.position.copy(position);
+      hitbox.userData.pin = pin;
+      group.add(hitbox);
+      hitboxes.push(hitbox);
+
+      const glowGeometry = new THREE.SphereGeometry(0.2, 32, 32);
+      const glowMaterial = new THREE.MeshBasicMaterial({ 
+        color: INACTIVE_PIN_COLOR, 
+        transparent: true, 
+        opacity: 0.7 
+      });
+      const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+      glow.position.copy(position);
+      group.add(glow);
+      pinGlows.push(glow);
+    });
+  }
+
+  // --- Functions to create and manage line animations ---
+  function startNewLineAnimation() {
+      // --- Updated: Increase simultaneous lines ---
+      if (pins.length < 2 || animatedLines.length > 11) return; 
+
+      // Pick two random, distinct pins
+      let pinA_index = Math.floor(Math.random() * pins.length);
+      let pinB_index = Math.floor(Math.random() * pins.length);
+      while (pinA_index === pinB_index) {
+          pinB_index = Math.floor(Math.random() * pins.length);
+      }
+      const pinA = pins[pinA_index];
+      const pinB = pins[pinB_index];
+
+      const startPoint = pinA.position;
+      const endPoint = pinB.position;
+      
+      // Calculate the arc for the line
+      const midPoint = new THREE.Vector3().addVectors(startPoint, endPoint).multiplyScalar(0.5);
+      const distance = startPoint.distanceTo(endPoint);
+      // --- Updated: Reduced arc height for a more direct look ---
+      midPoint.normalize().multiplyScalar(GLOBE_RADIUS + distance * 0.25);
+      
+      const curve = new THREE.QuadraticBezierCurve3(startPoint, midPoint, endPoint);
+      const points = curve.getPoints(50); 
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      
+      const material = new THREE.LineBasicMaterial({ 
+          color: 0xffffff,
+          transparent: true,
+          opacity: 0.7,
+          depthWrite: false
+      });
+      
+      const line = new THREE.Line(geometry, material);
+      
+      geometry.setDrawRange(0, 0);
+
+      group.add(line);
+      
+      animatedLines.push({
+          line: line,
+          geometry: geometry,
+          startTime: performance.now(),
+          duration: 1500 
+      });
+  }
+
+  function initLineAnimations() {
+      // --- Updated: Start new lines more frequently ---
+      setInterval(startNewLineAnimation, 700);
+  }
+
+  function createLocationList() {
+    pins.forEach((pin, index) => {
+      const item = document.createElement('div');
+      item.className = 'location-list-item';
+      item.dataset.country = pin.userData.country;
+      
+      item.innerHTML = `
+        <div class="country">${pin.userData.country}</div>
+        <div class="description">${pin.userData.description}</div>
+      `;
+      item.addEventListener('click', () => {
+        flyToPin(pin);
+      });
+      locationListEl.appendChild(item);
+    });
+  }
+  
+  function flyToPin(pin) {
+      if(isAnimating) return;
+      
+      activePin = pin;
+      isAnimating = true;
+      animationProgress = 0;
+      startQuaternion.copy(group.quaternion);
+      
+      const dummyObject = new THREE.Object3D();
+      dummyObject.lookAt(pin.position.clone().normalize());
+      targetQuaternion.copy(dummyObject.quaternion).invert();
+
+      updateActiveListItem();
+      updatePinColors();
+  }
+
+  function updateActiveListItem() {
+    document.querySelectorAll('.location-list-item').forEach(item => {
+        if(activePin && item.querySelector('.country').innerText === activePin.userData.country) {
+            item.classList.add('active');
+            item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else {
+            item.classList.remove('active');
+        }
+    });
+  }
+  
+  function updatePinColors() {
+    pins.forEach((pin, index) => {
+      const isPinActive = activePin && pin.userData.country === activePin.userData.country;
+      const targetColor = isPinActive ? ACTIVE_PIN_COLOR : INACTIVE_PIN_COLOR;
+      pin.material.color.lerp(targetColor, 0.1);
+      pinGlows[index].material.color.lerp(targetColor, 0.1);
+    });
+  }
+
+  function addEventListeners() {
+    let startX = 0, startY = 0;
+    
+    container.addEventListener('mousedown', (e) => {
+        isDragging = false;
+        startX = e.clientX;
+        startY = e.clientY;
+    });
+
+    container.addEventListener('mousemove', (e) => {
+        if (e.buttons === 1) {
+            const dx = Math.abs(e.clientX - startX);
+            const dy = Math.abs(e.clientY - startY);
+            if (dx > 5 || dy > 5) {
+                isDragging = true;
+                isAnimating = false;
+                activePin = null;
+                updateActiveListItem();
+                const deltaX = e.movementX || 0;
+                const deltaY = e.movementY || 0;
+                group.rotation.y -= deltaX * -0.005;
+                group.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, group.rotation.x - (deltaY * -0.005)));
+            }
+        }
+    });
+
+    container.addEventListener('mouseup', (e) => {
+        if (!isDragging) {
+            const rect = container.getBoundingClientRect();
+            mouse.x = ((e.clientX - rect.left) / container.clientWidth) * 2 - 1;
+            mouse.y = -((e.clientY - rect.top) / container.clientHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(hitboxes);
+            if (intersects.length > 0) {
+                flyToPin(intersects[0].object.userData.pin);
+            }
+        }
+        isDragging = false;
+    });
+    
+    container.addEventListener('touchstart', (e) => {
+        isDragging = false;
+        const touch = e.touches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+        previousTouchPosition = { x: touch.clientX, y: touch.clientY };
+    }, { passive: false });
+
+    container.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const dx = Math.abs(touch.clientX - startX);
+        const dy = Math.abs(touch.clientY - startY);
+
+        if (dx > 5 || dy > 5) {
+            isDragging = true;
+            isAnimating = false;
+            activePin = null;
+            updateActiveListItem();
+            const deltaX = touch.clientX - previousTouchPosition.x;
+            const deltaY = touch.clientY - previousTouchPosition.y;
+            group.rotation.y -= deltaX * -0.005;
+            group.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, group.rotation.x - (deltaY * -0.005)));
+            previousTouchPosition = { x: touch.clientX, y: touch.clientY };
+        }
+    }, { passive: false });
+    
+    container.addEventListener('touchend', (e) => {
+        if (!isDragging) {
+            const rect = container.getBoundingClientRect();
+            const lastTouch = e.changedTouches[0] || {clientX: startX, clientY: startY};
+            mouse.x = ((lastTouch.clientX - rect.left) / container.clientWidth) * 2 - 1;
+            mouse.y = -((lastTouch.clientY - rect.top) / container.clientHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(hitboxes);
+            if (intersects.length > 0) {
+                flyToPin(intersects[0].object.userData.pin);
+            }
+        }
+        isDragging = false;
+    });
+
+    window.addEventListener('resize', () => {
+        const isMobile = window.innerWidth <= 768;
+        camera.position.z = isMobile ? 30 : 25;
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    const now = performance.now();
+
+    // Animate the communication lines
+    for (let i = animatedLines.length - 1; i >= 0; i--) {
+        const lineData = animatedLines[i];
+        const elapsedTime = now - lineData.startTime;
+        let progress = elapsedTime / lineData.duration;
+        
+        if (progress < 1) {
+            const drawCount = Math.floor(progress * (50 + 1));
+            lineData.geometry.setDrawRange(0, drawCount);
+        } else {
+            const fadeDuration = 1000;
+            const fadeProgress = (elapsedTime - lineData.duration) / fadeDuration;
+            
+            if (fadeProgress < 1) {
+                lineData.line.material.opacity = 0.7 * (1 - fadeProgress);
+            } else {
+                group.remove(lineData.line);
+                lineData.geometry.dispose();
+                lineData.line.material.dispose();
+                animatedLines.splice(i, 1);
+            }
+        }
+    }
+
+    if (isAnimating) {
+        animationProgress = Math.min(animationProgress + 0.02, 1);
+        THREE.Quaternion.slerp(startQuaternion, targetQuaternion, group.quaternion, animationProgress);
+        if (animationProgress >= 1) {
+            isAnimating = false;
+        }
+    } else if (!isDragging && !activePin) {
+        group.rotation.y += 0.001; 
+    }
+
+    if (!isDragging) {
+      updatePinColors();
+    }
+
+    if(starField) {
+      starField.rotation.y += 0.0001;
+    }
+
+    if (pinGlows.length > 0) {
+        const time = Date.now() * 0.002;
+        pinGlows.forEach((glow, index) => {
+            const pulseFactor = (Math.sin(time + index * 0.5) + 1) / 2;
+            glow.scale.setScalar(1 + pulseFactor * 1.5);
+            glow.material.opacity = pulseFactor * 0.5;
+        });
+    }
+
+    renderer.render(scene, camera);
+  }
+
+  const latLonToVector3 = (lat, lon, radius) => {
+    const phi = (90 - lat) * (Math.PI / 180);
+    const theta = (lon + 180) * (Math.PI / 180);
+    const x = -(radius * Math.sin(phi) * Math.cos(theta));
+    const z = radius * Math.sin(phi) * Math.sin(theta);
+    const y = radius * Math.cos(phi);
+    return new THREE.Vector3(x, y, z);
+  };
+
+  init();
+});
+</script>

@@ -1,0 +1,613 @@
+{% if section.settings.enable_section %}
+
+<style>
+
+/* --- Loading Spinners --- */
+.ss-loading-spinner {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: block !important;
+  position: relative;
+  margin: 0 auto;
+  border-top: 3px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+  border-right: 3px solid rgba(255, 255, 255, 0.2);
+  border-left: 3px solid #ffffff;
+  transform: translateZ(0);
+  animation: ssLoadingSpinner 1s infinite linear;
+}
+
+@keyframes ssLoadingSpinner {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.ss-typing-spinner {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: ssTypingSpinner 1s linear infinite alternate;
+}
+
+@keyframes ssTypingSpinner {
+  0% { 
+    background-color: rgba(0,0,0, 1);
+    box-shadow: 12px 0px 0px 0px rgba(0,0,0,0.2), 24px 0px 0px 0px rgba(0,0,0,0.2); 
+  }
+  25% { 
+    background-color: rgba(0,0,0, 0.4);
+    box-shadow: 12px 0px 0px 0px rgba(0,0,0,2), 24px 0px 0px 0px rgba(0,0,0,0.2); 
+  }
+  75% { 
+    background-color: rgba(0,0,0, 0.4);
+    box-shadow: 12px 0px 0px 0px rgba(0,0,0,0.2), 24px 0px 0px 0px rgba(0,0,0,2); 
+  }
+}
+
+/* --- WhatsApp Wrapper and Positioning --- */
+ss-whatsapp-wrapper {
+  position: fixed;
+  bottom: 14px;
+  z-index: 9;
+}
+
+.ss-whatsapp-button-left {
+  left: 14px;
+}
+
+.ss-whatsapp-button-left #ss-whatsapp-dialog {
+  right: auto;
+}
+  
+.ss-whatsapp-button-left #ss-whatsapp-button-text {
+  left: {{ section.settings.icon_size | times: 1.15 | round: 0}}px;
+}
+
+.ss-whatsapp-button-right {
+  right: 14px;
+}
+  
+.ss-whatsapp-button-right #ss-whatsapp-button-text {
+  right: {{ section.settings.icon_size | times: 1.15 | round: 0}}px;
+}
+
+/* --- Main WhatsApp Button (#ss-whatsapp-button) --- */
+#ss-whatsapp-button {
+  background: linear-gradient({{ section.settings.primary_color }}, {{ section.settings.primary_color2 }});
+  border: transparent;
+  border-radius: 50rem;
+  width: {{ section.settings.icon_size }}px;
+  height: {{ section.settings.icon_size }}px;
+  transition: all .2s ease-out;
+  border: 1px solid white;
+  cursor: pointer;
+}
+  
+#ss-whatsapp-button:hover,
+#ss-whatsapp-button:focus {
+  opacity: .9;
+  box-shadow: 0 0 1rem rgba(0, 0, 0, .25);
+}
+
+@keyframes showssWhatsAppDot {
+  90% { opacity: 0; transform: scale(0); }
+  100% { opacity: 1; transform: scale(1) }
+}
+
+/* --- WhatsApp Icon Shake Animation --- */
+#ss-whatsapp-button svg {
+  animation: whatsapp-shake 2s ease-out 1s infinite; /* Shake continuously with a 2-second delay between each shake */
+  transform-origin: center; /* Ensures the shake is centered */
+}
+
+@keyframes whatsapp-shake {
+  0%, 100% { transform: rotate(0deg); }
+  10%, 30%, 50%, 70% { transform: rotate(8deg); }
+  20%, 40%, 60% { transform: rotate(-8deg); }
+  80% { transform: rotate(4deg); }
+  90% { transform: rotate(-4deg); }
+}
+
+/* --- Button Text (#ss-whatsapp-button-text) with Continuous Gradient Flow --- */
+#ss-whatsapp-button-text {
+  border-radius: 50rem;
+  padding: 8px 16px;
+  font-size: {{ section.settings.button_text_size }}px;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  white-space: nowrap;
+  transform: translateY(-50%);
+  
+  /* Continuous horizontal gradient sweep setup (perfect loop) */
+  /* This gradient pattern will repeat seamlessly */
+  background: linear-gradient(90deg, #0C2048 0%, #1042A4 25%, #000 50%, #1042A4 75%, #0C2048 100%); 
+  
+  /* Make the background twice as wide to allow for smooth scrolling of one full pattern */
+  background-size: 200% 100%; 
+  background-position: 0% 0%; /* Initial position */
+  
+  box-shadow: 0 0 1rem rgba(0, 0, 0, .125);
+  color: white; 
+
+  /* Animation properties for one-directional continuous horizontal sweep */
+  animation: gradient-scroll-horizontal 6s linear infinite; /* Changed animation name for clarity */
+}
+
+@keyframes gradient-scroll-horizontal {
+  0% {
+    background-position: 0% 0%; /* Start at left edge */
+  }
+  100% {
+    /* Move the background horizontally by exactly 100% of its *own width*.
+       Since background-size is 200%, this means it moves by the width of one "pattern" cycle. */
+    background-position: 100% 0%; 
+  }
+}
+
+/* --- WhatsApp Dialog (#ss-whatsapp-dialog) --- */
+#ss-whatsapp-dialog {
+  visibility: hidden;
+  position: absolute;
+  bottom: 65px;
+  right: 0;
+  background: white;
+  border-radius: 1.25rem;
+  width: 360px;
+  height: 400px;
+  box-shadow: 0 0 1rem rgba(0, 0, 0, .125);
+  display: flex;
+  flex-direction: column;
+  max-width: calc(100vw - 28px);
+  max-height: 50vh;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all .3s ease-out;
+}
+
+.ss-whatsapp-dialog-visible #ss-whatsapp-dialog {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#ss-whatsapp-dialog-header {
+  background: {{ section.settings.secondary_color }};
+  padding: 1rem 1rem;
+  border-radius: 1rem 1rem 0 0;
+  color: white;
+  line-height: normal;
+  display: flex;
+  align-items: center;
+}
+
+#ss-whatsapp-dialog-close {
+  cursor:pointer;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: white;
+  position: absolute;
+  top: 0;
+  right: 0;
+  opacity: .6;
+  transition: all .2s ease-out;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#ss-whatsapp-dialog-close:hover,
+#ss-whatsapp-dialog-close:focus {
+  opacity: 1;
+}
+
+#ss-whatsapp-dialog-header-img-wrapper {
+  margin-right: 1rem;
+  position: relative;
+}
+
+#ss-whatsapp-dialog-header-img-wrapper::after {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  right: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: {{ section.settings.primary_color }};
+  border: 2px solid {{ section.settings.secondary_color }};
+}
+
+#ss-whatsapp-dialog-header-img {
+  border-radius: 50%;
+}
+
+#ss-whatsapp-dialog-label {
+  margin: 0;
+  color: white;
+  font-size: 18px;
+}
+
+#ss-whatsapp-dialog-subtitle {
+  font-size: .85em;
+  margin: 0;
+  opacity: .8;
+}
+
+#ss-whatsapp-dialog-body {
+  background-color: {{ section.settings.dialog_bg_color }};
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  overflow: auto;
+  flex: 1;
+  padding: 16px;
+}
+
+#ss-whatsapp-dialog-msg {
+  display: inline-block;
+  background-color: white;
+  border-radius: 0 1rem 1rem 1rem;
+  padding: 8px 12px;
+  margin: 0 64px 12px 4px;
+  line-height: normal;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .125);
+  position: relative;
+  color: #121212;
+  min-width: 60px;
+}
+  
+#ss-whatsapp-dialog-msg::after {
+  content: "";
+  border-top: 0px solid transparent;
+  border-bottom: 12px solid transparent;
+  border-right: 8px solid white;
+  position: absolute;
+  top: 0;
+  left: -8px;
+}
+
+#ss-whatsapp-dialog-msg-typing {
+  margin: 2px;
+}
+
+#ss-whatsapp-dialog-msg-text p {
+  margin: 0;
+}
+
+#ss-whatsapp-dialog-footer {
+  display: flex;
+  padding: 12px 6px 12px 16px;
+  background: linear-gradient(#fff, #f0f2f5);
+}
+
+#ss-whatsapp-dialog-user-input {
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid #d1d7e0;
+  background-color: white;
+  box-shadow: none;
+  padding: 8px 12px;
+  outline: none;
+  font-size: 16px;
+  transition: all .2s ease-out;
+}
+
+#ss-whatsapp-dialog-user-input:hover {}
+
+#ss-whatsapp-dialog-user-input:focus {
+  border-color: #94a2b8;
+}
+
+#ss-whatsapp-dialog-btn {
+  margin-left: 6px;
+  background: transparent;
+  color: #121212;
+  border-color: transparent;
+  display: flex;
+  align-items: center;
+  opacity: .5;
+  transition: all .2s ease-out;
+}
+
+#ss-whatsapp-dialog-btn:hover,
+#ss-whatsapp-dialog-btn:focus {
+  opacity: 1;
+}
+
+#ss-whatsapp-dialog-btn .ss-loading-spinner {
+  border-top-color: rgba(0, 0, 0, .2);
+  border-bottom-color: rgba(0, 0, 0, .2);
+  border-right-color: rgba(0, 0, 0, .2);
+  border-left-color: rgba(0, 0, 0, 1);
+}
+
+</style>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    class SsWhatsAppWrapper extends HTMLElement {
+      constructor () {
+        super()
+        this.whatsappButton = this.querySelector('#ss-whatsapp-button')
+        this.whatsappNumber = this.whatsappButton.dataset.whatsappNumber
+        this.whatsappButton.addEventListener('click', () => {
+          if (this.whatsappButton.dataset.openDialog === 'true') {
+            this.openDialog()
+          } else {
+            this.whatsappButton.innerHTML = '<div class="ss-loading-spinner"></div>'
+            setTimeout(() => {
+              window.location.href = `https://wa.me/${this.whatsappNumber}`
+            }, 1000)
+          }
+        })
+        this.dialogSubmitButton = this.querySelector('#ss-whatsapp-dialog-btn')
+        this.dialogSubmitButton?.addEventListener('click', () => {
+          this.dialogSubmitButton.innerHTML = '<div class="ss-loading-spinner"></div>'
+          setTimeout(() => {
+            const text = encodeURIComponent(this.querySelector('#ss-whatsapp-dialog-user-input').value)
+            window.location.href = `https://wa.me/${this.whatsappNumber}?text=${text}`
+          }, 1000)
+        })
+        this.querySelector('#ss-whatsapp-dialog-user-input')?.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            this.dialogSubmitButton.click()
+          }
+        })
+        this.querySelector('#ss-whatsapp-dialog-close')?.addEventListener('click', () => {
+          this.classList.remove('ss-whatsapp-dialog-visible')
+        })
+      }
+
+      openDialog () {
+        if (this.classList.contains('ss-whatsapp-dialog-visible')) {
+          this.classList.remove('ss-whatsapp-dialog-visible')
+        } else {
+          this.classList.add('ss-whatsapp-dialog-visible')
+          setTimeout(() => {
+            this.querySelector('#ss-whatsapp-dialog-user-input').focus()
+          }, 3000)
+        }
+        setTimeout(() => {
+          this.querySelector('#ss-whatsapp-dialog-msg-typing').style.display = 'none'
+          this.querySelector('#ss-whatsapp-dialog-msg-text').style.display = 'block'
+        }, 2000)
+      }
+    }
+    customElements.define('ss-whatsapp-wrapper', SsWhatsAppWrapper)
+  })
+
+</script>
+
+
+
+<ss-whatsapp-wrapper class="{{ section.settings.btn_position }}">
+  <button 
+    id="ss-whatsapp-button" 
+    class=""
+    aria-label="{{ section.settings.btn_text }}" 
+    data-whatsapp-number="{{ section.settings.whatsapp_number }}"
+    data-open-dialog="{{ section.settings.show_dialog }}">
+    <svg xmlns="http://www.w3.org/2000/svg" width="{{ section.settings.icon_size | times: 0.55 | round: 0}}" height="{{ section.settings.icon_size | times: 0.55 | round: 0}}" viewBox="0 0 24 24" fill="white">
+        <path d="M24 11.7c0 6.45-5.27 11.68-11.78 11.68-2.07 0-4-.53-5.7-1.45L0 24l2.13-6.27a11.57 11.57 0 0 1-1.7-6.04C.44 5.23 5.72 0 12.23 0 18.72 0 24 5.23 24 11.7M12.22 1.85c-5.46 0-9.9 4.41-9.9 9.83 0 2.15.7 4.14 1.88 5.76L2.96 21.1l3.8-1.2a9.9 9.9 0 0 0 5.46 1.62c5.46 0 9.9-4.4 9.9-9.83a9.88 9.88 0 0 0-9.9-9.83m5.95 12.52c-.08-.12-.27-.19-.56-.33-.28-.14-1.7-.84-1.97-.93-.26-.1-.46-.15-.65.14-.2.29-.75.93-.91 1.12-.17.2-.34.22-.63.08-.29-.15-1.22-.45-2.32-1.43a8.64 8.64 0 0 1-1.6-1.98c-.18-.29-.03-.44.12-.58.13-.13.29-.34.43-.5.15-.17.2-.3.29-.48.1-.2.05-.36-.02-.5-.08-.15-.65-1.56-.9-2.13-.24-.58-.48-.48-.64-.48-.17 0-.37-.03-.56-.03-.2 0-.5.08-.77.36-.26.29-1 .98-1 2.4 0 1.4 1.03 2.76 1.17 2.96.14.19 2 3.17 4.93 4.32 2.94 1.15 2.94.77 3.47.72.53-.05 1.7-.7 1.95-1.36.24-.67.24-1.25.17-1.37"/>
+    </svg>
+    {% if section.settings.show_btn_text %}
+        <span id="ss-whatsapp-button-text">
+            {{ section.settings.btn_text }}
+        </span>
+    {% endif %}
+  </button>
+  <div id="ss-whatsapp-dialog" role="dialog" aria-modal="true" aria-labelledby="ss-whatsapp-dialog-label">
+    <div id="ss-whatsapp-dialog-header">
+        <div id="ss-whatsapp-dialog-header-img-wrapper">
+            <img 
+                id="ss-whatsapp-dialog-header-img" 
+                class=""
+                src="{{ section.settings.dialog_header_img | image_url: width: 60, height: 60, crop: 'center' }}"
+                alt="{{ section.settings.dialog_header_img.alt }}"
+                width="60"
+                height="60"
+                loading="lazy">
+        </div>
+        <div class="">
+            <h3 id="ss-whatsapp-dialog-label">
+                {{ section.settings.dialog_name }}
+            </h3>
+            {% unless section.settings.dialog_subtitle == blank %}
+                <p id="ss-whatsapp-dialog-subtitle">
+                    {{ section.settings.dialog_subtitle }}
+                </p>
+            {% endunless %}
+        </div>
+        <button 
+            id="ss-whatsapp-dialog-close" 
+            aria-label="Close dialog">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+    </div>
+    <div id="ss-whatsapp-dialog-body">
+        <div id="ss-whatsapp-dialog-msg">
+            <div id="ss-whatsapp-dialog-msg-typing" class="ss-typing-spinner" aria-label="Typing indicator">
+            </div>
+            <div id="ss-whatsapp-dialog-msg-text" style="display: none;">
+                {{ section.settings.dialog_msg }}
+            </div>
+        </div>
+    </div>
+    <div id="ss-whatsapp-dialog-footer">
+        <input id="ss-whatsapp-dialog-user-input" type="text" aria-label="Type a message" placeholder="{{ section.settings.placeholder_text }}">
+        <button 
+            id="ss-whatsapp-dialog-btn" 
+            aria-label="Open WhatsApp"
+            data-whatsapp-number="{{ section.settings.whatsapp_number }}">
+            <svg width="20" height="20" viewBox="0 0 438 404" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <g id="noun-send-1038190" transform="translate(0.634296, 0.494941)" fill="#000000" fill-rule="nonzero">
+                        <path d="M436.695704,200.455059 C436.496484,197.427759 435.476904,194.509759 433.754304,192.013659 C432.027704,189.517559 429.656604,187.537059 426.898804,186.279259 L23.6988044,1.47925904 L23.6948974,1.47925904 C19.4839974,-0.415240957 14.6792974,-0.493440957 10.4058974,1.26441904 C6.13639744,3.02221904 2.77699744,6.45971904 1.12069744,10.772219 C-0.539502557,15.084719 -0.348102557,19.889419 1.64803744,24.053219 L87.7500374,201.503219 L1.64803744,378.953219 L1.64803744,378.957125 C-0.348062557,383.121225 -0.539462557,387.925925 1.12069744,392.238125 C2.77689744,396.546725 6.13629744,399.988125 10.4058974,401.745925 C14.6792974,403.503725 19.4839974,403.425625 23.6948974,401.531085 L426.894897,216.731085 L426.898803,216.731085 C429.980803,215.324885 432.570703,213.016285 434.316803,210.113885 C436.066803,207.207685 436.894903,203.840485 436.695703,200.457685 L436.695704,200.455059 Z M343.070704,184.705059 L116.970704,184.705059 L52.3967044,51.525059 L343.070704,184.705059 Z M343.070704,218.307059 L52.3907044,351.487059 L116.964704,218.307059 L343.070704,218.307059 Z" id="Shape"></path>
+                    </g>
+                </g>
+            </svg>
+        </button>
+    </div>
+  </div>
+
+</ss-whatsapp-wrapper>
+
+{% endif %}
+
+
+{% schema %}
+{
+  "name": "SC-WhatsAppChatButton",
+  "presets": [
+    {
+      "name": "SC-WhatsAppChatButton"
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "WhatsApp redirect",
+      "info": "Redirect to WhatsApp usually doesn't work inside theme editor"
+    },
+    {
+      "type": "header",
+      "content": "General"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_section",
+      "label": "Enable section",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "whatsapp_number",
+      "label": "Whatsapp number",
+      "info": "Add '+' in front of number"
+    },
+    {
+      "type": "color",
+      "id": "primary_color",
+      "label": "Icon color 1",
+      "default": "#5DF878"
+    },
+    {
+      "type": "color",
+      "id": "primary_color2",
+      "label": "Icon color 2",
+      "default": "#0ABB29"
+    },
+    {
+      "type": "color",
+      "id": "secondary_color",
+      "label": "Secondary color",
+      "default": "#095e54"
+    },
+    {
+      "type": "header",
+      "content": "Sizes"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "Icon size",
+      "default": 60,
+      "min": 30,
+      "max": 100,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "button_text_size",
+      "label": "Button text size",
+      "default": 14,
+      "min": 8,
+      "max": 24,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "select",
+      "id": "btn_position",
+      "label": "Button position",
+      "default": "ss-whatsapp-button-right",
+      "options": [
+        { "value": "ss-whatsapp-button-left", "label": "Left" },
+        { "value": "ss-whatsapp-button-right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button text",
+      "default": "Need help?"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_btn_text",
+      "label": "Show button text",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Dialog"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dialog",
+      "label": "Show dialog",
+      "default": true,
+      "info": "If disabled, Whatsapp will open directly on click."
+    },
+    {
+      "type": "image_picker",
+      "id": "dialog_header_img",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "dialog_name",
+      "label": "Name",
+      "default": "Kathrine"
+    },
+    {
+      "type": "text",
+      "id": "dialog_subtitle",
+      "label": "Subtitle",
+      "default": "Usually replies within 10 minutes."
+    },
+    {
+      "type": "color",
+      "id": "dialog_bg_color",
+      "label": "Background color",
+      "default": "#ece5dd"
+    },
+    {
+      "type": "text",
+      "id": "dialog_msg",
+      "label": "Message",
+      "default": "<p>Hi 👋 <br>What can I help you with?</p>"
+    },
+    {
+      "type": "text",
+      "id": "placeholder_text",
+      "label": "Placeholder Text",
+      "default": "Type a message..."
+    }
+  ]
+}
+{% endschema %}

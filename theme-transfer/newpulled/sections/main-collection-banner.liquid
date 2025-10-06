@@ -1,0 +1,230 @@
+{{ 'section-main-collection-banner.css' | asset_url | stylesheet_tag }}
+
+{% liquid
+
+	assign show_img = section.settings.show_collection_image
+	assign media_size = section.settings.image_size
+
+	if show_img
+		assign show_collection_image = 'show_img'
+	else
+		assign show_collection_image = ''
+	endif
+
+	if section.settings.overlay_opacity and show_img
+		assign overlay_enable = 'have-overlay'
+	else
+		assign overlay_enable = ''
+	endif
+
+	
+	case media_size
+	when 'landscape'
+	assign image_size = '50%'
+when 'portrait'
+	assign image_size = '125%'
+when 'square'
+	assign image_size = '100%'
+else
+	assign image_size = '100%'
+			
+	endcase
+	
+
+	assign collection_image = collection.image
+	if collection_image == blank and collection.id == blank
+		assign collection_image = section.settings.image_products
+	endif
+	assign image_height = collection_image.width | divided_by: collection_image.aspect_ratio
+	assign adapt_height = 1 | divided_by: collection_image.aspect_ratio | times: 100 | append: '%'
+	if image_size == 'adapt'
+		assign image_size = adapt_height
+	endif
+
+	assign collection_description = collection.description
+	if collection.id == blank
+		assign collection_description = section.settings.description_products
+	endif
+%}
+{% style %}
+	#shopify-section-{{ section.id }}{
+		--image-height : {{ image_size }};
+	}
+	
+	[data-id="{{ section.id }}"] .have-overlay {
+		--overlay-alpha : {{ section.settings.overlay_opacity }}%;
+	}
+{% endstyle %}
+
+{% if section.settings.section_size == 'container' %}
+	<div class="container">
+{% endif %}
+
+		<div class="collection-banner" data-id="{{ section.id }}">
+			<div class="collection-banner__body   {{ show_collection_image }} ">
+				<div class="{% if section.settings.section_size == 'container' %}container-small{% else %}container{% endif %}">
+					<div class="collection-banner__wrapper ">
+						<div class="collection-banner__text{% if section.settings.text_horizontal == 'center' %}-center{% endif %}">
+							<h1 class="collection-banner__title h2">
+								<span class="visually-hidden">
+									{{- 'sections.collection_template.title' | t }}:
+								</span>
+								{{- collection.title | escape -}}
+								{% if section.settings.show_word
+									and section.settings.add_word != blank
+								%}
+									<span>{{ section.settings.add_word }}</span>
+								{% endif %}
+							</h1>
+							{%- if section.settings.show_collection_description
+								and collection_description != blank
+							-%}
+								<div class="collection-banner__desc medium-font">
+									{{ collection_description }}
+								</div>
+							{%- endif -%}
+							{% if section.settings.collection_list != blank %}
+							<div class="type-filter__list type-filter__all_active">
+								<a
+									href="{{ routes.all_products_collection_url }}"
+									class="type-filter__label type-filter__title h4"
+								>
+										{{- 'products.facets.all' | t -}}
+								</a>
+								{%- for collection in section.settings.collection_list -%}
+										<a
+											class="full-unstyled-link type-filter__label type-filter__all_active h4" href="{{ collection.url }}">
+												{{ collection.title }}
+										</a>
+								{%- endfor -%}
+							</div>
+						{% endif %}
+						</div>
+						{%- if show_img and collection_image != blank -%}
+							<div class="collection-banner__img">
+								{{
+									collection_image
+									| image_url: width: 3840
+									| image_tag:
+										loading: 'lazy',
+										width: collection_image.width,
+										height: image_height,
+										sizes: '100vw',
+										widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+								}}
+							</div>
+						{% endif %}
+						
+					</div>
+				</div>
+			</div>
+		</div>
+{% if section.settings.section_size == 'container' %}
+	</div>
+{% endif %}
+
+
+<script>
+	{% comment %}document.querySelector('.page-nav').classList.add('active-{{ count }}');{% endcomment %}
+	const currentURL = window.location.href;
+	 document.querySelectorAll('.type-filter__all_active a').forEach(function(link) {
+		console.log(link)
+		 if (link.href === currentURL) {
+			 link.classList.add('active_opacity');
+		 }
+	 });
+ </script>
+{% comment %}<script>
+
+		const allFIlter = document.querySelectorAll(".type-filter__all_active");
+{% comment %}const qFIlter = document.querySelector(".type-filter__label_active");{% endcomment %}
+console.log(allFIlter)
+allFIlter.forEach((icon) => {
+	icon.addEventListener("click", function () {
+		icon.classList.add("active_opacity");
+		console.log("red")
+	});
+});
+	{% comment %}allFIlter.addEventListener("click", function () {
+		allFIlter.classList.remove("active_opacity");
+	});{% endcomment %}
+</script>{% endcomment %}
+{% schema %}
+{
+	"name": "t:sections.main-collection-banner.name",
+	"class": "collection-banner-section spaced-section--full-width section-template--overlay",
+	"settings": [
+		{
+			"type": "collection_list",
+			"id": "collection_list",
+			"label": "t:sections.header.settings.collection_list.label",
+			"limit": 4
+		},
+		{
+			"type": "paragraph",
+			"content": "t:sections.main-collection-banner.settings.paragraph.content"
+		},
+		{
+			"type": "text",
+			"id": "add_word",
+			"label": "t:sections.main-collection-banner.settings.add_word.label",
+			"default": "Collection"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_word",
+			"default": false,
+			"label": "t:sections.main-collection-banner.settings.show_word.label"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_collection_description",
+			"default": true,
+			"label": "t:sections.main-collection-banner.settings.show_collection_description.label"
+		},
+		{
+			"type": "inline_richtext",
+			"id": "description_products",
+			"label": "t:sections.main-collection-banner.settings.description_products.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.image.header.content"
+		},
+		{
+			"type": "image_picker",
+			"id": "image_products",
+			"label": "t:sections.main-collection-banner.settings.image_products.label",
+			"info": "t:sections.main-collection-banner.settings.image_products.info"
+		},
+	
+		{
+			"type": "select",
+			"id": "image_size",
+			"options": [
+				{
+					"value": "landscape",
+					"label": "t:sections.all.image.ratio.options__1.label"
+				},
+				{
+					"value": "portrait",
+					"label": "t:sections.all.image.ratio.options__2.label"
+				},
+				{
+					"value": "square",
+					"label": "t:sections.all.image.ratio.options__3.label"
+				}
+			],
+			"default": "landscape",
+			"label": "t:sections.all.image.ratio.label",
+			"info": "t:sections.main-list-collections.settings.image_ratio.info"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_collection_image",
+			"default": false,
+			"label": "t:sections.main-collection-banner.settings.show_collection_image.label"
+		}
+	]
+}
+{% endschema %}

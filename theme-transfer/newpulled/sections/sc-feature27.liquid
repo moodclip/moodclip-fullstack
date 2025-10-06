@@ -1,0 +1,1218 @@
+{% comment %}
+---------------------------------------------------------
+Copyright © 2023 Section Store. All rights reserved.
+Unauthorized copying, modification, distribution, or use
+of this code or any portion of it, is strictly prohibited.
+Violators will be prosecuted to the fullest extent of the law.
+For inquiries or permissions, contact daniel@section.store
+---------------------------------------------------------
+{% endcomment %}
+
+{%- liquid
+  assign padding_horizontal = section.settings.padding_horizontal
+  assign padding_horizontal_mobile = section.settings.padding_horizontal_mobile
+  assign padding_top = section.settings.padding_top
+  assign padding_bottom = section.settings.padding_bottom
+  assign border_color = section.settings.border_color
+  assign border_thickness = section.settings.border_thickness
+  assign margin_top = section.settings.margin_top
+  assign margin_bottom = section.settings.margin_bottom
+  assign margin_horizontal_mobile = section.settings.margin_horizontal_mobile
+  assign margin_horizontal = section.settings.margin_horizontal
+  assign background_color = section.settings.background_color
+  assign background_gradient = section.settings.background_gradient
+  assign full_width = section.settings.full_width
+  assign content_width = section.settings.content_width
+  assign lazy = section.settings.lazy
+  assign section_radius = section.settings.section_radius
+
+  assign heading = section.settings.heading
+  assign heading_custom = section.settings.heading_custom
+  assign heading_font = section.settings.heading_font
+  assign heading_size = section.settings.heading_size
+  assign heading_size_mobile = section.settings.heading_size_mobile
+  assign heading_height = section.settings.heading_height
+  assign heading_color = section.settings.heading_color
+  assign heading_align = section.settings.heading_align
+  assign heading_align_mobile = section.settings.heading_align_mobile
+
+  assign cards_per_row = section.settings.cards_per_row
+  assign cards_per_row_mobile = section.settings.cards_per_row_mobile
+  assign cards_max_width = section.settings.cards_max_width
+  assign cards_align = section.settings.cards_align
+  assign cards_gap = section.settings.cards_gap
+  assign cards_gap_mobile = section.settings.cards_gap_mobile
+  assign cards_mt = section.settings.cards_mt
+  assign cards_mt_mobile = section.settings.cards_mt_mobile
+
+  assign card_padding_horizontal = section.settings.card_padding_horizontal
+  assign card_padding_horizontal_mobile = section.settings.card_padding_horizontal_mobile
+  assign card_padding_vertical = section.settings.card_padding_vertical
+  assign card_padding_vertical_mobile = section.settings.card_padding_vertical_mobile
+  assign card_radius = section.settings.card_radius
+  assign card_border_thickness = section.settings.card_border_thickness
+  assign card_border_color = section.settings.card_border_color
+  assign card_border_hover_color = section.settings.card_border_hover_color
+  assign card_bg_color = section.settings.card_bg_color
+  assign card_bg_hover_color = section.settings.card_bg_hover_color
+
+  assign card_content_align = section.settings.card_content_align
+  assign card_content_align_mobile = section.settings.card_content_align_mobile
+
+  assign card_content_horizontal_align = ""
+  if card_content_align == "center"
+    assign card_content_horizontal_align = "center"
+  elsif card_content_align == "right"
+    assign card_content_horizontal_align = "end"
+  else
+    assign card_content_horizontal_align = "start"
+  endif
+
+  assign card_content_horizontal_align_mobile = ""
+  if card_content_align_mobile == "center"
+    assign card_content_horizontal_align_mobile = "center"
+  elsif card_content_align_mobile == "right"
+    assign card_content_horizontal_align_mobile = "end"
+  else
+    assign card_content_horizontal_align_mobile = "start"
+  endif
+
+  assign icon_width = section.settings.icon_width
+  assign icon_width_mobile = section.settings.icon_width_mobile
+  assign icon_color = section.settings.icon_color
+  assign icon_hover_color = section.settings.icon_hover_color
+
+  assign count_custom = section.settings.count_custom
+  assign count_font = section.settings.count_font
+  assign count_size = section.settings.count_size
+  assign count_size_mobile = section.settings.count_size_mobile
+  assign count_height = section.settings.count_height
+  assign count_color = section.settings.count_color
+  assign count_hover_color = section.settings.count_hover_color
+  assign count_mt = section.settings.count_mt
+  assign count_mt_mobile = section.settings.count_mt_mobile
+
+  assign count_speed = section.settings.count_speed
+
+  assign title_custom = section.settings.title_custom
+  assign title_font = section.settings.title_font
+  assign title_size = section.settings.title_size
+  assign title_size_mobile = section.settings.title_size_mobile
+  assign title_height = section.settings.title_height
+  assign title_color = section.settings.title_color
+  assign title_hover_color = section.settings.title_hover_color
+  assign title_mt = section.settings.title_mt
+  assign title_mt_mobile = section.settings.title_mt_mobile
+-%}
+
+{%- style -%}
+  {{ heading_font | font_face: font_display: 'swap' }}
+  {{ count_font | font_face: font_display: 'swap' }}
+  {{ title_font | font_face: font_display: 'swap' }}
+
+  .section-{{ section.id }} {
+    border-top: solid {{ border_color }} {{ border_thickness }}px;
+    border-bottom: solid {{ border_color }} {{ border_thickness }}px;
+    margin-top: {{ margin_top | times: 0.75 | round: 0 }}px;
+    margin-bottom: {{ margin_bottom | times: 0.75 | round: 0 }}px;
+    margin-left: {{ margin_horizontal_mobile }}rem;
+    margin-right: {{ margin_horizontal_mobile }}rem;
+    border-radius: {{ section_radius | times: 0.6 | round: 0 }}px;
+    overflow: hidden;
+  }
+
+  .section-{{ section.id }}-settings {
+    margin: 0 auto;
+    padding-top: {{ padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ padding_bottom | times: 0.75 | round: 0 }}px;
+    padding-left: {{ padding_horizontal_mobile }}rem;
+    padding-right: {{ padding_horizontal_mobile }}rem;
+  }
+
+
+  .feature-heading-{{ section.id }} {
+    text-align: {{ heading_align_mobile }};
+  }
+
+  .feature-heading-{{ section.id }} * {
+    margin: 0;
+    font-size: {{ heading_size_mobile }}px;
+    color: {{ heading_color }};
+    line-height: {{ heading_height }}%;
+    text-transform: unset;
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .feature-cards-{{ section.id }} {
+    display: grid;
+    grid-template-columns: repeat({{ cards_per_row_mobile }}, 1fr);
+    gap: {{ cards_gap_mobile }}px;
+    max-width: 100%;
+    margin-top: {{ cards_mt_mobile }}px;
+  }
+
+  .feature-card-{{ section.id }} {
+    display: flex;
+    flex-direction: column;
+    align-items: {{ card_content_horizontal_align_mobile }};
+    transition: all 0.25s ease 0s;
+    padding: {{ card_padding_vertical_mobile }}px {{ card_padding_horizontal_mobile }}px;
+    border: {{ card_border_thickness }}px solid {{ card_border_color }};
+    border-radius: {{ card_radius }}px;
+    background-color: {{ card_bg_color }};
+    text-decoration: none;
+  }
+
+.feature-icon-{{ section.id }} {
+  width: {{ icon_width_mobile }}px;
+  height: {{ icon_width_mobile }}px;
+  }
+
+  .feature-icon-{{ section.id }} img,
+  .feature-icon-{{ section.id }} svg,
+  .feature-icon-{{ section.id }} lord-icon {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .feature-icon-{{ section.id }} svg path {
+    fill: {{ icon_color }};
+    transition: all 0.25s ease 0s;
+  }
+
+  .feature-count-wrapper-{{ section.id }} {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-items: center;
+    justify-content: {{ card_content_horizontal_align_mobile }};
+  }
+
+  .feature-count-text-{{ section.id }} {
+    margin: 0;
+    margin-top: {{ count_mt_mobile }}px;
+    text-align: {{ card_content_align_mobile }};
+    font-size: {{ count_size_mobile }}px;
+    color: {{ count_color }};
+    line-height: {{ count_height }}%;
+    text-transform: unset;
+    text-decoration: none;
+    transition: all 0.25s ease 0s;
+    font-weight: 700;
+  }
+
+  .feature-title-{{ section.id }} {
+    margin: 0;
+    margin-top: {{ title_mt_mobile }}px;
+    text-align: {{ card_content_align_mobile }};
+    font-size: {{ title_size_mobile }}px;
+    color: {{ title_color }};
+    line-height: {{ title_height }}%;
+    text-transform: unset;
+    text-decoration: none;
+    transition: all 0.25s ease 0s;
+  }
+
+  @media(min-width: 1024px) {
+
+    .section-{{ section.id }} {
+      margin-top: {{ margin_top }}px;
+      margin-bottom: {{ margin_bottom }}px;
+      margin-left: {{ margin_horizontal }}rem;
+      margin-right: {{ margin_horizontal }}rem;
+      border-radius: {{ section_radius }}px;
+    }
+
+    .section-{{ section.id }}-settings {
+      padding: 0 5rem;
+      padding-top: {{ padding_top }}px;
+      padding-bottom: {{ padding_bottom }}px;
+      padding-left: {{ padding_horizontal }}rem;
+      padding-right: {{ padding_horizontal }}rem;
+    }
+
+    .feature-heading-{{ section.id }} {
+      text-align: {{ heading_align }};
+    }
+
+    .feature-heading-{{ section.id }} * {
+      font-size: {{ heading_size }}px;
+    }
+
+
+    .feature-cards-{{ section.id }} {
+      grid-template-columns: repeat({{ cards_per_row }}, 1fr);
+      max-width: {{ cards_max_width }}%;
+      gap: {{ cards_gap }}px;
+      margin-top: {{ cards_mt }}px;
+    }
+
+    .feature-card-{{ section.id }} {
+      align-items: {{ card_content_horizontal_align }};
+      padding: {{ card_padding_vertical }}px {{ card_padding_horizontal }}px;
+    }
+
+    .feature-card-{{ section.id }}:hover {
+      transition: all 0.25s ease 0s;
+      transform: scale(1.1);
+      background-color: {{ card_bg_hover_color }};
+      border: {{ card_border_thickness }}px solid {{ card_border_hover_color }};
+    }
+
+.feature-icon-{{ section.id }} {
+  width: {{ icon_width_mobile }}px;
+  height: {{ icon_width_mobile }}px;
+}
+
+    .feature-card-{{ section.id }}:hover .feature-icon-{{ section.id }} svg path {
+      transition: all 0.25s ease 0s;
+      fill: {{ icon_hover_color }};
+    }
+
+    .feature-count-wrapper-{{ section.id }} {
+      justify-content: {{ card_content_horizontal_align }};
+    }
+
+    .feature-count-text-{{ section.id }} {
+      margin-top: {{ count_mt }}px;
+      font-size: {{ count_size }}px;
+      text-align: {{ card_content_align }};
+    }
+
+
+    .feature-card-{{ section.id }}:hover .feature-count-text-{{ section.id }} {
+      transition: all 0.25s ease 0s;
+      color: {{ count_hover_color }};
+    }
+
+    .feature-title-{{ section.id }} {
+      margin-top: {{ title_mt }}px;
+      font-size: {{ title_size }}px;
+      text-align: {{ card_content_align }};
+    }
+
+    .feature-card-{{ section.id }}:hover .feature-title-{{ section.id }} {
+      color: {{ title_hover_color }};
+      transition: all 0.25s ease 0s;
+    }
+  }
+
+{%- endstyle -%}
+
+{% unless full_width %}
+  <style>
+    .section-{{ section.id }}-settings {
+      max-width: {{ content_width }}px;
+    }
+  </style>
+{% endunless %}
+
+{% if margin_horizontal_mobile > 0 %}
+  <style>
+    .section-{{ section.id }} {
+      border-left: solid {{ border_color }} {{ border_thickness }}px;
+      border-right: solid {{ border_color }} {{ border_thickness }}px;
+    }
+
+    @media(min-width: 1024px) {
+      .section-{{ section.id }} {
+        border-left: 0px;
+        border-right: 0px;
+      }
+    }
+  </style>
+{% endif %}
+
+{% if margin_horizontal > 0 %}
+  <style>
+    @media(min-width: 1024px) {
+      .section-{{ section.id }} {
+        border-left: solid {{ border_color }} {{ border_thickness }}px;
+        border-right: solid {{ border_color }} {{ border_thickness }}px;
+      }
+    }
+  </style>
+{% endif %}
+
+{% if heading_custom %}
+  <style>
+    .feature-heading-{{ section.id }} * {
+      font-family: {{ heading_font.family }}, {{ heading_font.fallback_families }};
+      font-weight: {{ heading_font.weight }};
+      font-style: {{ heading_font.style }};
+    }
+  </style>
+{% endif %}
+
+{% if count_custom %}
+  <style>
+    .feature-count-text-{{ section.id }} {
+      font-family: {{ count_font.family }}, {{ count_font.fallback_families }};
+      font-weight: {{ count_font.weight }};
+      font-style: {{ count_font.style }};
+    }
+  </style>
+{% endif %}
+
+{% if title_custom %}
+  <style>
+    .feature-title-{{ section.id }} {
+      font-family: {{ title_font.family }}, {{ title_font.fallback_families }};
+      font-weight: {{ title_font.weight }};
+      font-style: {{ title_font.style }};
+    }
+  </style>
+{% endif %}
+
+
+{% if cards_align == 'center'%}
+  <style>
+    @media(min-width: 1024px) {
+      .feature-cards-{{ section.id }} {
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+  </style>
+{% elsif cards_align == 'right'%}
+  <style>
+    @media(min-width: 1024px) {
+      .feature-cards-{{ section.id }} {
+        margin-left: auto;
+      }
+    }
+  </style>
+{% endif %}
+
+<div class="section-{{ section.id }} feature-{{ section.id }}" style="background-color:{{ background_color }}; background-image: {{ background_gradient }};">
+  <div class="section-{{ section.id }}-settings">
+    {% if heading != blank %}
+      <div class="feature-heading-{{ section.id }}">{{ heading }}</div>
+    {% endif %}
+    <div class="feature-cards-{{ section.id }}">
+      {% for block in section.blocks %}
+        <{% if block.settings.url != blank %}a href="{{ block.settings.url }}"{% else %}div{% endif %} class="feature-card-{{ section.id }}">
+
+          {%- comment -%} Renders the icon, prioritizing Lottie > Custom Image {%- endcomment -%}
+          {%- if block.settings.lottie_url != blank or block.settings.custom_icon != blank %}
+            <div class="feature-icon-{{ section.id }}">
+              {%- if block.settings.lottie_url != blank -%}
+                <lord-icon
+                  src="{{ block.settings.lottie_url }}"
+                  trigger="loop"
+                  style="width:100%;height:100%">
+                </lord-icon>
+              {%- elsif block.settings.custom_icon != blank -%}
+                <img
+                  src="{{ block.settings.custom_icon | image_url: width: 300 }}"
+                  alt="{{ block.settings.custom_icon.alt | escape }}"
+                  width="{{ icon_width }}"
+                  height="{{ icon_width }}"
+                  {% if lazy %}loading="lazy"{% endif %}>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+
+          {%- comment -%} CODE TO DISPLAY NUMBERS AND TEXT (THIS WAS MISSING) {%- endcomment -%}
+          <div class="feature-count-wrapper-{{ section.id }}">
+            {% if block.settings.prefix != blank %}
+              <p class="feature-count-text-{{ section.id }}">{{ block.settings.prefix }}</p>
+            {% endif %}
+            {% if block.settings.count_from != blank %}
+              <p class="feature-count-text-{{ section.id }} feature-count-{{ section.id }}" data-from="{{ block.settings.count_from }}" data-to="{{ block.settings.count_to }}">{{ block.settings.count_from }}</p>
+            {% endif %}
+            {% if block.settings.suffix != blank %}
+              <p class="feature-count-text-{{ section.id }}">{{ block.settings.suffix }}</p>
+            {% endif %}
+          </div>
+
+          {% if block.settings.title != blank %}
+            <p class="feature-title-{{ section.id }}">{{ block.settings.title }}</p>
+          {% endif %}
+
+        </{% if block.settings.url != blank %}a{% else %}div{% endif %}>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+  function initFeature27() {
+    const elements = document.querySelectorAll('.feature-count-{{ section.id }}');
+    const animatedElements = new Set(); // Track which elements have been animated
+
+    elements.forEach(el => {
+      const from = parseInt(el.dataset.from.replace(/,/g, ''), 10) || 0;
+      const to = parseInt(el.dataset.to.replace(/,/g, ''), 10) || 0;
+      const speed = {{ count_speed }};
+      let current = from;
+
+      function formatNumber(num) {
+        return num.toLocaleString('en-US');
+      }
+
+      function animateCount() {
+        current += (to - from) / (speed * 60);
+        if ((to > from && current >= to) || (to < from && current <= to)) {
+          current = to;
+          el.textContent = formatNumber(Math.round(current));
+          return;
+        }
+        el.textContent = formatNumber(Math.round(current));
+        requestAnimationFrame(animateCount);
+      }
+
+      function handleIntersection(entries) {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !animatedElements.has(el)) {
+            animatedElements.add(el); // Mark this element as animated
+            current = from;
+            animateCount();
+            observer.disconnect(); // Stop observing after animation starts
+          }
+        });
+      }
+
+      const observer = new IntersectionObserver(handleIntersection, {
+        root: null,
+        threshold: 0.5,
+      });
+
+      observer.observe(el.closest('.feature-{{ section.id }}'));
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initFeature27);
+
+  if (Shopify.designMode) {
+    document.addEventListener('shopify:section:unload', initFeature27);
+    document.addEventListener('shopify:section:load', initFeature27);
+  }
+</script>
+
+
+
+{% schema %}
+  {
+    "name": "SC-Feature27",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Heading settings"
+      },
+      {
+        "type": "richtext",
+        "id": "heading",
+        "label": "Heading",
+        "default": "<h2>Feature #27</h2>"
+      },
+      {
+        "type": "checkbox",
+        "id": "heading_custom",
+        "label": "Use custom font",
+        "default": false
+      },
+      {
+        "type": "font_picker",
+        "id": "heading_font",
+        "label": "Font family",
+        "default": "josefin_sans_n4"
+      },
+      {
+        "type": "range",
+        "id": "heading_size",
+        "min": 0,
+        "max": 72,
+        "step": 2,
+        "unit": "px",
+        "label": "Font size",
+        "default": 40
+      },
+      {
+        "type": "range",
+        "id": "heading_size_mobile",
+        "min": 0,
+        "max": 72,
+        "step": 2,
+        "unit": "px",
+        "label": "Font size - mobile",
+        "default": 24
+      },
+      {
+        "type": "range",
+        "id": "heading_height",
+        "min": 50,
+        "max": 200,
+        "step": 10,
+        "unit": "%",
+        "label": "Line height",
+        "default": 130
+      },
+      {
+        "type": "text_alignment",
+        "id": "heading_align",
+        "label": "Alignment",
+        "default": "center"
+      },
+      {
+        "type": "text_alignment",
+        "id": "heading_align_mobile",
+        "label": "Alignment - mobile",
+        "default": "center"
+      },
+      {
+        "type": "header",
+        "content": "Cards settings"
+      },
+      {
+        "type": "range",
+        "id": "cards_per_row",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "label": "Cards per row",
+        "default": 4
+      },
+      {
+        "type": "select",
+        "id": "cards_per_row_mobile",
+        "label": "Cards per row - mobile",
+        "default": "1",
+        "options": [
+          {
+            "label": "1",
+            "value": "1"
+          },
+          {
+            "label": "2",
+            "value": "2"
+          }
+        ]
+      },
+      {
+        "type": "range",
+        "id": "cards_max_width",
+        "min": 50,
+        "max": 100,
+        "step": 2,
+        "unit": "%",
+        "label": "Width - desktop",
+        "default": 80
+      },
+      {
+        "type": "range",
+        "id": "cards_gap",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Gap",
+        "default": 20
+      },
+      {
+        "type": "range",
+        "id": "cards_gap_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Gap - mobile",
+        "default": 20
+      },
+      {
+        "type": "range",
+        "id": "cards_mt",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Margin top",
+        "default": 40
+      },
+      {
+        "type": "range",
+        "id": "cards_mt_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Margin top - mobile",
+        "default": 32
+      },
+      {
+        "type": "text_alignment",
+        "id": "cards_align",
+        "label": "Alignment - desktop",
+        "default": "center"
+      },
+      {
+        "type": "header",
+        "content": "Cards settings"
+      },
+      {
+        "type": "range",
+        "id": "card_padding_horizontal",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Padding horizontal",
+        "default": 20
+      },
+      {
+        "type": "range",
+        "id": "card_padding_horizontal_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Padding horizontal - mobile",
+        "default": 20
+      },
+      {
+        "type": "range",
+        "id": "card_padding_vertical",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Padding vertical",
+        "default": 30
+      },
+      {
+        "type": "range",
+        "id": "card_padding_vertical_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Padding vertical - mobile",
+        "default": 30
+      },
+      {
+        "type": "range",
+        "id": "card_radius",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Roundness",
+        "default": 10
+      },
+      {
+        "type": "range",
+        "id": "card_border_thickness",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "unit": "px",
+        "label": "Border thickness",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Card content settings"
+      },
+      {
+        "type": "text_alignment",
+        "id": "card_content_align",
+        "label": "Alignment",
+        "default": "center"
+      },
+      {
+        "type": "text_alignment",
+        "id": "card_content_align_mobile",
+        "label": "Alignment - mobile",
+        "default": "center"
+      },
+      {
+        "type": "header",
+        "content": "Icon settings"
+      },
+      {
+        "type": "range",
+        "id": "icon_width",
+        "min": 10,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Size",
+        "default": 52
+      },
+      {
+        "type": "range",
+        "id": "icon_width_mobile",
+        "min": 10,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Size - mobile",
+        "default": 48
+      },
+      {
+        "type": "header",
+        "content": "Count settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "count_custom",
+        "label": "Use custom font",
+        "default": false
+      },
+      {
+        "type": "font_picker",
+        "id": "count_font",
+        "label": "Font family",
+        "default": "josefin_sans_n4"
+      },
+      {
+        "type": "range",
+        "id": "count_size",
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "unit": "px",
+        "label": "Font size",
+        "default": 36
+      },
+      {
+        "type": "range",
+        "id": "count_size_mobile",
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "unit": "px",
+        "label": "Font size - mobile",
+        "default": 32
+      },
+      {
+        "type": "range",
+        "id": "count_height",
+        "min": 50,
+        "max": 200,
+        "step": 10,
+        "unit": "%",
+        "label": "Line height",
+        "default": 130
+      },
+      {
+        "type": "range",
+        "id": "count_mt",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Margin top",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "count_mt_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Margin top - mobile",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "count_speed",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "label": "Animation speed",
+        "default": 1
+      },
+      {
+        "type": "header",
+        "content": "Title settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "title_custom",
+        "label": "Use custom font",
+        "default": false
+      },
+      {
+        "type": "font_picker",
+        "id": "title_font",
+        "label": "Font family",
+        "default": "josefin_sans_n4"
+      },
+      {
+        "type": "range",
+        "id": "title_size",
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "unit": "px",
+        "label": "Font size",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "title_size_mobile",
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "unit": "px",
+        "label": "Font size - mobile",
+        "default": 14
+      },
+      {
+        "type": "range",
+        "id": "title_height",
+        "min": 50,
+        "max": 200,
+        "step": 10,
+        "unit": "%",
+        "label": "Line height",
+        "default": 150
+      },
+      {
+        "type": "range",
+        "id": "title_mt",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Margin top",
+        "default": 10
+      },
+      {
+        "type": "range",
+        "id": "title_mt_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Margin top - mobile",
+        "default": 8
+      },
+      {
+        "type": "header",
+        "content": "Card colors"
+      },
+      {
+        "type": "color",
+        "label": "Icon",
+        "id": "icon_color",
+        "default": "#000000"
+      },
+      {
+        "type": "color",
+        "label": "Icon hover",
+        "id": "icon_hover_color",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "label": "Count",
+        "id": "count_color",
+        "default": "#000000"
+      },
+      {
+        "type": "color",
+        "label": "Count hover",
+        "id": "count_hover_color",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "label": "Title",
+        "id": "title_color",
+        "default": "#000000"
+      },
+      {
+        "type": "color",
+        "label": "Title hover",
+        "id": "title_hover_color",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "label": "Background",
+        "id": "card_bg_color",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "label": "Background hover",
+        "id": "card_bg_hover_color",
+        "default": "#000000"
+      },
+      {
+        "type": "color",
+        "label": "Border",
+        "id": "card_border_color",
+        "default": "#000000"
+      },
+      {
+        "type": "color",
+        "label": "Border hover",
+        "id": "card_border_hover_color",
+        "default": "#000000"
+      },
+      {
+        "type": "header",
+        "content": "Section colors"
+      },
+      {
+        "type": "color",
+        "label": "Heading",
+        "id": "heading_color",
+        "default": "#000000"
+      },
+      {
+        "type": "color",
+        "label": "Section background",
+        "id": "background_color",
+        "default": "#F7F7F7"
+      },
+      {
+        "type": "color_background",
+        "id": "background_gradient",
+        "label": "Section background gradient",
+        "info": "Remove gradient to replace with solid colors"
+      },
+      {
+        "type": "color",
+        "label": "Border",
+        "id": "border_color",
+        "default": "#000000"
+      },
+      {
+        "type": "header",
+        "content": "Section margin (outside)"
+      },
+      {
+        "type": "range",
+        "id": "margin_top",
+        "min": 0,
+        "max": 100,
+        "step": 4,
+        "unit": "px",
+        "label": "Margin top",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "margin_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 4,
+        "unit": "px",
+        "label": "Margin bottom",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "margin_horizontal",
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "unit": "rem",
+        "label": "Margin sides",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "margin_horizontal_mobile",
+        "min": 0,
+        "max": 15,
+        "step": 0.5,
+        "unit": "rem",
+        "label": "Margin sides mobile",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Section padding (inside)"
+      },
+      {
+        "type": "range",
+        "id": "padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 4,
+        "unit": "px",
+        "label": "Padding top",
+        "default": 36
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 4,
+        "unit": "px",
+        "label": "Padding bottom",
+        "default": 36
+      },
+      {
+        "type": "range",
+        "id": "padding_horizontal",
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "unit": "rem",
+        "label": "Padding sides",
+        "default": 5
+      },
+      {
+        "type": "range",
+        "id": "padding_horizontal_mobile",
+        "min": 0,
+        "max": 15,
+        "step": 0.5,
+        "unit": "rem",
+        "label": "Padding sides mobile",
+        "default": 1.5
+      },
+      {
+        "type": "header",
+        "content": "Section settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "full_width",
+        "label": "Full width",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "content_width",
+        "min": 800,
+        "max": 2000,
+        "step": 100,
+        "unit": "px",
+        "label": "Section content width",
+        "default": 1200
+      },
+      {
+        "type": "range",
+        "id": "border_thickness",
+        "min": 0,
+        "max": 50,
+        "step": 1,
+        "unit": "px",
+        "label": "Border thickness",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_radius",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Section roundness",
+        "default": 0
+      },
+      {
+        "type": "checkbox",
+        "id": "lazy",
+        "label": "Lazy load",
+        "info": "Lazy load images for speed optimisation",
+        "default": true
+      }
+    ],
+    "blocks": [
+      {
+        "type": "card",
+        "name": "Card",
+        "settings": [
+          {
+            "type": "url",
+            "id": "lottie_url",
+            "label": "Lottie Animation URL",
+            "info": "Upload JSON file to Content > Files, then paste URL here. Overrides other icon settings."
+          },
+          {
+            "type": "image_picker",
+            "id": "custom_icon",
+            "label": "Custom Icon (Fallback)",
+            "info": "Used if no Lottie URL is provided."
+          },
+          {
+            "type": "text",
+            "id": "count_from",
+            "label": "Count from",
+            "default": "1",
+            "info": "Use number"
+          },
+          {
+            "type": "text",
+            "id": "count_to",
+            "label": "Count to",
+            "default": "12",
+            "info": "Use number"
+          },
+          {
+            "type": "text",
+            "id": "prefix",
+            "label": "Prefix"
+          },
+          {
+            "type": "text",
+            "id": "suffix",
+            "label": "Suffix"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+            "default": "Title"
+          },
+          {
+            "type": "url",
+            "id": "url",
+            "label": "URL"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "SC-Feature27",
+        "blocks": [
+          {
+            "type": "card",
+            "settings": {
+              "count_to": "50",
+              "suffix": "+",
+              "title": "Team Members"
+            }
+          },
+          {
+            "type": "card",
+            "settings": {
+              "count_to": "15",
+              "suffix": "+",
+              "title": "Years of Experience"
+            }
+          },
+          {
+            "type": "card",
+            "settings": {
+              "count_to": "500",
+              "title": "Successful Projects",
+              "suffix": "+"
+            }
+          },
+          {
+            "type": "card",
+            "settings": {
+              "count_to": "150",
+              "title": "Blog Posts"
+            }
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

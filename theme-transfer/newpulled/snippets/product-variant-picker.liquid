@@ -1,0 +1,349 @@
+{% comment %}
+	Renders product variant-picker
+
+	Accepts:
+	- product: {Object} product object.
+	- block: {Object} passing the block information.
+	- product_form_id: {String} Id of the product form to which the variant picker is associated.
+	- update_url: {Boolean} whether or not to update url when changing variants. If false, the url isn't updated. Default: true (optional).
+	Usage:
+	{% render 'product-variant-picker', product: product, block: block, product_form_id: product_form_id %}
+{% endcomment %}
+
+{% if product.has_only_default_variant == false %}
+	<div class="product-parameters">
+		{%- unless product.has_only_default_variant -%}
+			<div class="product-parameters__item product-parameters__variant">
+				{%- if block.settings.picker_type == 'button' -%}
+					<variant-radios
+						id="variant-radios-{{ section.id }}"
+						class="no-js-hidden"
+						data-section="{{ section.id }}"
+						data-url="{{ product.url }}"
+						{% if update_url == false %}
+							data-update-url="false"
+						{% endif %}
+						{{ block.shopify_attributes }}
+					>
+						{%- for option in product.options_with_values -%}
+							{% liquid
+								assign option_name = option.name | escape | downcase
+							%}
+							<fieldset
+								class="product-form__input product-form__input--radios"
+								id="SingleOptionSelector-{{ forloop.index0 }}"
+							>
+								<legend class="product-form__group-name-legend subtitle">
+									{{ option.name }}
+								</legend>
+								<div class="product-form__controls-group">
+									{% render 'product-variant-options',
+										product: product,
+										option: option,
+										block: block,
+										product_variant_type: product_variant_type,
+										product_page: product_page
+									%}
+								</div>
+								{% if option_name == 'size'
+									and block.settings.show_size_guide
+								%}
+									<modal-opener
+										class="no-js-hidden adv-btn-opener"
+										data-modal="#PopupModal-{{ block.id }}"
+										{{ block.shopify_attributes }}
+									>
+										<button
+											class="button size-guide-btn"
+											id="ProductPopup-{{ block.id }}"
+											type="button"
+											aria-haspopup="dialog"
+											aria-label="Open popup"
+										>
+											{% render 'icon-button-arrow' %}
+											{% if settings.button_animation %}
+												<span class="animation-wrapper" hoverstagger="link">
+													<span
+														class="button-label animation"
+														hoverstagger="text"
+													>
+														<span class="word" id="word1">
+															{{- block.settings.size_guide_text -}}
+														</span>
+													</span>
+													<span
+														class="button-label is-2 animation"
+														hoverstagger="text"
+													>
+														<span class="word" id="word2">
+															{{- block.settings.size_guide_text -}}
+														</span>
+													</span>
+												</span>
+											{% else %}
+												<span class="button-label">
+													{{- block.settings.size_guide_text -}}
+												</span>
+											{% endif %}
+										</button>
+									</modal-opener>
+									<modal-dialog
+										id="PopupModal-{{ block.id }}"
+										class="product-popup-modal size_guide_image_container"
+										{{ block.shopify_attributes }}
+									>
+										<div
+											role="dialog"
+											aria-label="{{ block.settings.label }}"
+											aria-modal="true"
+											class="product-popup-modal__content"
+											tabindex="-1"
+										>
+											<div class="product-popup-modal__header">
+												<h4 class="product-popup-modal__title">
+													{{ block.settings.size_guide_header }}
+												</h4>
+												<button
+													id="ModalClose-{{ block.id }}"
+													type="button"
+													class="product-popup-modal__toggle button modal-close-button"
+													aria-label="{{ 'accessibility.close' | t }}"
+												>
+													{% comment %}{% render 'icon-close' %}{% endcomment %}
+													{{ 'general.close.title' | t }}
+												</button>
+											</div>
+											<div class="product-popup-modal__content-info">
+												{% if block.settings.size_guide_decription != blank %}
+													<div class="medium-font">
+														{{ block.settings.size_guide_decription }}
+													</div>
+												{% endif %}
+												{% if block.settings.size_guide_image != blank %}
+													<div class="size_guide_image">
+														{{
+															block.settings.size_guide_image
+															| image_url: width: 1790
+															| image_tag:
+																loading: 'lazy',
+																widths: '553, 895, 1790'
+														}}
+													</div>
+												{% endif %}
+												{%- if block.settings.page.content != blank -%}
+													{{ block.settings.page.content }}
+												{%- endif -%}
+											</div>
+										</div>
+										<div
+											id="ModalClose-Overlay"
+											class="modal__overlay"
+										></div>
+									</modal-dialog>
+								{% endif %}
+							</fieldset>
+						{%- endfor -%}
+
+						<script type="application/json">
+							{{ product.variants | json }}
+						</script>
+					</variant-radios>
+				{% else %}
+					{% liquid
+						assign color_trigger = settings.trigger_swatch | handle | strip
+						assign name_option = option.name | handle | strip
+					%}
+					<variant-radios
+						id="variant-selects-{{ section.id }}"
+						class="no-js-hidden variant-selects"
+						data-section="{{ section.id }}"
+						data-url="{{ product.url }}"
+						{% if update_url == false %}
+							data-update-url="false"
+						{% endif %}
+						{{ block.shopify_attributes }}
+					>
+						{%- for option in product.options_with_values -%}
+							{% liquid
+								assign color_trigger = settings.trigger_swatch | handle | strip
+								assign name_option = option.name | handle | strip
+								assign option_name = option.name | escape | downcase
+							%}
+
+							<fieldset class="product-form__input product-form__input--dropdown product-form__controls--dropdown">
+								<div class="select dropdown-select">
+									<div class="select-label medium-font">
+										{{ option.name }}: <span>{{- option.selected_value }}</span>
+									</div>
+									<ul class="product-form__controls-group">
+										{% render 'product-variant-options',
+											product: product,
+											option: option,
+											block: block,
+											product_variant_type: product_variant_type,
+											product_page: product_page
+										%}
+									</ul>
+									{% render 'icon-arrow-small' %}
+								</div>
+
+								{% if option_name == 'size'
+									and block.settings.show_size_guide
+								%}
+									<modal-opener
+										class="no-js-hidden adv-btn-opener"
+										data-modal="#PopupModal-{{ block.id }}"
+										{{ block.shopify_attributes }}
+									>
+										<button
+											class="button size-guide-btn"
+											id="ProductPopup-{{ block.id }}"
+											type="button"
+											aria-haspopup="dialog"
+											aria-label="Open popup"
+										>
+											{% render 'icon-button-arrow' %}
+											{% if settings.button_animation %}
+												<span class="animation-wrapper" hoverstagger="link">
+													<span
+														class="button-label animation"
+														hoverstagger="text"
+													>
+														<span class="word" id="word1">
+															{{- block.settings.size_guide_text -}}
+														</span>
+													</span>
+													<span
+														class="button-label is-2 animation"
+														hoverstagger="text"
+													>
+														<span class="word" id="word2">
+															{{- block.settings.size_guide_text -}}
+														</span>
+													</span>
+												</span>
+											{% else %}
+												<span class="button-label">
+													{{- block.settings.size_guide_text -}}
+												</span>
+											{% endif %}
+										</button>
+									</modal-opener>
+									<modal-dialog
+										id="PopupModal-{{ block.id }}"
+										class="product-popup-modal size_guide_image_container"
+										{{ block.shopify_attributes }}
+									>
+										<div
+											role="dialog"
+											aria-label="{{ block.settings.label }}"
+											aria-modal="true"
+											class="product-popup-modal__content"
+											tabindex="-1"
+										>
+											<div class="product-popup-modal__header">
+												<h4 class="product-popup-modal__title">
+													{{ block.settings.size_guide_header }}
+												</h4>
+												<button
+													id="ModalClose-{{ block.id }}"
+													type="button"
+													class="product-popup-modal__toggle button modal-close-button"
+													aria-label="{{ 'accessibility.close' | t }}"
+												>
+													{% comment %}{% render 'icon-close' %}{% endcomment %}
+													{{ 'general.close.title' | t }}
+												</button>
+											</div>
+											<div class="product-popup-modal__content-info">
+												{% if block.settings.size_guide_decription != blank %}
+													<div class="medium-font">
+														{{ block.settings.size_guide_decription }}
+													</div>
+												{% endif %}
+												{% if block.settings.size_guide_image != blank %}
+													<div class="size_guide_image">
+														{{
+															block.settings.size_guide_image
+															| image_url: width: 1790
+															| image_tag:
+																loading: 'lazy',
+																widths: '553, 895, 1790'
+														}}
+													</div>
+												{% endif %}
+												{%- if block.settings.page.content != blank -%}
+													{{ block.settings.page.content }}
+												{%- endif -%}
+											</div>
+										</div>
+										<div
+											id="ModalClose-Overlay"
+											class="modal__overlay"
+										></div>
+									</modal-dialog>
+								{% endif %}
+							</fieldset>
+						{% endfor %}
+						<script type="application/json">
+							{{ product.variants | json }}
+						</script>
+					</variant-radios>
+				{% endif %}
+			</div>
+		{% endunless %}
+
+		<noscript class="product-form__noscript-wrapper-{{ section.id }}">
+			<variant-selects>
+				{%- for option in product.options_with_values -%}
+					<fieldset class="product-form__input product-form__input--dropdown {% if product.has_only_default_variant %} hidden{% endif %}">
+						<p class="product-form__group-name">{{ option.name }}</p>
+						<div class="select">
+							<select
+								name="id"
+								id="Variants-{{ section.id }}"
+								class="select__select"
+								form="{{ product_form_id }}"
+							>
+								{%- for variant in product.variants -%}
+									<option
+										{% if variant == product.selected_or_first_available_variant
+										%}
+											selected="selected"
+										{% endif %}
+										{% if variant.available == false %}
+											disabled
+										{% endif %}
+										value="{{ variant.id }}"
+									>
+										{%- liquid
+											echo variant.title
+											echo variant.price | money | strip_html | prepend: ' - '
+											if variant.available == false
+												echo 'products.product.sold_out' | t | prepend: ' - '
+											endif
+											if variant.quantity_rule.increment > 1
+												echo 'products.product.quantity.multiples_of' | t: quantity: variant.quantity_rule.increment | prepend: ' - '
+											endif
+											if variant.quantity_rule.min > 1
+												echo 'products.product.quantity.minimum_of' | t: quantity: variant.quantity_rule.min | prepend: ' - '
+											endif
+											if variant.quantity_rule.max != null
+												echo 'products.product.quantity.maximum_of' | t: quantity: variant.quantity_rule.max | prepend: ' - '
+											endif
+											assign cart_quantity = cart | item_count_for_variant: variant.id
+											if cart_quantity > 0
+												echo 'products.product.quantity.in_cart_html' | t: quantity: cart_quantity | prepend: ' - '
+											endif
+										-%}
+									</option>
+								{%- endfor -%}
+							</select>
+							{% render 'icon-arrow-small' %}
+						</div>
+					</fieldset>
+				{%- endfor -%}
+			</variant-selects>
+		</noscript>
+	</div>
+{% endif %}

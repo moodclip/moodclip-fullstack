@@ -1,0 +1,745 @@
+{% comment %}
+    New Standalone Section: Custom Audio Player
+    Version 12: Added subheading and typography controls for heading/subheading.
+{% endcomment %}
+
+{% style %}
+    .section-{{ section.id }}-padding {
+        padding-top: {{ section.settings.padding_top }}px;
+        padding-bottom: {{ section.settings.padding_bottom }}px;
+        position: relative; /* Needed for pseudo-element overlay */
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        {%- if section.settings.background_type == 'image' and section.settings.background_image != blank -%}
+            background-image: url('{{ section.settings.background_image | image_url }}');
+        {%- elsif section.settings.background_type == 'gradient' and section.settings.gradient_start and section.settings.gradient_end -%}
+            background: linear-gradient(to bottom, {{ section.settings.gradient_start }}, {{ section.settings.gradient_end }});
+        {%- elsif section.settings.background_type == 'color' and section.settings.background_color != blank -%}
+            background-color: {{ section.settings.background_color }};
+        {%- endif -%}
+    }
+
+    @media screen and (max-width: 749px) {
+        .section-{{ section.id }}-padding {
+            padding-top: {{ section.settings.padding_top | times: 0.5 | round: 0 }}px;
+            padding-bottom: {{ section.settings.padding_bottom | times: 0.5 | round: 0 }}px;
+        }
+    }
+
+    /* --- Typography and Content Alignment --- */
+    .title-wrapper-{{ section.id }} {
+        text-align: {{ section.settings.text_alignment }};
+        margin-bottom: 2rem;
+    }
+
+    .title-wrapper-{{ section.id }} .title {
+        font-size: {{ section.settings.heading_font_size }}px;
+        margin: 0;
+    }
+
+    .title-wrapper-{{ section.id }} .subheading {
+        font-size: {{ section.settings.subheading_font_size }}px;
+        margin-top: 10px;
+    }
+
+    @media screen and (max-width: 749px) {
+        .title-wrapper-{{ section.id }} .title {
+            font-size: {{ section.settings.heading_font_size | times: 0.7 | round: 0 }}px;
+        }
+        .title-wrapper-{{ section.id }} .subheading {
+            font-size: {{ section.settings.subheading_font_size | times: 0.85 | round: 0 }}px;
+        }
+    }
+
+
+    /* --- Styles for the Custom Music Player --- */
+    :root {
+        --player-background: #212529;
+        --player-text-primary: #ffffff;
+        --player-text-secondary: #adb5bd;
+        --player-accent: #ffffff;
+        --player-progress-bg: #495057;
+    }
+
+    .custom-audio-player__container {
+        /* Control the width with a new setting */
+        max-width: {{ section.settings.player_max_width }}px;
+        margin: 0 auto;
+        background: var(--player-background);
+        border-radius: 8px;
+        padding: 16px;
+        color: var(--player-text-primary);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+        position: relative; /* Ensure player is on top of background */
+        z-index: 2;
+    }
+
+    /* --- Styles for the Spotify Embed --- */
+    .spotify-embed-wrapper {
+        /* Center the wrapper and control its width */
+        margin: 0 auto;
+        width: {{ section.settings.spotify_width }}%;
+    }
+
+    .spotify-embed-wrapper iframe {
+        /* Ensure the iframe fills its wrapper */
+        width: 100%;
+        /* Set desktop height based on content type (track vs. playlist) */
+        height: {% if spotify_block.settings.spotify_embed_src_url contains '/track/' %}{{ section.settings.spotify_track_height_desktop }}px{% else %}{{ section.settings.spotify_playlist_height_desktop }}px{% endif %};
+    }
+
+    /* Apply mobile-specific heights */
+    @media screen and (max-width: 749px) {
+        .spotify-embed-wrapper iframe {
+            /* Use a single height setting for the compact mobile view */
+            height: {{ section.settings.spotify_height_mobile }}px;
+        }
+    }
+
+    .music-player {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .track-info-bar {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .track-info-bar .album-art {
+        width: 50px;
+        height: 50px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+     .track-info-bar .album-art svg {
+        width: 32px;
+        height: 32px;
+        fill: var(--player-text-primary);
+    }
+
+    .track-info .title {
+        font-weight: 600;
+        font-size: 16px;
+        margin: 0 0 2px;
+    }
+    .track-info .artist {
+        font-size: 14px;
+        color: var(--player-text-secondary);
+        margin: 0;
+    }
+
+    .controls-bar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .controls-bar button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        color: var(--player-text-secondary);
+        transition: color 0.2s ease;
+    }
+    .controls-bar button:hover {
+        color: var(--player-text-primary);
+    }
+    .controls-bar button.play-pause-btn {
+        width: 40px;
+        height: 40px;
+        background: var(--player-accent);
+        border-radius: 50%;
+        color: var(--player-background);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+      .controls-bar button.play-pause-btn:hover {
+        transform: scale(1.05);
+        color: var(--player-background);
+      }
+    .controls-bar button svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+    }
+    .controls-bar button.play-pause-btn svg {
+        width: 22px;
+        height: 22px;
+    }
+    /* Hide one icon when the other is active */
+    .play-pause-btn .icon-pause,
+    .music-player.playing .play-pause-btn .icon-play {
+        display: none;
+    }
+    .music-player.playing .play-pause-btn .icon-pause {
+        display: block;
+    }
+
+    .progress-bar-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .progress-bar {
+        flex-grow: 1;
+        height: 4px;
+        background: var(--player-progress-bg);
+        border-radius: 2px;
+        cursor: pointer;
+    }
+    .progress {
+        height: 100%;
+        width: 0%;
+        background: var(--player-accent);
+        border-radius: 2px;
+    }
+
+    .time-display {
+        font-size: 12px;
+        color: var(--player-text-secondary);
+        min-width: 75px;
+        text-align: center;
+    }
+
+    .volume-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+    .volume-bar button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--player-text-secondary);
+    }
+    .volume-bar button:hover {
+        color: var(--player-text-primary);
+    }
+    .volume-bar svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+    }
+    .volume-slider {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 80px;
+        height: 4px;
+        background: var(--player-progress-bg);
+        outline: none;
+        border-radius: 2px;
+        cursor: pointer;
+    }
+    .volume-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 12px;
+        height: 12px;
+        background: var(--player-accent);
+        cursor: pointer;
+        border-radius: 50%;
+    }
+    .volume-slider::-moz-range-thumb {
+        width: 12px;
+        height: 12px;
+        background: var(--player-accent);
+        cursor: pointer;
+        border-radius: 50%;
+    }
+
+    #plwrap {
+        margin-top: 20px;
+    }
+      #plUL li {
+        background: none;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        border-radius: 0;
+        color: var(--player-text-secondary);
+        cursor: pointer;
+        padding: 10px;
+        transition: all 0.2s ease;
+      }
+      #plUL li:hover {
+        color: var(--player-text-primary);
+        background: rgba(255,255,255,0.05);
+      }
+      #plUL li.plSel {
+        color: var(--player-text-primary);
+        background: rgba(255,255,255,0.1);
+        font-weight: bold;
+      }
+
+{% endstyle %}
+
+{%- liquid
+    assign spotify_block = section.blocks | where: "type", "spotify_content" | first
+    assign audio_blocks = section.blocks | where: "type", "audio_track"
+
+    if spotify_block and spotify_block.settings.spotify_embed_src_url != blank
+        assign spotify_embed_url = spotify_block.settings.spotify_embed_src_url
+    endif
+-%}
+
+<div class="color-{{ section.settings.color_scheme }} section-{{ section.id }}-padding">
+    <div class="container page-width">
+        <div class="title-wrapper-{{ section.id }} title-wrapper--self-padded-mobile title-wrapper--no-top-margin">
+            {%- if section.settings.heading != blank -%}
+                <h2 class="title inline-richtext">
+                    {{ section.settings.heading }}
+                </h2>
+            {%- endif -%}
+            {%- if section.settings.subheading != blank -%}
+                <div class="subheading rte">
+                    {{ section.settings.subheading }}
+                </div>
+            {%- endif -%}
+        </div>
+
+        {% if spotify_embed_url %}
+            <div class="spotify-embed-wrapper">
+                <iframe
+                    title="Spotify Embed"
+                    style="border-radius:12px"
+                    src="{{ spotify_embed_url }}"
+                    frameBorder="0"
+                    allowfullscreen=""
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    loading="lazy">
+                </iframe>
+            </div>
+        {% elsif audio_blocks.size > 0 %}
+            <div class="custom-audio-player__container">
+                <audio id="audio-{{ section.id }}" style="display:none;"></audio>
+                
+                <div class="music-player">
+                    <div class="track-info-bar">
+                        <div class="album-art">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M384 64c0-17.7-14.3-32-32-32H128c-17.7 0-32 14.3-32 32s14.3 32 32 32H352V384c0 35.3-28.7 64-64 64H192c-35.3 0-64-28.7-64-64V128c0-35.3-28.7-64-64-64S0 92.7 0 128V384c0 70.7 57.3 128 128 128h128c70.7 0 128-57.3 128-128V64z"/></svg>
+                        </div>
+                        <div class="track-info">
+                            <p class="title" id="npTitle-{{ section.id }}">Select a track</p>
+                            <p class="artist" id="npArtist-{{ section.id }}"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-bar-wrapper">
+                         <div class="controls-bar">
+                            <button id="btnPrev-{{ section.id }}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path d="M267.5 440.6c9.5 7.9 22.8 9.7 34.1 4.4s18.4-16.6 18.4-29V96c0-12.4-7.2-23.7-18.4-29s-24.5-3.6-34.1 4.4L28.9 233.4c-11.2 9.3-11.2 25.9 0 35.2l238.6 172z"/></svg></button>
+                            <button class="play-pause-btn" id="btnPlayPause-{{ section.id }}">
+                                <span class="icon-play"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span>
+                                <span class="icon-pause"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path d="M48 64C21.5 64 0 85.5 0 112V400c0 26.5 21.5 48 48 48H80c26.5 0 48-21.5 48-48V112c0-26.5-21.5-48-48-48H48zm192 0c-26.5 0-48 21.5-48 48V400c0 26.5 21.5 48 48 48h32c26.5 0 48-21.5 48-48V112c0-26.5-21.5-48-48-48H240z"/></svg></span>
+                            </button>
+                            <button id="btnNext-{{ section.id }}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" transform="rotate(180)"><path d="M267.5 440.6c9.5 7.9 22.8 9.7 34.1 4.4s18.4-16.6 18.4-29V96c0-12.4-7.2-23.7-18.4-29s-24.5-3.6-34.1 4.4L28.9 233.4c-11.2 9.3-11.2 25.9 0 35.2l238.6 172z"/></svg></button>
+                        </div>
+                        <div class="progress-bar" id="progressBar-{{ section.id }}">
+                            <div class="progress" id="progress-{{ section.id }}"></div>
+                        </div>
+                         <div class="time-display" id="timeDisplay-{{ section.id }}">00:00 / 00:00</div>
+                         <div class="volume-bar">
+                            <button id="volumeBtn-{{ section.id }}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M533.6 32.5C598.5 85.2 640 165.8 640 256s-41.5 170.8-106.4 223.5c-10.1 8.4-25.3 6.9-33.8-3.1s-6.9-25.3 3.1-33.8C557.5 398.2 592 331.2 592 256s-34.5-142.2-89.2-186.6c-10.1-8.4-11.5-23.6-3.1-33.8s23.6-11.5 33.8-3.1zM473.1 107c43.2 35.2 70.9 88.9 70.9 149s-27.7 113.8-70.9 149c-10.1 8.2-25.3 6.7-33.5-3.4s-6.7-25.3 3.4-33.5c32.1-26.2 52.1-66.3 52.1-112.1s-20-85.9-52.1-112.1c-10.1-8.2-11.7-23.5-3.4-33.5s23.5-11.7 33.5-3.4zm-60.5 74.5C434.1 199.1 448 225.9 448 256s-13.9 56.9-35.4 74.5c-10.3 8.6-25.6 7.1-34.2-3.2s-7.1-25.6 3.2-34.2C394.8 281.2 400 269 400 256s-5.2-25.2-17.1-35.1c-10.3-8.6-11.8-23.8-3.2-34.2s23.8-11.8 34.2-3.2zM32.5 142.1c-9.1 8.4-10.3 22.8-2.8 31.8L143 284.4c11.3 13.4 31.5 13.4 42.9 0L299.8 174c7.5-9 6.3-23.4-2.8-31.8s-22.8-10.3-31.8-2.8L160 221.2 54.3 139.3c-9.1-8.4-22.7-7.2-31.8 2.8z"/></svg></button>
+                            <input type="range" class="volume-slider" id="volumeSlider-{{ section.id }}" min="0" max="1" step="0.01" value="1">
+                         </div>
+                    </div>
+                </div>
+
+                {% if section.settings.show_playlist %}
+                    <div id="plwrap-{{ section.id }}">
+                        <ul id="plUL-{{ section.id }}">
+                            {% for block in audio_blocks %}
+                                {% if block.settings.audio_file_url != blank %}
+                                    <li data-track-src="{{ block.settings.audio_file_url | escape }}" data-artist="{{ block.settings.artist | escape }}">
+                                        {{ block.settings.title | default: 'Untitled Track' | escape }}
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sectionId = '{{ section.id }}';
+    const playerContainer = document.querySelector(`.section-${sectionId}-padding .custom-audio-player__container`);
+    if (!playerContainer) return;
+
+    const audio = document.getElementById(`audio-${sectionId}`);
+    const playlistItems = document.querySelectorAll(`#plUL-${sectionId} li`);
+    
+    const player = playerContainer.querySelector('.music-player');
+    const playPauseBtn = document.getElementById(`btnPlayPause-${sectionId}`);
+    const nextBtn = document.getElementById(`btnNext-${sectionId}`);
+    const prevBtn = document.getElementById(`btnPrev-${sectionId}`);
+    const npTitle = document.getElementById(`npTitle-${sectionId}`);
+    const npArtist = document.getElementById(`npArtist-${sectionId}`);
+    const progressBar = document.getElementById(`progressBar-${sectionId}`);
+    const progress = document.getElementById(`progress-${sectionId}`);
+    const timeDisplay = document.getElementById(`timeDisplay-${sectionId}`);
+    const volumeSlider = document.getElementById(`volumeSlider-${sectionId}`);
+
+    if (audio && playlistItems.length > 0) {
+        let currentIndex = 0;
+
+        function formatTime(seconds) {
+            const min = Math.floor(seconds / 60);
+            const sec = Math.floor(seconds % 60);
+            return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+        }
+        
+        function updateProgress() {
+            const { duration, currentTime } = audio;
+            const progressPercent = (currentTime / duration) * 100;
+            if (progress) progress.style.width = `${progressPercent}%`;
+
+            if(duration) {
+                if (timeDisplay) timeDisplay.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+            } else {
+                 if (timeDisplay) timeDisplay.textContent = '00:00 / 00:00';
+            }
+        }
+        
+        function setProgress(e) {
+            const width = this.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audio.duration;
+            if(duration) {
+                audio.currentTime = (clickX / width) * duration;
+            }
+        }
+
+        function loadTrack(index, playOnLoad = false) {
+            playlistItems.forEach(item => item.classList.remove('plSel'));
+            const currentItem = playlistItems[index];
+            if (currentItem) {
+                currentItem.classList.add('plSel');
+                if (npTitle) npTitle.textContent = currentItem.textContent.trim();
+                if (npArtist) npArtist.textContent = currentItem.dataset.artist || '';
+                audio.src = currentItem.dataset.trackSrc;
+                currentIndex = index;
+                if (playOnLoad) {
+                    audio.play();
+                }
+            }
+        }
+
+        function playTrack(index) {
+            loadTrack(index, true);
+        }
+        
+        function prevTrack() {
+            currentIndex--;
+            if (currentIndex < 0) {
+                currentIndex = playlistItems.length - 1;
+            }
+            playTrack(currentIndex);
+        }
+
+        function nextTrack() {
+            currentIndex++;
+            if (currentIndex > playlistItems.length - 1) {
+                currentIndex = 0;
+            }
+            playTrack(currentIndex);
+        }
+
+        if (playPauseBtn) {
+            playPauseBtn.addEventListener('click', () => {
+                if (audio.paused) {
+                    audio.play();
+                } else {
+                    audio.pause();
+                }
+            });
+        }
+        
+        audio.addEventListener('play', () => player.classList.add('playing'));
+        audio.addEventListener('pause', () => player.classList.remove('playing'));
+        audio.addEventListener('timeupdate', updateProgress);
+        
+        if (nextBtn) nextBtn.addEventListener('click', nextTrack);
+        if (prevBtn) prevBtn.addEventListener('click', prevTrack);
+        audio.addEventListener('ended', nextTrack);
+        
+        if (progressBar) progressBar.addEventListener('click', setProgress);
+        
+        if (volumeSlider) {
+            volumeSlider.addEventListener('input', (e) => {
+                audio.volume = e.target.value;
+            });
+        }
+
+        playlistItems.forEach((item, index) => {
+            item.addEventListener('click', () => playTrack(index));
+        });
+
+        loadTrack(0);
+    }
+});
+</script>
+
+{% schema %}
+{
+  "name": "Custom Audio Player",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content & Typography"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "default": "Listen to our music",
+      "label": "Heading"
+    },
+    {
+        "type": "range",
+        "id": "heading_font_size",
+        "min": 16,
+        "max": 80,
+        "step": 2,
+        "unit": "px",
+        "label": "Heading font size",
+        "default": 40
+    },
+    {
+      "type": "richtext",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "<p>Add a short description or introduction here.</p>"
+    },
+    {
+        "type": "range",
+        "id": "subheading_font_size",
+        "min": 12,
+        "max": 40,
+        "step": 1,
+        "unit": "px",
+        "label": "Subheading font size",
+        "default": 16
+    },
+    {
+        "type": "select",
+        "id": "text_alignment",
+        "label": "Text alignment",
+        "options": [
+            { "value": "left", "label": "Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "right", "label": "Right" }
+        ],
+        "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "options": [
+        { "value": "accent-1", "label": "Accent 1" },
+        { "value": "accent-2", "label": "Accent 2" },
+        { "value": "background-1", "label": "Background 1" },
+        { "value": "background-2", "label": "Background 2" },
+        { "value": "inverse", "label": "Inverse" }
+      ],
+      "default": "background-1",
+      "label": "Color scheme",
+      "info": "Controls text color and other theme elements."
+    },
+    {
+      "type": "header",
+      "content": "Background Settings"
+    },
+    {
+      "type": "select",
+      "id": "background_type",
+      "label": "Background Type",
+      "options": [
+        { "value": "color", "label": "Solid Color" },
+        { "value": "gradient", "label": "Gradient" },
+        { "value": "image", "label": "Image" },
+        { "value": "default", "label": "Theme Default"}
+      ],
+      "default": "default"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#f0f0f0"
+    },
+    {
+      "type": "color",
+      "id": "gradient_start",
+      "label": "Gradient Start Color",
+      "default": "#eeeeee"
+    },
+    {
+      "type": "color",
+      "id": "gradient_end",
+      "label": "Gradient End Color",
+      "default": "#dddddd"
+    },
+    {
+        "type": "image_picker",
+        "id": "background_image",
+        "label": "Background Image"
+    },
+    {
+      "type": "header",
+      "content": "Custom Player Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_playlist",
+      "default": true,
+      "label": "Show track playlist (Custom Player only)"
+    },
+    {
+      "type": "header",
+      "content": "Sizing & Layout Controls"
+    },
+    {
+      "type": "range",
+      "id": "player_max_width",
+      "min": 300,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "label": "Custom Player Max Width",
+      "default": 600
+    },
+    {
+        "type": "range",
+        "id": "spotify_width",
+        "min": 50,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Spotify Player Width",
+        "default": 100
+    },
+    {
+        "type": "range",
+        "id": "spotify_playlist_height_desktop",
+        "min": 200,
+        "max": 800,
+        "step": 10,
+        "unit": "px",
+        "label": "Spotify Playlist/Album Height (Desktop)",
+        "default": 350
+    },
+    {
+        "type": "range",
+        "id": "spotify_track_height_desktop",
+        "min": 80,
+        "max": 200,
+        "step": 5,
+        "unit": "px",
+        "label": "Spotify Track Height (Desktop)",
+        "default": 80
+    },
+    {
+        "type": "range",
+        "id": "spotify_height_mobile",
+        "min": 150,
+        "max": 500,
+        "step": 10,
+        "unit": "px",
+        "label": "Spotify Player Height (Mobile)",
+        "info": "Applies a compact height for both tracks and playlists on mobile.",
+        "default": 150
+    },
+    {
+      "type": "header",
+      "content": "Section Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "audio_track",
+      "name": "Audio Track",
+      "limit": 12,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Track Title",
+          "default": "My Awesome Song"
+        },
+        {
+          "type": "text",
+          "id": "artist",
+          "label": "Artist Name",
+          "default": "Artist"
+        },
+        {
+          "type": "text",
+          "id": "audio_file_url",
+          "label": "Audio File URL",
+          "info": "Go to Content > Files, upload your audio, copy its link, and paste it here."
+        }
+      ]
+    },
+    {
+      "type": "spotify_content",
+      "name": "Spotify Content",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "url",
+          "id": "spotify_embed_src_url",
+          "label": "Spotify Embed SRC URL",
+          "info": "On Spotify, click 'Share' > 'Embed' and copy only the URL from the 'src' attribute."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Audio Player",
+      "blocks": [
+        {
+          "type": "audio_track"
+        },
+        {
+          "type": "audio_track"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

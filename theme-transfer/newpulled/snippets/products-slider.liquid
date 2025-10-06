@@ -1,0 +1,79 @@
+{% liquid
+	assign slideshow_speed = slider_settings.slideshow_speed
+	assign slideshow_delay = slider_settings.slideshow_delay
+	assign autoplay = slider_settings.autoplay
+	assign stop_autoplay = slider_settings.stop_autoplay
+	assign show_arrows = slider_settings.show_arrows
+	assign perRow = slider_settings.per_row
+	assign media_size = slider_settings.image_ratio
+	assign media_fit = slider_settings.image_fit
+	assign show_secondary_image = slider_settings.show_secondary_image
+	assign show_vendor = slider_settings.show_vendor
+	assign show_tags = slider_settings.show_tags
+	assign show_type = slider_settings.show_type
+	assign show_desc = slider_settings.show_desc
+	assign show_color_swatch = slider_settings.show_color_swatch
+	assign show_collection_name = slider_settings.show_collection_name
+	assign show_sku = slider_settings.show_sku
+	assign show_two_cards = slider_settings.show_two_cards
+	assign product_variant_type = slider_settings.product_variant_type
+	assign mobile = 1
+	if show_two_cards
+		assign mobile = 2
+	endif
+%}
+
+<div
+	class="products-slider"
+	data-id="{{ section_id }}"
+	data-speed="{{ slideshow_speed }}"
+	data-delay="{{ slideshow_delay }}"
+	data-autoplay="{{ autoplay }}"
+	data-stop-autoplay="{{ stop_autoplay }}"
+	data-show-arrows="{{ show_arrows }}"
+	data-per-row="{{ perRow }}"
+	data-mobile="{{ mobile }}"
+	style="--slider-per-row : {{ perRow }}"
+>
+	<div class="products-slider__container{% if container %} container{% endif %}">
+		<div class="products-slider__wrapper">
+			<div class="products-slider__swiper swiper mySwiper">
+				<div class="products-slider__swiper-wrapper swiper-wrapper">
+					{% for product in product_list %}
+						<div
+							data-type="{{ product.type }}"
+							class="products-slider__slide swiper-slide "
+						>
+							{% render 'product-card',
+								product_card_product: product,
+								media_size: media_size,
+								media_fit: media_fit,
+								show_secondary_image: show_secondary_image,
+								show_vendor: show_vendor,
+								show_desc: show_desc,
+								show_color_swatch: show_color_swatch,
+								show_collection_name: show_collection_name,
+								show_tags: show_tags,
+								show_type: show_type,
+								product_variant_type: product_variant_type,
+								section_id: section_id,
+								show_sku: show_sku
+							%}
+						</div>
+					{%- else -%}
+						{%- for i in (1..perRow) -%}
+							<div class="products-slider__slide swiper-slide">
+								{% render 'product-card-placeholder', media_size: media_size %}
+							</div>
+						{% endfor %}
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+		{% if show_arrows %}
+			<div
+				class="swiper-pagination products-slider-pagination swiper-pagination-default"
+			></div>
+		{% endif %}
+	</div>
+</div>

@@ -1,0 +1,352 @@
+{{ 'section-contact-form.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+	{% render 'section-margin' %}
+{%- endstyle -%}
+
+<div class="contact">
+	<div class=" contact__wrapper">
+		{% render 'section-header' %}
+		<div class=" container">
+			<div class="contact__container ">
+				<div class="contact-form__block color-{{ section.settings.color_scheme }} background">
+					{% if section.settings.form_heading != blank
+						or section.settings.form_desc != blank
+					%}
+						<div class="contact-form__header">
+							{%- if section.settings.form_heading != blank -%}
+								<h3 class="contact-form__title">
+									{{ section.settings.form_heading }}
+								</h3>
+							{%- endif -%}
+							{% if section.settings.form_desc != blank %}
+								<div class="contact-form__desc richtext__content">
+									{{ section.settings.form_desc }}
+								</div>
+							{% endif %}
+						</div>
+					{% endif %}
+					{%- form 'contact', id: 'ContactForm' -%}
+						{%- if form.posted_successfully? -%}
+							<div
+								class="form-status form-status-list form__message"
+								tabindex="-1"
+								autofocus
+							>
+								{% render 'icon-success' %}
+								{{ 'templates.contact.form.post_success' | t }}
+							</div>
+						{%- elsif form.errors -%}
+						{%- endif -%}
+
+						<label class="field__label medium-font" for="ContactForm-name">
+							{{- 'templates.contact.form.name' | t -}}
+							{% comment %}<span class="form-asterisk">*</span>{% endcomment %}
+						</label>
+
+						<div class="field field__name">
+							<input
+								class="field__input"
+								autocomplete="name"
+								type="text"
+								id="ContactForm-name"
+								name="contact[{{ 'templates.contact.form.name' | t }}]"
+								aria-required="true"
+								value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+								placeholder=" "
+								required
+							>
+							<label class="field__label " for="ContactForm-name">
+								{{- 'templates.contact.form.name' | t -}}
+							</label>
+						</div>
+						<label class="field__label medium-font" for="ContactForm-email">
+							{{- 'templates.contact.form.email' | t -}}
+							{% comment %}<span class="form-asterisk">*</span>{% endcomment %}
+						</label>
+						<div class="field">
+							<input
+								autocomplete="email"
+								type="email"
+								id="ContactForm-email"
+								class="field__input"
+								name="contact[email]"
+								spellcheck="false"
+								autocapitalize="off"
+								value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+								aria-required="true"
+								{% if form.errors contains 'email' %}
+									aria-invalid="true"
+									aria-describedby="ContactForm-email-error"
+								{% endif %}
+								placeholder=" "
+								required
+							>
+							<label class="field__label" for="ContactForm-email">
+								{{- 'templates.contact.form.email' | t -}}
+							</label>
+							{%- if form.errors contains 'email' -%}
+								<small
+									class="contact__field-error"
+									id="ContactForm-email-error"
+								>
+									<span class="visually-hidden">
+										{{- 'accessibility.error' | t -}}
+									</span>
+									<span class="form__message">
+										{{- form.errors.translated_fields.email | capitalize }}
+										{{ form.errors.messages.email -}}
+									</span>
+								</small>
+							{%- endif -%}
+						</div>
+						<label class="field__label medium-font" for="ContactForm-phone">
+							{{- 'templates.contact.form.phone' | t -}}
+						</label>
+						<div class="field">
+							<input
+								type="tel"
+								id="ContactForm-phone"
+								class="field__input"
+								autocomplete="tel"
+								name="contact[{{ 'templates.contact.form.phone' | t }}]"
+								pattern="[0-9\-]*"
+								aria-required="true"
+								value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
+								placeholder=" "
+								required
+							>
+							<label class="field__label" for="ContactForm-phone">
+								{{- 'templates.contact.form.phone' | t -}}
+							</label>
+						</div>
+						<label
+							class=" field__label medium-font"
+							for="ContactForm-body"
+						>
+							{{- 'templates.contact.form.comment' | t -}}
+						</label>
+						<div class="field">
+							<textarea
+								rows="10"
+								id="ContactForm-body"
+								class="text-area field__input"
+								name="contact[{{ 'templates.contact.form.comment' | t }}]"
+								placeholder=" "
+								aria-required="true"
+								required
+							>
+            {{- form.body -}}
+          </textarea>
+							<label
+								class="form__label field__label"
+								for="ContactForm-body"
+							>
+								{{- 'templates.contact.form.comment' | t -}}
+								{% comment %}<span class="form-asterisk">*</span>{% endcomment %}
+							</label>
+						</div>
+						<div class="contact__bottom">
+							<button type="submit" class="button button--primary">
+								{% if settings.button_animation %}
+									<span class="animation-wrapper" hoverstagger="link">
+										<span class="button-label animation" hoverstagger="text">
+											<span class="word" id="word1">
+												{{- 'templates.contact.form.submit' | t -}}
+											</span>
+										</span>
+										<span
+											class="button-label is-2 animation"
+											hoverstagger="text"
+										>
+											<span class="word" id="word2">
+												{{- 'templates.contact.form.submit' | t -}}
+											</span>
+										</span>
+									</span>
+								{% else %}
+									<span class="button-label">
+										{{- 'templates.contact.form.submit' | t -}}
+									</span>
+								{% endif %}
+							</button>
+							{%- if section.settings.additional_text != blank -%}
+								<div class="contact__add-text">
+									{{ section.settings.additional_text }}
+								</div>
+							{%- endif -%}
+						</div>
+					{%- endform -%}
+				</div>
+				{%- if section.blocks.size > 0 -%}
+					<div class="contact-form__post">
+						{% for block in section.blocks %}
+							<div class="content-block">
+								{%- if block.settings.subheading != blank -%}
+									<div class="content__subtitle subtitle">
+										{{ block.settings.subheading }}
+									</div>
+								{%- endif -%}
+								{%- if block.settings.description != blank -%}
+									<div class="content-item__description  richtext__content">
+										{{ block.settings.description }}
+									</div>
+								{%- endif -%}
+							</div>
+						{% endfor %}
+					</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+
+{% schema %}
+{
+	"name": "t:sections.contact-form.name",
+	"tag": "section",
+	"class": "spaced-section contact-section",
+	"enabled_on": {
+		"templates": ["*"]
+	},
+	"settings": [
+		{
+			"type": "inline_richtext",
+			"id": "heading",
+			"default": "Heading",
+			"label": "t:sections.all.heading.label"
+		},
+
+		{
+			"type": "richtext",
+			"id": "description",
+			"default": "<p></p>",
+			"label": "t:sections.all.text.label"
+		},
+		{
+			"type": "checkbox",
+			"id": "enable_border_top",
+			"default": true,
+			"label": "t:sections.all.section_header.border"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.contact-form.settings.form_settings.header"
+		},
+		{
+			"type": "inline_richtext",
+			"id": "form_heading",
+			"default": "Heading",
+			"label": "t:sections.contact-form.settings.heading.label"
+		},
+		{
+			"type": "richtext",
+			"id": "form_desc",
+			"default": "<p>Description</p>",
+			"label": "t:sections.contact-form.settings.description.label"
+		},
+		{
+			"type": "richtext",
+			"id": "additional_text",
+			"default": "<p>Additional text for contact form.</p>",
+			"label": "t:sections.contact-form.settings.additional_text.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.section-margin.header.content"
+		},
+		{
+			"type": "select",
+			"id": "margin_top",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "no-indent",
+			"label": "t:sections.all.section-margin.margin_top.label"
+		},
+		{
+			"type": "select",
+			"id": "margin_bottom",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "l",
+			"label": "t:sections.all.section-margin.margin_bottom.label"
+		}
+	],
+	"blocks": [
+		{
+			"type": "text-block",
+			"name": "t:sections.contact-form.blocks.accordion.name",
+			"settings": [
+				{
+					"type": "text",
+					"id": "subheading",
+					"default": "Subheading",
+					"label": "t:sections.all.subheading.label"
+				},
+				{
+					"type": "richtext",
+					"id": "description",
+					"default": "<p>Description</p>",
+					"label": "t:sections.all.description.label"
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "t:sections.contact-form.presets.name",
+			"blocks": [
+				{
+					"type": "text-block"
+				},
+				{
+					"type": "text-block"
+				},
+				{
+					"type": "text-block"
+				}
+			]
+		}
+	]
+}
+{% endschema %}

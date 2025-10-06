@@ -1,0 +1,405 @@
+{% style %}
+	{% render 'section-padding' %}
+	{% render 'section-margin' %}
+
+	#shopify-section-{{ section.id }} .countdown .have-overlay {
+		--overlay-alpha : {{ section.settings.overlay_opacity }}%;
+		--ticker-speed : {{ section.settings.ticker_speed }}s;
+	}
+	#shopify-section-{{ section.id }} {
+
+		--ticker-speed : {{ section.settings.ticker_speed }}s;
+	}
+{% endstyle %}
+
+{{ 'steps.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'steps.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'steps-contact.js' | asset_url }}" defer="defer"></script>
+
+<div
+	class="steps"
+>
+	<div class="container">
+		<div class="steps__wrapper">
+			<div class="steps__img color-inverse">
+				{% if section.settings.image != blank %}
+					{% assign image_height = section.settings.image.width
+						| divided_by: section.settings.image.aspect_ratio
+					%}
+					{{
+						section.settings.image
+						| image_url: width: 3840
+						| image_tag:
+							loading: 'lazy',
+							width: section.settings.image.width,
+							height: image_height,
+							sizes: '100vw',
+							widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+					}}
+				{%- elsif section.settings.video != blank -%}
+					{% assign image_height = section.settings.image.width
+						| divided_by: section.settings.image.aspect_ratio
+					%}
+					{{
+						section.settings.video
+						| video_tag:
+							image_size: '1100x',
+							autoplay: true,
+							height: image_height,
+							loop: true,
+							controls: false,
+							muted: true,
+							class: 'cards-grid__image'
+					}}
+				{% else %}
+					{{ 'image' | placeholder_svg_tag: 'placeholder' }}
+				{% endif %}
+				{% if section.settings.ticker_text != blank %}
+					<div class="steps__ticker-wrapper ticker-right">
+						<div
+							class="steps__ticker color-{{ section.settings.color_scheme_ticker }} background"
+							data-ticker-id="{{ section.id }}"
+							data-ticker-speed="{{ section.settings.ticker_speed }}"
+						>
+							<div class="marquee container ticker-js-{{ section.id }}">
+								<div class="marquee-content">
+									{%- if section.settings.ticker_text != blank -%}
+										{% for i in (1..20) %}
+											<div class="marquee-tag">
+												<div class="ticker__title h3">
+													{{ section.settings.ticker_text }}
+												</div>
+											</div>
+										{% endfor %}
+									{%- endif -%}
+								</div>
+							</div>
+						</div>
+					</div>
+				{% endif %}
+				<div class="steps_content_text {% if section.settings.ticker_text != blank %}steps_content_text_ticker_left {% endif %}">
+					<div class="steps__header">
+						{%- if section.settings.subheading != blank -%}
+							<div class="subtitle steps_subheading">
+								{{ section.settings.subheading }}
+							</div>
+						{%- endif -%}
+						{% if section.settings.heading != blank %}
+							<h2
+								class="steps__header-title h1"
+								{% if section.settings.text_animation %}
+									data-animation-text="true"
+								{% endif %}
+							>
+								{{ section.settings.heading }}
+							</h2>
+						{%- endif -%}
+						{%- if section.settings.description != blank -%}
+							<div class="richtext__content steps__header-text medium-font">
+								{{ section.settings.description }}
+							</div>
+						{%- endif -%}
+					</div>
+				</div>
+			</div>
+			<div
+				class="steps_content color-{{ section.settings.color_scheme }} background"
+			>
+				<div class="steps-info_block">
+					{%- for block in section.blocks -%}
+						<div class="content-block">
+							{%- if block.settings.subheading != blank -%}
+								<div class="content__subtitle h1">
+									{{ block.settings.subheading }}
+								</div>
+							{%- endif -%}
+							{%- if block.settings.heading != blank -%}
+								<h3 class="content__heading">
+									{{ block.settings.heading }}
+								</h3>
+							{%- endif -%}
+							{%- if block.settings.description != blank -%}
+								<div class="content-item__description medium-font richtext__content">
+									{{ block.settings.description }}
+								</div>
+							{%- endif -%}
+						</div>
+					{%- endfor -%}
+				</div>
+				{%- if section.settings.heading_modal != blank
+					or section.settings.description_modal != blank
+				-%}
+					{%- if section.settings.button_label != blank -%}
+						<button
+							type="submit"
+							class="button button--primary button--{{ section.settings.button_style }} {% if  settings.button_animation %} button-animation{% endif %} steps_content_button"
+						>
+							{% if section.settings.button_arrow %}
+								<span class="button-icon">
+									{% render 'icon-button-arrow' %}
+								</span>
+							{% endif %}
+							{% if settings.button_animation %}
+								<span class="animation-wrapper" hoverstagger="link">
+									<span class="button-label animation" hoverstagger="text">
+										<span class="word" id="word1">
+											{{- section.settings.button_label | escape -}}
+										</span>
+									</span>
+									<span class="button-label is-2 animation" hoverstagger="text">
+										<span class="word" id="word2">
+											{{- section.settings.button_label | escape -}}
+										</span>
+									</span>
+								</span>
+							{% else %}
+								<span class="button-label">
+									{{- section.settings.button_label | escape -}}
+								</span>
+							{% endif %}
+						</button>
+					{%- endif -%}
+				{%- endif -%}
+			</div>
+		</div>
+	</div>
+</div>
+{% render 'contact-modal',
+	description_modal: section.settings.description_modal,
+	heading_modal: section.settings.heading_modal
+%}
+{% schema %}
+{
+	"name": "t:sections.steps.name",
+	"tag": "section",
+	"class": "steps-section",
+	"enabled_on": {
+		"templates": ["*"]
+	},
+	"settings": [
+		{
+			"type": "image_picker",
+			"id": "image",
+			"label": "t:sections.all.image.label"
+		},
+		{
+			"type": "video",
+			"id": "video",
+			"label": "t:sections.all.video.label"
+		},
+		{
+			"type": "text",
+			"id": "subheading",
+			"default": "Subheading",
+			"label": "t:sections.all.subheading.label"
+		},
+		{
+			"type": "inline_richtext",
+			"id": "heading",
+			"label": "t:sections.all.heading.label",
+			"default": "Heading"
+		},
+		{
+			"type": "checkbox",
+			"id": "text_animation",
+			"default": true,
+			"label": "t:sections.all.animations.label"
+		},
+		{
+			"type": "richtext",
+			"id": "description",
+			"default": "<p>Description</p>",
+			"label": "t:sections.all.description.label"
+		},
+		{
+			"type": "color_scheme",
+			"id": "color_scheme",
+			"default": "background-6",
+			"label": "t:sections.all.color_scheme.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.steps.blocks.steps_slide.settings.drawer_settings.label"
+		},
+		{
+			"type": "inline_richtext",
+			"id": "heading_modal",
+			"label": "t:sections.all.heading.label",
+			"default": "Heading"
+		},
+		{
+			"type": "richtext",
+			"id": "description_modal",
+			"default": "<p>Description</p>",
+			"label": "t:sections.all.description.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.button.header.content"
+		},
+		{
+			"type": "text",
+			"id": "button_label",
+			"default": "Button label",
+			"label": "t:sections.all.button.label.label",
+			"info": "t:sections.all.button.label.info"
+		},
+		{
+			"type": "select",
+			"id": "button_style",
+			"options": [
+				{
+					"value": "primary",
+					"label": "t:sections.all.button.style.options__1.label"
+				},
+				{
+					"value": "secondary",
+					"label": "t:sections.all.button.style.options__2.label"
+				},
+				{
+					"value": "tertiary",
+					"label": "t:sections.all.button.style.options__3.label"
+				}
+			],
+			"default": "primary",
+			"label": "t:sections.all.button.style.label"
+		},
+		{
+			"type": "checkbox",
+			"id": "button_arrow",
+			"default": false,
+			"label": "t:sections.all.button.arrow.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.ticker.header.content"
+		},
+		{
+			"type": "text",
+			"id": "ticker_text",
+			"default": "Some text",
+			"label": "t:sections.all.ticker.settings.ticker_text.label",
+			"info": "t:sections.all.ticker.info"
+		},
+		{
+			"type": "color_scheme",
+			"id": "color_scheme_ticker",
+			"default": "background-3",
+			"label": "t:sections.all.color_scheme.label"
+		},
+		{
+			"type": "range",
+			"id": "ticker_speed",
+			"min": 0,
+			"max": 50,
+			"step": 1,
+			"default": 25,
+			"unit": "s",
+			"label": "t:sections.all.ticker.settings.ticker_speed.label"
+		},
+		{
+			"type": "header",
+			"content": "t:sections.all.section-margin.header.content"
+		},
+		{
+			"type": "select",
+			"id": "margin_top",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "s",
+			"label": "t:sections.all.section-margin.margin_top.label"
+		},
+		{
+			"type": "select",
+			"id": "margin_bottom",
+			"options": [
+				{
+					"value": "no-indent",
+					"label": "t:sections.all.section-margin.options__1.label"
+				},
+				{
+					"value": "xs",
+					"label": "t:sections.all.section-margin.options__2.label"
+				},
+				{
+					"value": "s",
+					"label": "t:sections.all.section-margin.options__3.label"
+				},
+				{
+					"value": "m",
+					"label": "t:sections.all.section-margin.options__4.label"
+				},
+				{
+					"value": "l",
+					"label": "t:sections.all.section-margin.options__5.label"
+				}
+			],
+			"default": "s",
+			"label": "t:sections.all.section-margin.margin_bottom.label"
+		}
+	],
+	"blocks": [
+		{
+			"type": "text_block",
+			"name": "t:sections.steps.blocks.steps_slide.name",
+			"limit": 3,
+			"settings": [
+				{
+					"type": "text",
+					"id": "subheading",
+					"default": "Subheading",
+					"label": "t:sections.all.subheading.label"
+				},
+				{
+					"type": "inline_richtext",
+					"id": "heading",
+					"default": "Heading",
+					"label": "t:sections.all.heading.label"
+				},
+				{
+					"type": "richtext",
+					"id": "description",
+					"default": "<p>Description</p>",
+					"label": "t:sections.all.description.label"
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "t:sections.steps.presets.name",
+			"blocks": [
+				{
+					"type": "text_block"
+				},
+				{
+					"type": "text_block"
+				},
+				{
+					"type": "text_block"
+				}
+			]
+		}
+	]
+}
+{% endschema %}

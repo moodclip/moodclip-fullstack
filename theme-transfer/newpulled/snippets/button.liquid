@@ -1,0 +1,42 @@
+{% liquid
+	if layout != blank
+		assign btn_label = layout.settings.button_label
+		assign btn_link = layout.settings.button_link
+		assign btn_animation = settings.button_animation
+		if layout.settings.button_style != blank
+			assign btn_style = layout.settings.button_style
+		else
+			assign btn_style = 'simple'
+		endif
+		assign enable_arrow = layout.settings.button_arrow
+	endif
+%}
+{% if btn_label != blank %}
+	<a
+		{% if btn_link != blank %}
+			href="{{ btn_link }}"
+		{% endif %}
+		class="button button--{{ btn_style }}{% if full %} button--full-width{% endif %}{% if btn_animation %} button-animation{% endif %}"
+		{% if btn_link == blank %}
+			aria-disabled="true"
+		{% endif %}
+	>
+		{% if enable_arrow %}
+			<span class="button-icon">
+				{% render 'icon-button-arrow' %}
+			</span>
+		{% endif %}
+		{% if btn_animation %}
+			<span class="animation-wrapper" hoverstagger="link">
+				<span class="button-label animation" hoverstagger="text">
+					<span class="word" id="word1">{{ btn_label | strip }}</span>
+				</span>
+				<span class="button-label is-2 animation" hoverstagger="text">
+					<span class="word" id="word2">{{ btn_label | strip }}</span>
+				</span>
+			</span>
+		{% else %}
+			<span class="button-label">{{ btn_label | strip }}</span>
+		{% endif %}
+	</a>
+{% endif %}

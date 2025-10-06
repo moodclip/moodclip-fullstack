@@ -1,0 +1,372 @@
+{% comment %}
+  Shopify Section: Pricing with Animated Guarantee Ribbon
+
+  - Author: Gemini
+  - Date: June 17, 2024
+  - Based on a detailed plan to create a premium, animated guarantee ribbon.
+  - Features: CSS-only animations, customizable settings, responsive design.
+{% endcomment %}
+
+<div class="pricing-guarantee-section color-{{ section.settings.color_scheme }}" data-section-id="{{ section.id }}">
+  <div class="page-width">
+    {% if section.settings.heading != blank %}
+      <h2 class="h2-style-global center">{{ section.settings.heading }}</h2>
+    {% endif %}
+
+    <div class="pricing-cards-container">
+      {% for block in section.blocks %}
+        <div class="pricing-card" {{ block.shopify_attributes }}>
+          <div class="pricing-card__content">
+            <h3 class="h3-style-global center">{{ block.settings.plan_name }}</h3>
+            <div class="price center">{{ block.settings.price }}</div>
+            <ul class="features-list" role="list">
+              {% for i in (1..5) %}
+                {% assign feature_setting = 'feature_' | append: i %}
+                {% assign feature_text = block.settings[feature_setting] %}
+                {% if feature_text != blank %}
+                  <li>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"></path></svg>
+                    {{ feature_text }}
+                  </li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+            <a href="{{ block.settings.button_link }}" class="button button--primary">{{ block.settings.button_text }}</a>
+          </div>
+
+          {% comment %}
+            STEP 1: Inject HTML for the ribbon below the pricing cards.
+            - A container is used for positioning and perspective.
+            - The inner ribbon holds the text and visual styling.
+            - aria-hidden="true" is used as the effect is decorative. The guarantee
+              should be stated elsewhere on the page for full accessibility.
+          {% endcomment %}
+          <div class="guarantee-ribbon-container" aria-hidden="true">
+            <div class="guarantee-ribbon">
+              <span>{{ section.settings.guarantee_text | upcase }}</span>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% comment %}
+  STEP 2 & 3: Add CSS for styling and define keyframe animations.
+{% endcomment %}
+<style>
+  /* Root variables for customization from schema settings */
+  .pricing-guarantee-section[data-section-id="{{ section.id }}"] {
+    --ribbon-bg-color: {{ section.settings.ribbon_color }};
+    --ribbon-glow-color: {{ section.settings.glow_color }};
+    --ribbon-text-color: {{ section.settings.ribbon_text_color }};
+    --glow-intensity: {{ section.settings.glow_intensity | divided_by: 100.0 }};
+
+    /* Base section styling */
+    padding: 50px 0;
+    background-color: var(--color-background);
+    color: var(--color-text);
+  }
+
+  .h2-style-global, .h3-style-global {
+    font-weight: 700;
+    margin-top: 0;
+    line-height: 1.2;
+  }
+  .h2-style-global { font-size: 2.5rem; margin-bottom: 40px; }
+  .h3-style-global { font-size: 1.5rem; margin-bottom: 15px; }
+  .center { text-align: center; }
+  .page-width { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+  /* Pricing Card Structure (for demonstration) */
+  .pricing-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
+    justify-content: center;
+  }
+
+  .pricing-card {
+    position: relative; /* Anchor for the ribbon */
+    background-color: rgba(128, 128, 128, 0.05);
+    border: 1px solid rgba(128, 128, 128, 0.1);
+    border-radius: 16px;
+    padding: 30px;
+    padding-bottom: 60px; /* Make space for the ribbon */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .pricing-card__content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .price {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  .features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 30px 0;
+    text-align: left;
+    flex-grow: 1;
+  }
+
+  .features-list li {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .button {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: var(--ribbon-bg-color);
+    color: var(--ribbon-text-color);
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px -2px var(--ribbon-glow-color);
+  }
+
+  /* --- Guarantee Ribbon Styling --- */
+
+  .guarantee-ribbon-container {
+    position: absolute;
+    bottom: 25px; /* Position it at the bottom of the card */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 40px;
+    z-index: 2;
+    perspective: 500px; /* For the 3D hover effect */
+    opacity: 0; /* Initially hidden for fade-in */
+
+    /* STEP 8: Performance Optimization */
+    will-change: opacity;
+    animation: fadeIn 0.5s ease-out 0.2s forwards;
+  }
+
+  .guarantee-ribbon {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    line-height: 40px;
+    text-align: center;
+    background: var(--ribbon-bg-color);
+    border-radius: 4px;
+    color: var(--ribbon-text-color);
+    font-size: 14px; /* STEP 3: Typography */
+    font-weight: 600;
+    letter-spacing: 0.1em; /* STEP 3: Typography */
+    box-shadow: 0 0 20px 0px rgba(var(--ribbon-glow-color-rgb), calc(var(--glow-intensity) * 0.7)); /* STEP 2: Glow Effect */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
+    /* STEP 8: Performance Optimization */
+    will-change: transform, box-shadow;
+
+    /* STEP 4: Animation Sequence (Pulse) */
+    animation: pulse 6s ease-in-out infinite;
+    animation-delay: 0.7s; /* Start after fade-in */
+  }
+
+  /* Ribbon "forks" using pseudo-elements */
+  .guarantee-ribbon::before,
+  .guarantee-ribbon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-color: transparent;
+    border-width: 20px 15px; /* Creates a 40px high triangle */
+    transform: translateY(-50%);
+  }
+  .guarantee-ribbon::before {
+    left: -30px;
+    border-right-width: 0;
+    border-left-color: var(--ribbon-bg-color);
+  }
+  .guarantee-ribbon::after {
+    right: -30px;
+    border-left-width: 0;
+    border-right-color: var(--ribbon-bg-color);
+  }
+  
+  /* STEP 4: Keyframe Animations (Fade In, Pulse) */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px) translateX(-50%); }
+    to { opacity: 1; transform: translateY(0) translateX(-50%); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(0.98); }
+    50% { transform: scale(1.02); }
+  }
+
+  /* STEP 4: Hover State Animation */
+  .pricing-card:hover .guarantee-ribbon {
+    transform: translateY(-10px) rotateX(15deg) scale(1.05);
+    box-shadow: 0 15px 30px -5px rgba(var(--ribbon-glow-color-rgb), calc(var(--glow-intensity))); /* Enhanced glow */
+  }
+
+  /* STEP 6: Responsive Behavior */
+  @media (max-width: 768px) {
+    .pricing-cards-container {
+        grid-template-columns: 1fr;
+        gap: 50px; /* Increased gap on mobile for ribbon space */
+    }
+    .pricing-card {
+        padding-bottom: 70px; /* More space for ribbon */
+    }
+    .guarantee-ribbon-container {
+        width: 90%;
+        bottom: 30px;
+    }
+    .guarantee-ribbon {
+      font-size: 12px;
+    }
+  }
+
+</style>
+
+{% schema %}
+{
+  "name": "Pricing with Guarantee",
+  "tag": "section",
+  "class": "spaced-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Pricing Plans"
+    },
+    {
+      "type": "header",
+      "content": "Guarantee Ribbon Settings"
+    },
+    {
+      "type": "text",
+      "id": "guarantee_text",
+      "label": "Guarantee Text",
+      "default": "First Month Guarantee",
+      "info": "This text appears in the animated ribbon."
+    },
+    {
+      "type": "color",
+      "id": "ribbon_color",
+      "label": "Ribbon Background Color",
+      "default": "#2c3e50"
+    },
+    {
+      "type": "color",
+      "id": "ribbon_text_color",
+      "label": "Ribbon Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "glow_color",
+      "label": "Ribbon Glow Color",
+      "default": "#3498db",
+      "info": "Choose a vibrant color for the best effect."
+    },
+    {
+      "type": "range",
+      "id": "glow_intensity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Glow Intensity",
+      "default": 80
+    }
+  ],
+  "blocks": [
+    {
+      "type": "pricing_plan",
+      "name": "Pricing Plan",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "text",
+          "id": "plan_name",
+          "label": "Plan Name",
+          "default": "Standard"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price",
+          "default": "$99/mo"
+        },
+        {
+          "type": "text",
+          "id": "feature_1",
+          "label": "Feature 1",
+          "default": "10 Video Shorts"
+        },
+        {
+          "type": "text",
+          "id": "feature_2",
+          "label": "Feature 2",
+          "default": "Basic Color Correction"
+        },
+        {
+          "type": "text",
+          "id": "feature_3",
+          "label": "Feature 3",
+          "default": "Royalty-Free Music"
+        },
+        {
+          "type": "text",
+          "id": "feature_4",
+          "label": "Feature 4",
+          "label": "Feature 4"
+        },
+        {
+          "type": "text",
+          "id": "feature_5",
+          "label": "Feature 5",
+          "label": "Feature 5"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button Text",
+          "default": "Choose Plan"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Pricing with Guarantee",
+      "blocks": [
+        { "type": "pricing_plan" },
+        { "type": "pricing_plan" },
+        { "type": "pricing_plan" }
+      ]
+    }
+  ]
+}
+{% endschema %}

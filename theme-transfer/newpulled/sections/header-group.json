@@ -1,0 +1,52 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "header",
+  "name": "t:sections.header.settings.header-group.label",
+  "sections": {
+    "announcement-bar": {
+      "type": "announcement-bar",
+      "disabled": true,
+      "settings": {
+        "show_type": "always",
+        "announcement_link": "",
+        "height": 40,
+        "scroll_fade_in_percentage": 7,
+        "color_scheme": "scheme-1",
+        "lottie_url": "https://cdn.shopify.com/s/files/1/0732/9421/7444/files/wired-gradient-225-arrow-small-right-hover-pointing.json?v=1749642858",
+        "text": "<p><strong>Book a 15 Minute Call</strong></p>"
+      }
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "full_width": true,
+        "height": 40,
+        "color_scheme_bg": "scheme-3",
+        "header_enable_border_bottom": false,
+        "logo_width": 140,
+        "header_overlay": false,
+        "header_overlay_with_background": false,
+        "scroll_color": false,
+        "menu": "main-menu",
+        "color_scheme": "scheme-1",
+        "enable_country_selector": true,
+        "enable_language_selector": true,
+        "sticky_header_type": "on-scroll-up",
+        "logo_position": "center",
+        "enable_search": false
+      }
+    }
+  },
+  "order": [
+    "announcement-bar",
+    "header"
+  ]
+}

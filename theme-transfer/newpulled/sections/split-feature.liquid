@@ -1,0 +1,747 @@
+{% comment %}
+  This is a Liquid file for a Shopify section.
+  To use it:
+  1. Go to your Shopify Admin > Online Store > Themes.
+  2. Find your theme and click "Actions" > "Edit code".
+  3. In the "Sections" directory, find and open "split-feature-section.liquid".
+  4. Replace the entire content of the file with this code.
+  5. Click "Save".
+  6. You can now adjust the calendar background color from the Shopify Theme Customizer.
+{% endcomment %}
+
+<style>
+  /* Pre-load custom fonts selected in the section settings */
+  {{ section.settings.subheading_font | font_face: font_display: 'swap' }}
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'cta_button' and block.settings.button_custom -%}
+      {{ block.settings.button_font | font_face: font_display: 'swap' }}
+    {%- endif -%}
+  {%- endfor -%}
+  {{ section.settings.cta_subheading_font | font_face: font_display: 'swap' }}
+
+  #shopify-section-{{ section.id }} {
+    --section-bg-color: {{ section.settings.section_background_color }};
+    --heading-color: {{ section.settings.heading_color }};
+    --text-color: {{ section.settings.text_color }};
+    --padding-top: {{ section.settings.padding_top }}px;
+    --padding-bottom: {{ section.settings.padding_bottom }}px;
+    
+    /* Font & Alignment Variables */
+    --h-align: {{ section.settings.heading_alignment }};
+    --h-fs-m: {{ section.settings.heading_fs_mobile }}px;
+    --h-fs-d: {{ section.settings.heading_fs_desktop }}px;
+    
+    --subh-align: {{ section.settings.subheading_alignment }};
+    --subh-fs-m: {{ section.settings.subheading_fs_mobile }}px;
+    --subh-fs-d: {{ section.settings.subheading_fs_desktop }}px;
+
+    --list-align: {{ section.settings.list_alignment }};
+    --list-fs-m: {{ section.settings.list_fs_mobile }}px;
+    --list-fs-d: {{ section.settings.list_fs_desktop }}px;
+    
+    --team-title-fs-m: {{ section.settings.team_box_title_fs_mobile }}px;
+    --team-title-lh-m: {{ section.settings.team_box_title_lh_mobile }}%;
+    --team-title-fs-d: {{ section.settings.team_box_title_fs_desktop }}px;
+    --team-title-lh-d: {{ section.settings.team_box_title_lh_desktop }}%;
+
+    --cta-h-align: {{ section.settings.cta_heading_alignment }};
+    --cta-h-fs-m: {{ section.settings.cta_heading_fs_mobile }}px;
+    --cta-h-fs-d: {{ section.settings.cta_heading_fs_desktop }}px;
+    
+    --cta-subh-align: {{ section.settings.cta_subheading_alignment }};
+    --cta-subh-fs-m: {{ section.settings.cta_subheading_fs_mobile }}px;
+    --cta-subh-fs-d: {{ section.settings.cta_subheading_fs_desktop }}px;
+
+    --buttons-margin-top: {{ section.settings.buttons_margin_top_mobile }}px;
+  }
+  
+  .sfs__background-video-wrapper {
+    overflow: hidden;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 0;
+  }
+
+  .sfs__background-video {
+    width: 100%;
+    height: 100%;
+    object-fit: {{ section.settings.mobile_video_fit }};
+    object-position: {{ section.settings.mobile_video_alignment }};
+  }
+
+  /* --- Base Styles --- */
+  .sfs { /* sfs = split-feature-section */
+    background-color: var(--section-bg-color);
+    padding: var(--padding-top) 20px var(--padding-bottom);
+    color: var(--text-color);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    position: relative;
+  }
+
+  {% if section.settings.background_video != blank %}
+    .sfs {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+  {% endif %}
+
+  .sfs__container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: start;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+  }
+
+  /* --- Left Column Styles --- */
+  .sfs__left-col {
+    text-align: left;
+  }
+  .sfs__heading {
+    font-size: var(--h-fs-m);
+    font-weight: 700;
+    color: var(--heading-color);
+    margin: 0 0 30px;
+    text-align: var(--h-align);
+  }
+  .sfs__list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 30px;
+  }
+  .sfs__list-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    font-size: var(--list-fs-m);
+    font-weight: 500;
+    justify-content: {{ section.settings.list_alignment }};
+    text-align: var(--list-align);
+  }
+  .sfs__list-icon {
+    width: var(--icon-size-mobile);
+    height: var(--icon-size-mobile);
+    flex-shrink: 0;
+  }
+  .sfs__list-icon svg,
+  .sfs__list-icon lord-icon,
+  .sfs__list-icon img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    fill: var(--icon-color, var(--heading-color));
+  }
+  .sfs__subheading {
+    font-size: var(--subh-fs-m);
+    font-weight: 500;
+    text-align: var(--subh-align);
+    white-space: pre-wrap; /* Allows line breaks from textarea */
+  }
+  {% if section.settings.subheading_custom_font %}
+    .sfs__subheading {
+      font-family: {{ section.settings.subheading_font.family }}, {{ section.settings.subheading_font.fallback_families }};
+      font-weight: {{ section.settings.subheading_font.weight }};
+      font-style: {{ section.settings.subheading_font.style }};
+    }
+  {% endif %}
+  
+  /* --- Right Column Styles --- */
+  .sfs__right-col-box {
+    background-color: {{ section.settings.box_bg_color }};
+    border-radius: 24px;
+    padding: 40px;
+    text-align: center;
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* Team styles */
+  .sfs__team-box {
+    background-color: {{ section.settings.team_box_bg_color }};
+    border: 2px solid {{ section.settings.team_box_border_color }};
+    border-radius: 16px;
+    padding: 30px;
+    margin: 0 auto;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  }
+  .sfs__team-title {
+    font-size: var(--team-title-fs-m);
+    line-height: var(--team-title-lh-m);
+    font-weight: 600;
+    color: {{ section.settings.team_box_title_color }};
+    margin: 0 0 30px;
+  }
+  .sfs__team-title-highlight {
+    background: linear-gradient(to right, {{ section.settings.team_underline_start }}, {{ section.settings.team_underline_end }});
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 100% 12%;
+    padding-bottom: 4px;
+  }
+  .sfs__team-members {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+  }
+  .sfs__team-member {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    background-color: {{ section.settings.member_card_bg_color }};
+    border-radius: 12px;
+  }
+  .sfs__team-member-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  .sfs__team-member-name {
+    font-weight: 500;
+    color: {{ section.settings.member_name_color }};
+  }
+  
+  /* Right column additional content */
+  .sfs__cta-content {
+    margin-top: 40px;
+  }
+  .sfs__cta-heading {
+    font-size: var(--cta-h-fs-m);
+    font-weight: 600;
+    margin: 0 0 15px;
+    text-align: var(--cta-h-align);
+  }
+  .sfs__cta-subheading {
+    font-size: var(--cta-subh-fs-m);
+    margin: 0;
+    opacity: 0.8;
+    text-align: var(--cta-subh-align);
+    white-space: pre-wrap; /* Allows line breaks from textarea */
+  }
+  {% if section.settings.cta_subheading_custom_font %}
+    .sfs__cta-subheading {
+      font-family: {{ section.settings.cta_subheading_font.family }}, {{ section.settings.cta_subheading_font.fallback_families }};
+      font-weight: {{ section.settings.cta_subheading_font.weight }};
+      font-style: {{ section.settings.cta_subheading_font.style }};
+    }
+  {% endif %}
+
+  /* --- Button Styles --- */
+  .sfs__bottom-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: var(--buttons-margin-top);
+    position: relative;
+    z-index: 1;
+  }
+
+  {% for block in section.blocks %}
+    {% if block.type == 'booking_iframe' %}
+      /* --- Booking Calendar Styles --- */
+      .sfs__booking-calendar-wrapper-{{ block.id }} {
+          margin-top: var(--buttons-margin-top);
+          width: 100%;
+          max-width: 1200px;
+          margin-left: auto;
+          margin-right: auto;
+          position: relative;
+          z-index: 1;
+          background-color: {{ block.settings.background_color }};
+          border-radius: 24px;
+          padding: {{ block.settings.padding }}px;
+          box-sizing: border-box;
+      }
+      .sfs__booking-calendar-wrapper-{{ block.id }} iframe {
+          border-radius: 12px;
+          width: 100%;
+      }
+    {% endif %}
+    {% if block.type == 'cta_button' %}
+      .sfs-button-{{ block.id }} {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        padding: {{ block.settings.button_padding_vertical_mobile }}px {{ block.settings.button_padding_horizontal_mobile }}px;
+        font-size: {{ block.settings.button_size_mobile }}px;
+        line-height: {{ block.settings.button_height }}%;
+        border-radius: {{ block.settings.button_radius }}px;
+        color: {{ block.settings.button_color }};
+        font-weight: 700;
+        {% if block.settings.button_custom %}
+          font-family: {{ block.settings.button_font.family }}, {{ block.settings.button_font.fallback_families }};
+          font-weight: {{ block.settings.button_font.weight }};
+          font-style: {{ block.settings.button_font.style }};
+        {% endif %}
+      }
+      .sfs-button-{{ block.id }}:hover {
+        color: {{ block.settings.button_hover_color }};
+      }
+      .sfs-button-{{ block.id }} svg path {
+        fill: {{ block.settings.button_color }};
+        transition: fill 0.3s ease;
+      }
+      .sfs-button-{{ block.id }}:hover svg path {
+        fill: {{ block.settings.button_hover_color }};
+      }
+      {% case block.settings.button_style %}
+        {% when 'non_outline' or 'non_outline_arrow' %}
+          .sfs-button-{{ block.id }} {
+            background-color: {{ block.settings.button_bg_color }};
+            border: 0;
+          }
+          .sfs-button-{{ block.id }}:hover {
+            background-color: {{ block.settings.button_bg_hover_color }};
+            {% if block.settings.use_shadow %}
+              box-shadow: 0px 0px 8px 2px {{ block.settings.button_bg_color }};
+            {% endif %}
+          }
+        {% when 'outline' or 'outline_arrow' %}
+          .sfs-button-{{ block.id }} {
+            background-color: {{ block.settings.button_bg_color }};
+            border: {{ block.settings.button_border_thickness }}px solid {{ block.settings.button_border_color }};
+          }
+          .sfs-button-{{ block.id }}:hover {
+            background-color: {{ block.settings.button_bg_hover_color }};
+            border-color: {{ block.settings.button_border_hover_color }};
+          }
+      {% endcase %}
+      @media (min-width: 768px) {
+        .sfs-button-{{ block.id }} {
+          padding: {{ block.settings.button_padding_vertical }}px {{ block.settings.button_padding_horizontal }}px;
+          font-size: {{ block.settings.button_size }}px;
+        }
+      }
+    {% endif %}
+  {% endfor %}
+
+  /* --- Responsive Styles --- */
+  @media (min-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      --buttons-margin-top: {{ section.settings.buttons_margin_top_desktop }}px;
+    }
+    .sfs__container { grid-template-columns: 1fr 1fr; }
+    .sfs__heading { font-size: var(--h-fs-d); }
+    .sfs__subheading { font-size: var(--subh-fs-d); }
+    .sfs__list-item { font-size: var(--list-fs-d); }
+    .sfs__list-icon {
+      width: var(--icon-size-desktop);
+      height: var(--icon-size-desktop);
+    }
+    .sfs__team-title {
+        font-size: var(--team-title-fs-d);
+        line-height: var(--team-title-lh-d);
+    }
+    .sfs__cta-heading { font-size: var(--cta-h-fs-d); }
+    .sfs__cta-subheading { font-size: var(--cta-subh-fs-d); }
+    .sfs__bottom-buttons {
+      flex-direction: row;
+      justify-content: center;
+    }
+    .sfs__background-video {
+      object-fit: {{ section.settings.desktop_video_fit }};
+      object-position: {{ section.settings.desktop_video_alignment }};
+    }
+  }
+  @media (min-width: 992px) {
+    .sfs__container { grid-template-columns: 1fr 1.1fr; }
+  }
+</style>
+
+<section id="shopify-section-{{ section.id }}" class="sfs">
+  {%- if section.settings.background_video != blank -%}
+    <div class="sfs__background-video-wrapper">
+      {{
+        section.settings.background_video
+        | video_tag:
+          class: 'sfs__background-video',
+          autoplay: true,
+          loop: true,
+          controls: false,
+          muted: true
+      }}
+    </div>
+  {%- endif -%}
+
+  <div class="sfs__container">
+    
+    <div class="sfs__left-col">
+      <h2 class="sfs__heading">{{ section.settings.heading | escape }}</h2>
+      <ul class="sfs__list">
+        {% for block in section.blocks %}
+          {% if block.type == 'list_item' %}
+            <li class="sfs__list-item" {{ block.shopify_attributes }}>
+              <div 
+                class="sfs__list-icon" 
+                style="
+                  --icon-color: {{ block.settings.icon_color }};
+                  --icon-size-mobile: {{ block.settings.icon_size_mobile }}px;
+                  --icon-size-desktop: {{ block.settings.icon_size_desktop }}px;
+                "
+              >
+                {% case block.settings.icon_type %}
+                  {% when 'svg' %}
+                    {{ block.settings.icon_svg }}
+                  {% when 'image' %}
+                    {% if block.settings.icon_image != blank %}
+                      <img src="{{ block.settings.icon_image | image_url: width: 96, height: 96 }}" alt="{{ block.settings.text | escape }}">
+                    {% endif %}
+                  {% when 'lottie' %}
+                    {% if block.settings.icon_lottie_url != blank %}
+                      <lord-icon
+                        src="{{ block.settings.icon_lottie_url }}"
+                        trigger="hover"
+                        style="width:100%;height:100%">
+                      </lord-icon>
+                    {% endif %}
+                {% endcase %}
+              </div>
+              <span>{{ block.settings.text | escape }}</span>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+      <div class="sfs__subheading">{{ section.settings.subheading | newline_to_br }}</div>
+    </div>
+    
+    <div class="sfs__right-col">
+      <div 
+        class="sfs__right-col-box" 
+        {% if section.settings.box_bg_image != blank %}
+          style="background-image: url('{{ section.settings.box_bg_image | image_url: width: 1200 }}');"
+        {% endif %}
+      >
+        <div class="sfs__team-box">
+          <h3 class="sfs__team-title">
+            <span class="sfs__team-title-highlight">{{ section.settings.team_box_title | escape }}</span>
+          </h3>
+          <div class="sfs__team-members">
+            {% for block in section.blocks %}
+              {% if block.type == 'team_member' %}
+                <div class="sfs__team-member" {{ block.shopify_attributes }}>
+                  {% if block.settings.image %}
+                    <img
+                      src="{{ block.settings.image | image_url: width: 80, height: 80, crop: 'center' }}"
+                      alt="{{ block.settings.image.alt | default: 'Team member' | escape }}"
+                      class="sfs__team-member-img"
+                      width="40"
+                      height="40"
+                      loading="lazy"
+                    >
+                  {% endif %}
+                  <p class="sfs__team-member-name">{{ block.settings.name | escape }}</p>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="sfs__cta-content">
+          <h4 class="sfs__cta-heading">{{ section.settings.cta_heading | escape }}</h4>
+          <div class="sfs__cta-subheading">{{ section.settings.cta_subheading | newline_to_br }}</div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+  {%- assign booking_block_exists = false -%}
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'booking_iframe' -%}
+      {%- assign booking_block_exists = true -%}
+      {%- assign booking_block_content = block -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- if booking_block_exists and booking_block_content.settings.iframe_code != blank -%}
+    <div class="sfs__booking-calendar-wrapper-{{ booking_block_content.id }}" {{ booking_block_content.shopify_attributes }}>
+      {{ booking_block_content.settings.iframe_code }}
+    </div>
+  {%- else -%}
+    <div class="sfs__bottom-buttons">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'cta_button' and block.settings.button != blank -%}
+          <a href="{{ block.settings.url }}" class="sfs-button-{{ block.id }}" {{ block.shopify_attributes }}>
+            {%- if block.settings.show_lottie_icon and block.settings.lottie_icon_url != blank -%}
+              <lord-icon
+                  src="{{ block.settings.lottie_icon_url }}"
+                  trigger="loop"
+                  delay="500"
+                  style="width:{{ block.settings.lottie_icon_size }}px;height:{{ block.settings.lottie_icon_size }}px">
+              </lord-icon>
+            {%- endif -%}
+            <span>{{ block.settings.button }}</span>
+            {%- if block.settings.button_style contains 'arrow' -%}
+              <svg width="14" height="14" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M187.827 98.7858C188.123 98.4749 188.123 98.4749 188.123 98.1761C188.419 97.8652 188.419 97.5663 188.704 97.5663C189 96.9566 189 96.6458 189 96.0361C189 95.4263 189 94.8166 188.704 94.5058C188.704 94.195 188.408 93.8961 188.123 93.5852C188.123 93.2744 187.827 93.2744 187.827 92.9755L103.287 4.21945C102.41 3.29889 101.533 3 100.668 3C99.791 3 98.6295 3.31083 98.0488 4.21945C97.1719 5.14 96.8872 6.06058 96.8872 6.96919C96.8872 7.88974 97.1833 9.10918 98.0488 9.7189L175.587 92.0539H6.79206C4.75371 92.0539 3 93.895 3 96.0351C3 98.1751 4.75365 100.016 6.79206 100.016H175.575L97.7543 182.042C96.2967 183.572 96.2967 186.322 97.7543 187.852C99.2119 189.383 101.831 189.383 103.288 187.852L187.827 98.7858Z" fill="currentColor"></path>
+              </svg>
+            {%- endif -%}
+          </a>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Split Feature Section",
+  "tag": "section",
+  "settings": [
+    { "type": "header", "content": "Section Colors & Spacing" },
+    { "type": "color", "id": "section_background_color", "label": "Section Background", "default": "#1a1a1a" },
+    { "type": "color", "id": "heading_color", "label": "Main Heading Color", "default": "#FFFFFF" },
+    { "type": "color", "id": "text_color", "label": "List & Subheading Color", "default": "#CCCCCC" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 150, "step": 5, "unit": "px", "label": "Top Padding", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 150, "step": 5, "unit": "px", "label": "Bottom Padding", "default": 80 },
+    
+    {
+      "type": "header",
+      "content": "Background Video"
+    },
+    {
+      "type": "video",
+      "id": "background_video",
+      "label": "Background Video"
+    },
+    {
+      "type": "header",
+      "content": "Video Fit & Position"
+    },
+    {
+      "type": "select",
+      "id": "desktop_video_fit",
+      "label": "Desktop Video Fit",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "desktop_video_alignment",
+      "label": "Desktop Video Alignment",
+      "options": [
+        { "value": "center", "label": "Center" },
+        { "value": "top", "label": "Top" },
+        { "value": "bottom", "label": "Bottom" },
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "mobile_video_fit",
+      "label": "Mobile Video Fit",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "mobile_video_alignment",
+      "label": "Mobile Video Alignment",
+      "options": [
+        { "value": "center", "label": "Center" },
+        { "value": "top", "label": "Top" },
+        { "value": "bottom", "label": "Bottom" },
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    
+    { "type": "header", "content": "Left Column Content" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Book a Call Today" },
+    { "type": "select", "id": "heading_alignment", "label": "Heading Alignment", "options": [{ "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" }], "default": "left" },
+    { "type": "range", "id": "heading_fs_mobile", "min": 24, "max": 50, "step": 1, "unit": "px", "label": "Heading Font Size (Mobile)", "default": 32 },
+    { "type": "range", "id": "heading_fs_desktop", "min": 24, "max": 60, "step": 1, "unit": "px", "label": "Heading Font Size (Desktop)", "default": 40 },
+    
+    { "type": "select", "id": "list_alignment", "label": "List Alignment", "options": [{ "value": "flex-start", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "flex-end", "label": "Right" }], "default": "flex-start" },
+    { "type": "range", "id": "list_fs_mobile", "min": 12, "max": 24, "step": 1, "unit": "px", "label": "List Font Size (Mobile)", "default": 16 },
+    { "type": "range", "id": "list_fs_desktop", "min": 12, "max": 28, "step": 1, "unit": "px", "label": "List Font Size (Desktop)", "default": 16 },
+
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Are you ready to save thousands without sacrificing quality?" },
+    { "type": "select", "id": "subheading_alignment", "label": "Subheading Alignment", "options": [{ "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" }], "default": "left" },
+    { "type": "range", "id": "subheading_fs_mobile", "min": 12, "max": 24, "step": 1, "unit": "px", "label": "Subheading Font Size (Mobile)", "default": 16 },
+    { "type": "range", "id": "subheading_fs_desktop", "min": 12, "max": 28, "step": 1, "unit": "px", "label": "Subheading Font Size (Desktop)", "default": 18 },
+    { "type": "checkbox", "id": "subheading_custom_font", "label": "Use custom font for subheading", "default": false },
+    { "type": "font_picker", "id": "subheading_font", "label": "Subheading Font", "default": "assistant_n4" },
+
+    { "type": "header", "content": "Right Column Content" },
+    { "type": "color", "id": "box_bg_color", "label": "Box Background Color", "default": "#0D0D0D" },
+    { "type": "image_picker", "id": "box_bg_image", "label": "Box Background Image" },
+    { "type": "text", "id": "team_box_title", "label": "Team Box Title", "default": "You get a full team of professionals" },
+    { "type": "range", "id": "team_box_title_fs_mobile", "min": 14, "max": 30, "step": 1, "unit": "px", "label": "Team Box Title Font Size (Mobile)", "default": 20 },
+    { "type": "range", "id": "team_box_title_lh_mobile", "min": 100, "max": 200, "step": 5, "unit": "%", "label": "Team Box Title Line Height (Mobile)", "default": 130 },
+    { "type": "range", "id": "team_box_title_fs_desktop", "min": 16, "max": 40, "step": 1, "unit": "px", "label": "Team Box Title Font Size (Desktop)", "default": 24 },
+    { "type": "range", "id": "team_box_title_lh_desktop", "min": 100, "max": 200, "step": 5, "unit": "%", "label": "Team Box Title Line Height (Desktop)", "default": 130 },
+    { "type": "color", "id": "team_box_bg_color", "label": "Team Box Background", "default": "#1F1F1F" },
+    { "type": "color", "id": "team_box_border_color", "label": "Team Box Border", "default": "#333333" },
+    { "type": "color", "id": "team_box_title_color", "label": "Team Box Title Color", "default": "#FFFFFF" },
+    { "type": "color", "id": "team_underline_start", "label": "Team Underline Start", "default": "#FFD700" },
+    { "type": "color", "id": "team_underline_end", "label": "Team Underline End", "default": "#FFA500" },
+    { "type": "color", "id": "member_card_bg_color", "label": "Member Card Background", "default": "#333333" },
+    { "type": "color", "id": "member_name_color", "label": "Member Name Color", "default": "#FFFFFF" },
+    
+    { "type": "text", "id": "cta_heading", "label": "CTA Heading", "default": "Reduce costs without compromising quality" },
+    { "type": "select", "id": "cta_heading_alignment", "label": "CTA Heading Alignment", "options": [{ "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" }], "default": "center" },
+    { "type": "range", "id": "cta_heading_fs_mobile", "min": 18, "max": 36, "step": 1, "unit": "px", "label": "CTA Heading Font Size (Mobile)", "default": 20 },
+    { "type": "range", "id": "cta_heading_fs_desktop", "min": 18, "max": 42, "step": 1, "unit": "px", "label": "CTA Heading Font Size (Desktop)", "default": 24 },
+    
+    { "type": "textarea", "id": "cta_subheading", "label": "CTA Subheading", "default": "Average cost reductions: 63%\nAverage time savings: 32 hrs/week" },
+    { "type": "select", "id": "cta_subheading_alignment", "label": "CTA Subheading Alignment", "options": [{ "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" }], "default": "center" },
+    { "type": "range", "id": "cta_subheading_fs_mobile", "min": 12, "max": 24, "step": 1, "unit": "px", "label": "CTA Subheading Font Size (Mobile)", "default": 14 },
+    { "type": "range", "id": "cta_subheading_fs_desktop", "min": 12, "max": 28, "step": 1, "unit": "px", "label": "CTA Subheading Font Size (Desktop)", "default": 16 },
+    { "type": "checkbox", "id": "cta_subheading_custom_font", "label": "Use custom font for CTA subheading", "default": false },
+    { "type": "font_picker", "id": "cta_subheading_font", "label": "CTA Subheading Font", "default": "assistant_n4" },
+
+    { "type": "header", "content": "Button Area" },
+    { "type": "range", "id": "buttons_margin_top_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "Margin Top (Mobile)", "default": 40 },
+    { "type": "range", "id": "buttons_margin_top_desktop", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "Margin Top (Desktop)", "default": 40 }
+  ],
+  "blocks": [
+    {
+      "type": "list_item",
+      "name": "List Item",
+      "settings": [
+        { "type": "select", "id": "icon_type", "label": "Icon Type", "options": [ { "value": "svg", "label": "SVG" }, { "value": "image", "label": "Image" }, { "value": "lottie", "label": "Lottie/Lordicon" } ], "default": "svg" },
+        { "type": "liquid", "id": "icon_svg", "label": "Icon SVG", "info": "Paste SVG code here. For SVG type.", "default": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12.0006 18.26L4.94715 22.2082L6.52248 14.2799L0.587891 8.7918L8.61483 7.84006L12.0006 0.5L15.3864 7.84006L23.4133 8.7918L17.4787 14.2799L19.054 22.2082L12.0006 18.26Z\"></path></svg>" },
+        { "type": "image_picker", "id": "icon_image", "label": "Icon Image", "info": "For Image type." },
+        { "type": "text", "id": "icon_lottie_url", "label": "Lottie/Lordicon URL", "info": "Paste JSON URL here. For Lottie/Lordicon type." },
+        { "type": "color", "id": "icon_color", "label": "Icon Color (SVG only)", "default": "#FFD700" },
+        { "type": "range", "id": "icon_size_mobile", "min": 16, "max": 50, "step": 1, "unit": "px", "label": "Icon Size (Mobile)", "default": 24 },
+        { "type": "range", "id": "icon_size_desktop", "min": 16, "max": 50, "step": 1, "unit": "px", "label": "Icon Size (Desktop)", "default": 24 },
+        { "type": "text", "id": "text", "label": "Text", "default": "List item text" }
+      ]
+    },
+    {
+      "type": "team_member",
+      "name": "Team Member",
+      "limit": 3,
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "name", "label": "Name", "default": "Team Member" }
+      ]
+    },
+    {
+      "type": "cta_button",
+      "name": "CTA Button",
+      "limit": 2,
+      "settings": [
+        { "type": "header", "content": "Button Icon" },
+        { "type": "checkbox", "id": "show_lottie_icon", "label": "Show Lottie Icon", "default": false },
+        { "type": "text", "id": "lottie_icon_url", "label": "Lottie Icon URL", "info": "Paste JSON URL for the icon that appears before the text." },
+        { "type": "range", "id": "lottie_icon_size", "min": 12, "max": 40, "step": 1, "unit": "px", "label": "Lottie Icon Size", "default": 20 },
+        { "type": "header", "content": "Button Content & Style" },
+        { "type": "text", "id": "button", "label": "Button label", "default": "Book a Call", "info": "Leave the label blank to hide the button." },
+        { "type": "url", "id": "url", "label": "Button link" },
+        { "type": "checkbox", "id": "button_custom", "label": "Use custom font", "default": false },
+        { "type": "font_picker", "id": "button_font", "label": "Font family", "default": "assistant_n4" },
+        { "type": "range", "id": "button_size", "min": 0, "max": 30, "step": 1, "unit": "px", "label": "Font size", "default": 16 },
+        { "type": "range", "id": "button_size_mobile", "min": 0, "max": 30, "step": 1, "unit": "px", "label": "Font size - mobile", "default": 16 },
+        { "type": "range", "id": "button_height", "min": 50, "max": 200, "step": 10, "unit": "%", "label": "Line height", "default": 100 },
+        { "type": "range", "id": "button_padding_horizontal", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "Padding horizontal", "default": 52 },
+        { "type": "range", "id": "button_padding_horizontal_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "Padding horizontal - mobile", "default": 40 },
+        { "type": "range", "id": "button_padding_vertical", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "Padding vertical", "default": 20 },
+        { "type": "range", "id": "button_padding_vertical_mobile", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "Padding vertical - mobile", "default": 20 },
+        { "type": "range", "id": "button_radius", "min": 0, "max": 100, "step": 2, "unit": "px", "label": "Roundness", "default": 8 },
+        { "type": "range", "id": "button_border_thickness", "min": 0, "max": 10, "step": 1, "unit": "px", "label": "Border thickness", "default": 1 },
+        { "type": "select", "id": "button_style", "label": "Button style", "default": "non_outline", "options": [ { "label": "Link", "value": "link" }, { "label": "Non-outline", "value": "non_outline" }, { "label": "Non-outline & arrow", "value": "non_outline_arrow" }, { "label": "Outline", "value": "outline" }, { "label": "Outline & arrow", "value": "outline_arrow" } ] },
+        { "type": "checkbox", "id": "use_shadow", "label": "Use shadow on hover", "default": false },
+        { "type": "header", "content": "Button colors" },
+        { "type": "color", "label": "Text", "id": "button_color", "default": "#000000" },
+        { "type": "color", "label": "Hover text", "id": "button_hover_color", "default": "#000000" },
+        { "type": "color", "label": "Background", "id": "button_bg_color", "default": "#FFFFFF" },
+        { "type": "color", "label": "Background hover", "id": "button_bg_hover_color", "default": "#F0F0F0" },
+        { "type": "color", "label": "Button border", "id": "button_border_color", "default": "#17c87c" },
+        { "type": "color", "label": "Border hover", "id": "button_border_hover_color", "default": "#17c87c" }
+      ]
+    },
+    {
+      "type": "booking_iframe",
+      "name": "Booking Calendar",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Google Calendar Embed"
+        },
+        {
+          "type": "liquid",
+          "id": "iframe_code",
+          "label": "Booking Iframe Code",
+          "info": "Paste the entire <iframe> code from your Google Calendar booking page here."
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "Background Color",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "range",
+          "id": "padding",
+          "min": 0,
+          "max": 50,
+          "step": 2,
+          "unit": "px",
+          "label": "Padding",
+          "default": 20
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Split Feature Section",
+      "blocks": [
+        { "type": "list_item", "settings": { "text": "Fraction of the cost" }},
+        { "type": "list_item", "settings": { "text": "Guaranteed turnarounds" }},
+        { "type": "list_item", "settings": { "text": "Quality control procedures" }},
+        { "type": "team_member", "settings": {"name": "Video Editor"}},
+        { "type": "team_member", "settings": {"name": "Project Manager"}},
+        { "type": "team_member", "settings": {"name": "Creative Producer"}},
+        { "type": "cta_button" }
+      ]
+    },
+    {
+      "name": "Split Feature with Booking",
+      "blocks": [
+        { "type": "list_item" },
+        { "type": "list_item" },
+        { "type": "list_item" },
+        { "type": "team_member" },
+        { "type": "team_member" },
+        { "type": "team_member" },
+        { "type": "booking_iframe" }
+      ]
+    }
+  ]
+}
+{% endschema %}

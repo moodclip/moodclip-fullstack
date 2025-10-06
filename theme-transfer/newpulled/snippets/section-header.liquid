@@ -1,0 +1,111 @@
+{% liquid
+	assign section_heading = section.settings.heading
+	assign section_header_type = section.settings.section_header_type
+	assign section_description = section.settings.description
+	assign section_subheading = section.settings.subheading
+	assign section_button_label = section.settings.button_label
+	assign section_button_link = section.settings.button_link
+	assign enable_border_top = section.settings.enable_border_top
+%}
+{%- if section_heading != blank
+	or section_button_label != blank
+	or section_subheading != blank
+	or section_description != blank
+	or enable_border_top
+-%}
+	<div class="section-header__line">
+		<div class="container">
+			<div class="section-header__item">
+				{%- if section_header_type == 'type1' -%}
+					<div class="section-header__title__block section-header__title__center {% if enable_border_top %} section_border_bottom{% endif %}">
+						{% if show_arrows %}
+							<div class="section-header__button-arrow">
+								<button class=" {% if section_button_label %}section-header__button-right {% endif %}swiper-button swiper-button-prev swiper-button-disabled">
+									{% render 'icon-arrow-big-left' %}
+								</button>
+							</div>
+						{% endif %}
+						{%- if section_heading != blank
+							or section_subheading != blank
+							or section_description != blank
+						-%}
+							<div class="section-header__title-item">
+								{%- if section_subheading != blank -%}
+									<div class="subtitle">
+										{{ section_subheading }}
+									</div>
+								{%- endif -%}
+								{%- if section_heading != blank -%}
+									<h2 class="section-header__title title--section">
+										{{ section_heading }}
+									</h2>
+								{% endif %}
+
+								{%- if section_description != blank -%}
+									<div class="section-header__desc richtext__content">
+										{{ section_description }}
+									</div>
+								{% endif %}
+							</div>
+						{% endif %}
+						{% if show_arrows %}
+							<div class="section-header__button">
+								<div class="section-header__button-arrow">
+									<button class="swiper-button swiper-button-next">
+										{% render 'icon-arrow-big-right' %}
+									</button>
+								</div>
+							</div>
+						{% endif %}
+					</div>
+				{%- else -%}
+					<div class="section-header__title__block {% if enable_border_top %} section_border_bottom{% endif %}">
+						{%- if section_heading != blank
+							or section_subheading != blank
+							or section_description != blank
+						-%}
+							<div class="section-header__title-item">
+								{%- if section_subheading != blank -%}
+									<div class=" subtitle">
+										{{ section_subheading }}
+									</div>
+								{%- endif -%}
+								{%- if section_heading != blank -%}
+									<h2 class="section-header__title title--section">
+										{{ section_heading }}
+									</h2>
+								{% endif %}
+
+								{%- if section_description != blank -%}
+									<div class="section-header__desc richtext__content">
+										{{ section_description }}
+									</div>
+								{% endif %}
+							</div>
+						{% endif %}
+						{% if show_arrows or section_button_label != blank %}
+							<div class="section-header__button">
+								{% if show_arrows %}
+									<div class="section-header__button-arrow">
+										<button class=" {% if section_button_label %}section-header__button-right {% endif %}swiper-button swiper-button-prev swiper-button-disabled">
+											{% render 'icon-arrow-big-left' %}
+										</button>
+										<button class="swiper-button swiper-button-next">
+											{% render 'icon-arrow-big-right' %}
+										</button>
+									</div>
+								{% endif %}
+
+								{% if section_button_label != blank %}
+									<div class="section-header__btn-top">
+										{% render 'button', layout: section %}
+									</div>
+								{% endif %}
+							</div>
+						{% endif %}
+					</div>
+				{%- endif -%}
+			</div>
+		</div>
+	</div>
+{%- endif -%}
