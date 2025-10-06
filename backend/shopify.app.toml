@@ -1,8 +1,8 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id       = "bc4a14e184b8697b63929e67246d1871"
-name            = "moodclip-v3"
-handle          = "moodclip-v3"
+client_id       = "7e9a8625d8e0665ab092baff1aee8ab3"
+name            = "moodclipnewstore-2"
+handle          = "moodclipnewstore-2"
 application_url = "https://mf-backend-270455452709.us-central1.run.app"
 embedded        = true
 
