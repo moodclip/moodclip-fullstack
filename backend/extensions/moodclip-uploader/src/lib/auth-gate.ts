@@ -12,6 +12,7 @@
 const PROXY_PREFIX = "/apps/moodclip-uploader-v4";
 const PING = `${PROXY_PREFIX}/proxy/ping`;
 const GOOGLE_START = `${PROXY_PREFIX}/auth/google/start`;
+const AFTER_LOGIN_KEY = "mc_after_login";
 
 let cache: { ts: number; logged: boolean } | null = null;
 
@@ -75,10 +76,38 @@ export async function isLoggedIn(): Promise<boolean> {
   }
 }
 
+const rememberAfterLogin = (after: { action: "download" | "return_only"; href?: string }) => {
+  try {
+    sessionStorage.setItem(AFTER_LOGIN_KEY, JSON.stringify(after));
+  } catch {
+    // Ignore storage failures (e.g., private mode)
+  }
+};
+
 /** Store an after-login action then go to Shopify login */
 function goShopifyLogin(after: { action: "download" | "return_only"; href?: string }) {
-  try { sessionStorage.setItem("mc_after_login", JSON.stringify(after)); } catch {}
+  rememberAfterLogin(after);
   location.assign(loginUrl());
+}
+
+/**
+ * Attempt to open the Shopify login flow in a popup window so the current page can
+ * continue running background work (e.g., uploads). Returns the popup reference
+ * when successful, or null if the browser blocked the window.
+ */
+export function openShopifyLoginWindow(
+  after: { action: "download" | "return_only"; href?: string } = { action: "return_only" },
+  features: string = "noopener,noreferrer,width=520,height=720",
+): Window | null {
+  rememberAfterLogin(after);
+  try {
+    const popup = window.open(loginUrl(), "mc-shopify-login", features);
+    if (!popup) return null;
+    popup.focus?.();
+    return popup;
+  } catch {
+    return null;
+  }
 }
 
 /** Start Google OAuth (top-level nav) */

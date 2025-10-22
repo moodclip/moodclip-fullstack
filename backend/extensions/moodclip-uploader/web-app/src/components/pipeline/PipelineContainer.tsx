@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
@@ -10,7 +10,7 @@ import {
   requestUploadUrl,
   uploadToSignedUrl,
 } from '@/lib/api';
-import { isLoggedIn } from '@/lib/auth';
+import { ensureAuthed, isLoggedIn } from '@/lib/auth';
 import { useClaimTokensOnAuth } from '@/hooks/useClaimTokens';
 import type { ClipStatus, ProjectStatusResponse } from '@/types/backend';
 import type { PipelineData, PipelineStage } from '@/types/pipeline';
@@ -242,6 +242,9 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
     [initialData.stages],
   );
 
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [viewerAuthed, setViewerAuthed] = useState(false);
+
   const [pipelineData, setPipelineData] = useState<PipelineData>(() => createBasePipeline(stageBlueprints));
   const [manualStageId, setManualStageId] = useState<number | null>(null);
   const [maxUnlockedStage, setMaxUnlockedStage] = useState<number>(1);
@@ -265,12 +268,12 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
     return 30 + (clamped / 100) * 70;
   };
 
-  const updateUploadStage = (mutator: (stage: PipelineStage) => PipelineStage) => {
+  const updateUploadStage = useCallback((mutator: (stage: PipelineStage) => PipelineStage) => {
     setPipelineData((prev) => ({
       ...prev,
       stages: prev.stages.map((stage) => (stage.id === 1 ? mutator(stage) : stage)),
     }));
-  };
+  }, []);
 
   const stopBootstrap = () => {
     if (bootstrapFrameRef.current !== null) {
@@ -370,7 +373,7 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
       if (!activeVideoId) throw new Error('Missing video id for status query');
       return fetchProjectStatus(activeVideoId, { signal });
     },
-    enabled: shouldPoll,
+    enabled: shouldPoll && viewerAuthed,
     refetchInterval: (data) => (shouldContinuePolling(data as ProjectStatusResponse | undefined) ? POLL_INTERVAL_MS : false),
     refetchIntervalInBackground: true,
     refetchOnWindowFocus: true,
@@ -413,6 +416,67 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
       });
     }
   }, [statusQuery.data, activeVideoId, stageBlueprints, manualStageId, maxUnlockedStage]);
+
+  const requireAuth = useCallback(async (): Promise<boolean> => {
+    try {
+      if (viewerAuthed) return true;
+
+      const authed = await isLoggedIn().catch(() => false);
+      if (authed) {
+        setViewerAuthed(true);
+        setAuthError(null);
+        return true;
+      }
+
+      setAuthError(null);
+      await ensureAuthed({ action: 'upload' });
+    } catch (error) {
+      console.error('[moodclip] authentication check failed', error);
+      setAuthError('We could not verify your Shopify login. Please refresh the page.');
+    }
+    return false;
+  }, [viewerAuthed]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const bootstrapAuth = async () => {
+      try {
+        const authed = await isLoggedIn().catch(() => false);
+        if (cancelled) return;
+        setViewerAuthed(authed);
+        setAuthError(null);
+        if (authed) {
+          await claimPendingUploads().catch((error) => {
+            console.warn('[moodclip] claimPendingUploads after auth failed', error);
+          });
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error('[moodclip] failed to verify authentication', error);
+          setAuthError('We could not verify your Shopify login. Please refresh the page.');
+        }
+      }
+    };
+
+    void bootstrapAuth();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    updateUploadStage((stage) => {
+      if (stage.ctaStatus === 'running') return stage;
+      if (stage.ctaStatus === 'completed') return stage;
+      return {
+        ...stage,
+        buttonText: 'Upload',
+        secondaryButtonText: viewerAuthed ? undefined : undefined,
+      };
+    });
+  }, [viewerAuthed, updateUploadStage]);
 
   const triggerRipple = (event: React.MouseEvent) => {
     if (!containerRef.current) return;
@@ -500,23 +564,26 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
       resetUploadState();
     }
 
-    setUploadError(null);
-    setManualStageId(1);
-    updateUploadStage((stage) => ({
-      ...stage,
-      ctaStatus: 'running',
-      status: 'active',
-      buttonText: 'Uploading',
-      progress: 0,
-      displayProgress: 0,
-      secondaryButtonText: undefined,
-    }));
-    setIsUploading(true);
-    startBootstrap();
-
     try {
-      const authed = await isLoggedIn().catch(() => false);
-      const uploadInfo = await requestUploadUrl(file, { storeClaimToken: authed });
+      const authed = await requireAuth();
+      if (!authed) {
+        return;
+      }
+      setUploadError(null);
+      setManualStageId(1);
+      updateUploadStage((stage) => ({
+        ...stage,
+        ctaStatus: 'running',
+        status: 'active',
+        buttonText: 'Uploading',
+        progress: 0,
+        displayProgress: 0,
+        secondaryButtonText: undefined,
+      }));
+      setIsUploading(true);
+      startBootstrap();
+
+      const uploadInfo = await requestUploadUrl(file);
       setGlobalProjectId(uploadInfo.videoId);
       setActiveVideoId(uploadInfo.videoId);
       const controller = uploadToSignedUrl(uploadInfo.url, file, (percent) => {
@@ -539,9 +606,9 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
       uploadControllerRef.current = controller;
       await controller.promise;
 
-      if (authed) {
-        await claimPendingUploads();
-      }
+      await claimPendingUploads().catch((error) => {
+        console.warn('[moodclip] claimPendingUploads after upload failed', error);
+      });
       stopBootstrap();
       updateUploadStage((stage) => ({
         ...stage,
@@ -630,10 +697,12 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
     }
   };
 
-  const openFilePicker = () => {
+  const openFilePicker = useCallback(async () => {
     if (isUploading) return;
+    const authed = await requireAuth();
+    if (!authed) return;
     fileInputRef.current?.click();
-  };
+  }, [isUploading, requireAuth]);
 
   const handleSecondaryUpload = () => {
     if (isUploading) return;
@@ -772,6 +841,9 @@ export const PipelineContainer = ({ initialData }: PipelineContainerProps) => {
           <span className="text-sm text-muted-foreground">
             Last updated {lastUpdatedAt.toLocaleTimeString()}
           </span>
+        )}
+        {authError && (
+          <span className="text-sm text-destructive">{authError}</span>
         )}
         {uploadError && pipelineData.currentStage === 1 && (
           <span className="text-sm text-destructive">{uploadError}</span>

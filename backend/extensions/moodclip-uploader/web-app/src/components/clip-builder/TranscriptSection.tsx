@@ -13,6 +13,8 @@ interface TranscriptSectionProps {
   onAddClip: (text: string, startTime: number, endTime: number) => void;
   activeBubble: AIClipBubble | undefined;
   onDeletedWordsChange?: (deletedWords: Set<string>) => void;
+  onSelectionStart?: () => void;
+  onSelectionEnd?: () => void;
 }
 export const TranscriptSection = ({
   transcript,
@@ -20,7 +22,9 @@ export const TranscriptSection = ({
   onSelectedWordsChange,
   onAddClip,
   activeBubble,
-  onDeletedWordsChange
+  onDeletedWordsChange,
+  onSelectionStart,
+  onSelectionEnd,
 }: TranscriptSectionProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showHooks, setShowHooks] = useState(false);
@@ -41,6 +45,8 @@ export const TranscriptSection = ({
 
     // Prevent selecting deleted words
     if (deletedWords.has(wordId)) return;
+
+    onSelectionStart?.();
 
     // Handle clicks on already selected words
     if (selectedWords.includes(wordId)) {
@@ -82,7 +88,8 @@ export const TranscriptSection = ({
   }, [transcript, onSelectedWordsChange, deletedWords]);
   const handleMouseUp = useCallback(() => {
     selectionRef.current.isSelecting = false;
-  }, []);
+    onSelectionEnd?.();
+  }, [onSelectionEnd]);
   const handleTranscriptClick = useCallback((event: React.MouseEvent) => {
     const target = event.target as HTMLElement;
     // Check if the clicked element is a word span
@@ -91,14 +98,16 @@ export const TranscriptSection = ({
     // Don't clear selection if user was just dragging
     if (selectionRef.current.wasDragging) {
       selectionRef.current.wasDragging = false;
+      onSelectionEnd?.();
       return;
     }
 
     // Clear selection if clicking outside of words
     if (!isWordClick && selectedWords.length > 0) {
       onSelectedWordsChange([]);
+      onSelectionEnd?.();
     }
-  }, [selectedWords, onSelectedWordsChange]);
+  }, [selectedWords, onSelectedWordsChange, onSelectionEnd]);
   const handleWordDoubleClick = useCallback((wordId: string) => {
     if (deletedWords.has(wordId)) return;
 

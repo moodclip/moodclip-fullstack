@@ -1,1 +1,8 @@
-export { isLoggedIn, ensureAuthed, loginUrl, navigateGoogleLogin, getPid } from '../../../src/lib/auth-gate';
+export {
+  isLoggedIn,
+  ensureAuthed,
+  loginUrl,
+  navigateGoogleLogin,
+  getPid,
+  openShopifyLoginWindow,
+} from '../../../src/lib/auth-gate';

@@ -345,11 +345,48 @@ export const claimPendingUploads = async (): Promise<void> => {
   const pending = getPendingClaimTokens();
   if (!pending.length) return;
 
+  const readStatus = (error: unknown): number | undefined => {
+    if (!error) return undefined;
+    const status = (error as { status?: unknown })?.status;
+    if (typeof status === 'number') return status;
+    return undefined;
+  };
+
   claimInFlight = (async () => {
-    pending.forEach(({ videoId }) => consumeClaimToken(videoId));
-    console.info('[moodclip] Claim endpoints are disabled; cleared pending claim tokens', {
-      cleared: pending.length,
-    });
+    const retry: Array<{ videoId: string; claimToken: string }> = [];
+
+    await Promise.all(
+      pending.map(async ({ videoId, claimToken }) => {
+        consumeClaimToken(videoId);
+        try {
+          await claimUploadForVideo(videoId, claimToken);
+          console.info('[moodclip] Claimed upload ownership', { videoId });
+        } catch (error) {
+          const status = readStatus(error);
+          const shouldRetry =
+            status === undefined ||
+            status === 401 ||
+            status === 403 ||
+            (typeof status === 'number' && status >= 500);
+
+          if (shouldRetry) {
+            retry.push({ videoId, claimToken });
+            console.warn('[moodclip] Claim upload deferred', { videoId, status });
+            return;
+          }
+
+          console.error('[moodclip] Claim upload failed permanently', {
+            videoId,
+            status,
+            error,
+          });
+        }
+      }),
+    );
+
+    if (retry.length) {
+      retry.forEach(({ videoId, claimToken }) => storeClaimToken(videoId, claimToken));
+    }
   })().finally(() => {
     claimInFlight = null;
   });

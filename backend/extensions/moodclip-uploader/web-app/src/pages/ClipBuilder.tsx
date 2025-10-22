@@ -152,6 +152,19 @@ const normalizeWord = (
     end = start + Math.max(0.3, text.length * 0.05);
   }
 
+  if (durationSec && durationSec > 0) {
+    const duration = durationSec;
+    if (start > duration) {
+      start = Math.max(duration - Math.max(0.3, text.length * 0.05), 0);
+    }
+    if (end > duration) {
+      end = duration;
+      if (end <= start) {
+        start = Math.max(end - Math.max(0.3, text.length * 0.05), 0);
+      }
+    }
+  }
+
   const speaker =
     typeof word.speaker === 'string'
       ? word.speaker
@@ -207,6 +220,75 @@ const buildParagraphsFromWords = (words: TranscriptWord[]): TranscriptParagraph[
   return paragraphs;
 };
 
+const adjustParagraphsToDuration = (
+  paragraphs: TranscriptParagraph[],
+  durationSec?: number,
+): TranscriptParagraph[] => {
+  if (!paragraphs.length) return paragraphs;
+
+  const allWords = flattenWords(paragraphs);
+  if (!allWords.length) return paragraphs;
+
+  const MIN_WORD_DURATION = 0.06;
+  const SCALE_TOLERANCE = 0.02;
+
+  const firstStart = Math.min(...allWords.map((word) => word.startTime));
+  const offset = Number.isFinite(firstStart) ? firstStart : 0;
+  const lastEnd = Math.max(...allWords.map((word) => word.endTime));
+  const span = Math.max(lastEnd - offset, MIN_WORD_DURATION);
+
+  const hasDuration = typeof durationSec === 'number' && Number.isFinite(durationSec) && durationSec > 0;
+  const targetSpan = hasDuration ? Math.max(durationSec!, MIN_WORD_DURATION) : span;
+  const ratio = targetSpan / span;
+  const shouldScale = hasDuration && Math.abs(1 - ratio) > SCALE_TOLERANCE;
+
+  const adjusted: TranscriptParagraph[] = [];
+
+  paragraphs.forEach((paragraph) => {
+    const adjustedWords: TranscriptWord[] = [];
+
+    paragraph.words.forEach((word) => {
+      let startTime = (word.startTime - offset) * (shouldScale ? ratio : 1);
+      let endTime = (word.endTime - offset) * (shouldScale ? ratio : 1);
+
+      if (!Number.isFinite(startTime)) startTime = 0;
+      if (!Number.isFinite(endTime)) endTime = startTime + MIN_WORD_DURATION;
+
+      if (endTime <= startTime + 0.002) {
+        endTime = startTime + MIN_WORD_DURATION;
+      }
+
+      if (hasDuration) {
+        if (startTime < 0) startTime = 0;
+        if (endTime > durationSec!) endTime = durationSec!;
+        if (startTime >= durationSec! - 0.005) {
+          return;
+        }
+        if (endTime <= startTime + 0.002) {
+          endTime = Math.min(durationSec!, startTime + MIN_WORD_DURATION);
+          if (endTime <= startTime) return;
+        }
+      }
+
+      adjustedWords.push({
+        ...word,
+        startTime,
+        endTime,
+      });
+    });
+
+    if (adjustedWords.length) {
+      adjusted.push({
+        ...paragraph,
+        words: adjustedWords,
+        timestamp: formatTimestamp(adjustedWords[0].startTime ?? 0),
+      });
+    }
+  });
+
+  return adjusted.length ? adjusted : paragraphs;
+};
+
 const normalizeTranscript = (
   raw: unknown,
   durationSec?: number,
@@ -244,31 +326,31 @@ const normalizeTranscript = (
 
   if (Array.isArray(raw)) {
     if (raw.length && Array.isArray((raw[0] as any)?.words)) {
-      return buildFromParagraphs(raw as any[]);
+      return adjustParagraphsToDuration(buildFromParagraphs(raw as any[]), durationSec);
     }
 
     if (raw.length && typeof raw[0] === 'object') {
       const words = (raw as any[])
         .map((item, index) => normalizeWord(item, `w-${index}`, durationSec))
         .filter(Boolean) as TranscriptWord[];
-      return buildParagraphsFromWords(words);
+      return adjustParagraphsToDuration(buildParagraphsFromWords(words), durationSec);
     }
   }
 
   if (raw && typeof raw === 'object') {
     const candidate = raw as Record<string, unknown>;
     if (Array.isArray(candidate.paragraphs)) {
-      return buildFromParagraphs(candidate.paragraphs as any[]);
+      return adjustParagraphsToDuration(buildFromParagraphs(candidate.paragraphs as any[]), durationSec);
     }
     if (Array.isArray(candidate.items)) {
       const items = candidate.items as any[];
       if (items.length && Array.isArray(items[0]?.words)) {
-        return buildFromParagraphs(items);
+        return adjustParagraphsToDuration(buildFromParagraphs(items), durationSec);
       }
       const words = items
         .map((item, index) => normalizeWord(item, `word-${index}`, durationSec))
         .filter(Boolean) as TranscriptWord[];
-      return buildParagraphsFromWords(words);
+      return adjustParagraphsToDuration(buildParagraphsFromWords(words), durationSec);
     }
   }
 
@@ -281,10 +363,10 @@ const normalizeTranscript = (
       endTime: index * 0.5 + 0.5,
       speaker: 'Speaker',
     }));
-    return buildParagraphsFromWords(words);
+    return adjustParagraphsToDuration(buildParagraphsFromWords(words), durationSec);
   }
 
-  return [];
+  return adjustParagraphsToDuration([], durationSec);
 };
 
 
@@ -507,6 +589,10 @@ const ClipBuilder = () => {
 
   const durationSec = statusQuery.data?.project?.durationSec ?? undefined;
 
+  const [videoDurationHint, setVideoDurationHint] = useState<number | null>(
+    durationSec && durationSec > 0 ? durationSec : null,
+  );
+
   const rawTranscript = useMemo(() => {
     if (statusQuery.data?.transcript) return statusQuery.data.transcript;
     if (transcriptQuery.data?.transcript) return transcriptQuery.data.transcript;
@@ -515,8 +601,8 @@ const ClipBuilder = () => {
   }, [statusQuery.data?.transcript, transcriptQuery.data]);
 
   const transcript = useMemo(
-    () => normalizeTranscript(rawTranscript, durationSec),
-    [rawTranscript, durationSec],
+    () => normalizeTranscript(rawTranscript, (videoDurationHint ?? durationSec) ?? undefined),
+    [rawTranscript, durationSec, videoDurationHint],
   );
 
   const rawSuggestions = statusQuery.data?.aiSuggestions;
@@ -538,6 +624,41 @@ const ClipBuilder = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [playMode, setPlayMode] = useState<'full' | 'selection' | 'lane'>('full');
   const [currentClipIndex, setCurrentClipIndex] = useState(0);
+  const [isSelectingTranscript, setIsSelectingTranscript] = useState(false);
+  const selectionPlayPendingRef = useRef(false);
+
+  useEffect(() => {
+    if (isSelectingTranscript) return;
+
+    if (selectedWords.length > 0) {
+      setIsPlaying(false);
+      setCurrentTime(0);
+      setPlayMode((prev) => (prev === 'selection' ? prev : 'selection'));
+      return;
+    }
+
+    selectionPlayPendingRef.current = false;
+
+    if (playMode === 'selection') {
+      setPlayMode('full');
+    }
+  }, [selectedWords, isSelectingTranscript, playMode]);
+
+  useEffect(() => {
+    if (isSelectingTranscript) return;
+    if (!selectedWords.length) return;
+    if (!selectionPlayPendingRef.current) return;
+
+    selectionPlayPendingRef.current = false;
+    setCurrentTime(0);
+    setIsPlaying(true);
+  }, [isSelectingTranscript, selectedWords]);
+
+  useEffect(() => {
+    if (durationSec && durationSec > 0) {
+      setVideoDurationHint((prev) => (prev && prev > 0 ? prev : durationSec));
+    }
+  }, [durationSec]);
 
   useEffect(() => {
     if (!videoId) return;
@@ -658,13 +779,28 @@ const ClipBuilder = () => {
   const aiReady = Boolean(statusQuery.data?.project?.aiReady);
   const transcriptDuration = useMemo(() => getTranscriptDuration(transcript), [transcript]);
 
+  const handleDurationDiscovered = useCallback((duration: number) => {
+    if (!Number.isFinite(duration) || duration <= 0) return;
+    setVideoDurationHint((prev) => {
+      if (prev && Math.abs(prev - duration) < 0.25) return prev;
+      return duration;
+    });
+  }, []);
+
+  const effectiveVideoDuration =
+    videoDurationHint && videoDurationHint > 0
+      ? videoDurationHint
+      : durationSec && durationSec > 0
+        ? durationSec
+        : transcriptDuration;
+
   const sourceVideo = useMemo(
     () => ({
       url: streamQuery.data?.url ?? '',
-      duration: durationSec ?? transcriptDuration,
+      duration: effectiveVideoDuration,
       error: streamQuery.isError ? (streamQuery.error as Error | undefined)?.message ?? 'unavailable' : null,
     }),
-    [streamQuery.data?.url, durationSec, transcriptDuration, streamQuery.isError, streamQuery.error],
+    [streamQuery.data?.url, effectiveVideoDuration, streamQuery.isError, streamQuery.error],
   );
 
   const handleExport = useCallback(async () => {
@@ -764,6 +900,15 @@ const ClipBuilder = () => {
             onSelectedWordsChange={setSelectedWords}
             onAddClip={handleAddClip}
             activeBubble={activeBubble}
+            onSelectionStart={() => {
+              selectionPlayPendingRef.current = false;
+              setIsSelectingTranscript(true);
+              setIsPlaying(false);
+            }}
+            onSelectionEnd={() => {
+              selectionPlayPendingRef.current = true;
+              setIsSelectingTranscript(false);
+            }}
           />
 
           <VideoPlayerSection
@@ -779,6 +924,7 @@ const ClipBuilder = () => {
             onTimeChange={setCurrentTime}
             onPlayModeChange={setPlayMode}
             onClipIndexChange={setCurrentClipIndex}
+            onDurationDiscovered={handleDurationDiscovered}
           />
         </div>
       </div>
